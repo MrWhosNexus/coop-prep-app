@@ -43,7 +43,7 @@ xattr -dr com.apple.quarantine "/Applications/Coop Prep.app"
 
 ### Or run it from source
 
-You need [Node.js 20 or newer](https://nodejs.org). Same three commands on every OS:
+You need [Node.js 22.15 or newer](https://nodejs.org). Same three commands on every OS:
 
 ```bash
 git clone https://github.com/MrWhosNexus/coop-prep-app.git

@@ -38,7 +38,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 22, not 20. Three test files use node:module's registerHooks() to swap
+          # the "electron" specifier for a stub in-process, and that API does not
+          # exist on Node 20 — the whole suite dies with a SyntaxError there. This
+          # was found by this very matrix on its first run, while the same suite
+          # was green on the author's Node 22 machine.
+          node-version: 22
           cache: npm
 
       - name: Install
@@ -54,6 +59,22 @@ jobs:
         # suite is green and `next build` is not.
         run: npm run build
 
+  # The floor in package.json's `engines` is a CLAIM. This proves it: the suite
+  # must pass on the OLDEST Node we tell people to install, not merely on
+  # whatever "22" resolves to this month. Without it, the floor drifts upward
+  # silently and a cohort member on a fresh 22.15 install hits a wall we said
+  # would work.
+  engines-floor:
+    name: node floor (22.15.0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.15.0
+      - run: npm ci
+      - run: npm test
+
   lint:
     name: lint
     runs-on: ubuntu-latest
@@ -61,7 +82,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       # Reported, not gated. The React Compiler rules flag 28 pre-existing
@@ -79,7 +100,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       # Fails on a NEW high-severity advisory. The three known ones all sit in

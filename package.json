@@ -51,6 +51,6 @@
     "url": "https://github.com/MrWhosNexus/coop-prep-app/issues"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.15.0"
   }
 }

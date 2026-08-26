@@ -66,7 +66,34 @@
 //   * act() flushes React work synchronously, but nothing here waits on a
 //     promise chain you did not await yourself.
 
-import { register } from "node:module";
+import { register, registerHooks } from "node:module";
+
+/*
+ * Node floor check, first thing, because the failure it replaces is unreadable.
+ *
+ * Three test files (ai-bridge, endpoints, electron-shell) use registerHooks()
+ * to swap the "electron" specifier for a stub in-process. That API landed in
+ * Node 22.15; on anything older the suite dies with
+ *
+ *     SyntaxError: The requested module 'node:module' does not provide an
+ *     export named 'registerHooks'
+ *
+ * which says nothing about Node versions and sends people looking for a broken
+ * import. This file is the shared --import hook for `npm test`, so it is the one
+ * place the check runs exactly once for every possible entry point.
+ *
+ * Found the hard way: the suite was green on the author's Node 22 and dead on
+ * all three CI runners pinned to Node 20.
+ */
+if (typeof registerHooks !== "function") {
+  console.error(
+    `\nThis test suite needs Node 22.15 or newer. You are on ${process.version}.\n\n` +
+      "  node:module's registerHooks() is missing, which the electron-stubbing\n" +
+      "  tests depend on. Upgrade Node, then run npm test again.\n\n" +
+      "  https://nodejs.org — or `nvm install 22 && nvm use 22`\n"
+  );
+  process.exit(1);
+}
 import { readFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, resolve as resolvePath } from "node:path";

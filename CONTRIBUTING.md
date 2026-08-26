@@ -14,7 +14,7 @@ You don't have to write any code to help.
 
 ## Getting set up
 
-You need [Node.js 20 or newer](https://nodejs.org).
+You need [Node.js 22.15 or newer](https://nodejs.org).
 
 ```bash
 git clone https://github.com/MrWhosNexus/coop-prep-app.git
