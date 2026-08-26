@@ -1,6 +1,6 @@
 {
   "name": "coop-prep",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "COOP Careers Financial Services Fellowship prep suite — FINRA exam banks (SIE, Series 65, CFI), interactive Excel/Tableau labs, guided tutorials, learning games, and on-device voice.",
   "author": "MrWhosNexus",
   "type": "module",

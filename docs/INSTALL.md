@@ -29,7 +29,7 @@ code in this repo, and each one publishes checksums you can verify. See
 ## Windows
 
 1. Go to the [latest release](https://github.com/MrWhosNexus/coop-prep-app/releases/latest).
-2. Under **Assets**, click **`Coop-Prep-Setup-0.2.0.exe`** (about 253 MB).
+2. Under **Assets**, click **`Coop-Prep-Setup-0.3.0.exe`** (about 253 MB).
 3. Open the downloaded file.
 4. A blue box appears: **"Windows protected your PC."**
    - Click the small **More info** link in that box.
@@ -53,8 +53,8 @@ You'll only see the blue box the first time.
 Then:
 
 1. Go to the [latest release](https://github.com/MrWhosNexus/coop-prep-app/releases/latest).
-2. Under **Assets**, click **`Coop-Prep-0.2.0-arm64.dmg`** *or*
-   **`Coop-Prep-0.2.0-x64.dmg`** (about 306 MB).
+2. Under **Assets**, click **`Coop-Prep-0.3.0-arm64.dmg`** *or*
+   **`Coop-Prep-0.3.0-x64.dmg`** (about 306 MB).
 3. Open the downloaded `.dmg`. A window opens showing the Coop Prep icon.
 4. Drag the icon onto the **Applications** folder shown beside it.
 5. **This next part matters.** Open your Applications folder and find Coop Prep.
@@ -86,13 +86,13 @@ It prints nothing. That's success. Open the app normally now.
 
 ### AppImage (works on most distributions)
 
-1. Download **`Coop-Prep-0.2.0-x86_64.AppImage`** (about 567 MB) from the
+1. Download **`Coop-Prep-0.3.0-x86_64.AppImage`** (about 567 MB) from the
    [latest release](https://github.com/MrWhosNexus/coop-prep-app/releases/latest).
 2. Make it runnable, then run it:
 
 ```bash
-chmod +x Coop-Prep-0.2.0-x86_64.AppImage
-./Coop-Prep-0.2.0-x86_64.AppImage
+chmod +x Coop-Prep-0.3.0-x86_64.AppImage
+./Coop-Prep-0.3.0-x86_64.AppImage
 ```
 
 The AppImage is the version that can update itself, so it's the one to prefer.
@@ -100,7 +100,7 @@ The AppImage is the version that can update itself, so it's the one to prefer.
 ### Debian / Ubuntu / Mint
 
 ```bash
-sudo apt install ./Coop-Prep-0.2.0-amd64.deb
+sudo apt install ./Coop-Prep-0.3.0-amd64.deb
 ```
 
 Then launch Coop Prep from your applications menu.
@@ -158,7 +158,7 @@ You want to see `OK` next to the file you downloaded.
 **Windows (PowerShell)**
 
 ```powershell
-Get-FileHash -Algorithm SHA512 .\Coop-Prep-Setup-0.2.0.exe
+Get-FileHash -Algorithm SHA512 .\Coop-Prep-Setup-0.3.0.exe
 ```
 
 Compare the result against the matching line in `SHA512SUMS-windows-latest.txt`.

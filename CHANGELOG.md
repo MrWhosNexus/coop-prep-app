@@ -10,6 +10,84 @@ If you hit a bug or want something added, open an issue; fixes ship here.
 
 Nothing yet. Open an issue and it can go here.
 
+## [0.3.0] — 2026-08-26
+
+A correctness release. An audit found the app was confidently wrong in several
+places — teaching things that were false, and reporting readiness it could not
+justify. Everything below was verified by driving the code, not by reading it.
+
+### Fixed — the app was teaching things that are wrong
+
+- **Date arithmetic was wrong by a full year on 17% of spans.** The decimal-years
+  lesson taught `DATEDIF(A2,B2,"Y") + MOD(B2-A2,365.25)/365.25`, which adds
+  calendar whole years to a remainder measured against 365.25 — two incompatible
+  definitions of a year. An exact 12-month span reported 1.999 years. Every
+  sample row was under a year, so it was unreachable by the grader. Now
+  `(B2-A2)/365.25`, with a >1-year row so a regression is catchable.
+- **A correct answer was marked wrong.** The same lesson required `DATEDIF` and
+  failed `=B2-A2` — what a competent analyst actually writes.
+- **Wrong answers scheduled cards FURTHER out.** Grade 3 meant "pass" to the
+  scheduler and "demotion" to every caller. Four "I was unsure" grades walked a
+  card to a 23-day interval with lapses stuck at 0. Missing a card now shortens
+  its interval and records the lapse.
+- **Semantic opposites were graded as near-misses** and counted toward mastery —
+  "revocable" for irrevocable, "disparate treatment" for disparate impact,
+  "systemic" for systematic risk. These are exactly the distinctions the SIE and
+  Series 65 are built on.
+- **A visualization lesson shipped six fabricated numbers** that contradicted the
+  data, stated a conclusion contradicting its own figures, and could not be
+  passed at all. Recomputed from the dataset.
+- **Silent auto-passes.** The chart grader dropped unrecognized keys, so two
+  dual-axis steps collapsed into the first — finish step 1 and you had "done" a
+  dual axis. It now fails loudly.
+- **Four-fifths conclusions drawn from groups of three people**, with no caveat
+  anywhere in 16 lessons. Small groups are now suppressed and named as such.
+
+### Fixed — the mock exams were passable by guessing
+
+Picking the longest option scored **75.9% on the SIE** (70% passes) and **80.2%
+on Series 65** (72% passes). The cause was an authoring habit: correct answers
+written as complete justified statements, distractors left terse. Real exams
+carry no such signal, so the tell scores 25% on test day and the app was
+reporting a confident pass to someone who had learned a formatting artefact.
+
+714 items rewritten. Guessing by length now scores **43%/46%** — 0 of 150 seeded
+sittings passable. A test measures this on every run, so the habit cannot return
+unnoticed.
+
+Repeated mocks also drew with no memory of prior sittings, so the whole bank was
+visible in 6-10 attempts; they now avoid recently-seen items.
+
+### Added — you can ask for the problem without the answer
+
+Every lab now offers two ways in, chosen when you open it:
+
+- **"Walk me through it"** — the original, step by step.
+- **"Just give me the problem"** — the business question, no formula, and a
+  grader that accepts any route to the right answer.
+
+37 of 60 lab instructions used to contain the finished formula, which made them
+typing exercises. Both variants now exist for all 34 lessons across 129 steps.
+
+### Added — six data-governance labs
+
+Profiling, quality rules, completeness, duplicates, standardisation and
+reconciliation, on a deliberately dirty extract with the defects a real intake
+has: lost leading zeros, four spellings of "missing", numbers stored as text,
+near-duplicates, and a second system that disagrees. The standardisation lab is
+the one to do: grouping the raw file gives the wrong approval-rate gap, because
+"Black", "black" and "BLACK" count as three groups.
+
+### Fixed — doing the hard work no longer costs you
+
+- Guided labs did not advance your streak, so a week on the hardest content in
+  the app read as a week of inactivity while clicking "complete" on an 8-minute
+  reading did not.
+- Hints cost 10% while resubmitting was free and unlimited, so guess-and-check
+  strictly dominated asking for help. A blind retry now costs what a hint costs.
+- Lessons requiring `$`-pinning arrived six positions before the lesson teaching
+  it. The order is now derived from what the graders actually demand.
+
 ## [0.2.0] — 2026-08-25
 
 First release built for the cohort rather than for one machine. If you are installing
