@@ -626,8 +626,14 @@ describe("scoring: matchAnswer is monotone in closeness", () => {
     assert.equal(card.intervalDays, 6, "a learned card");
     const after = reviewCard(card, gradeFromMatch(m("COUNTIS")), { now: card.due });
     assert.ok(after.intervalDays > 1, `a one-character typo reset the interval to ${after.intervalDays} day(s)`);
-    assert.equal(after.lapses, 0, "the card was not lapsed");
-    assert.equal(after.reps, card.reps + 1);
+    // ...but HARD is no longer a pass. The near miss keeps the schedule
+    // alive (interval creeps rather than resetting), while the shakiness is
+    // recorded: it counts as a lapse, and reps does not advance -- a card
+    // must never mature on near misses alone, which is exactly what the old
+    // pass-at-3 mapping allowed (four "unsure" grades reached 23 days with
+    // lapses stuck at 0).
+    assert.equal(after.lapses, 1, "the near miss is recorded as a lapse");
+    assert.equal(after.reps, card.reps, "HARD does not advance reps toward maturity");
   });
 });
 

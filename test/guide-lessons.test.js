@@ -366,7 +366,7 @@ describe("excel-countifs: the four-fifths calculator", () => {
     for (let r = 2; r <= 7; r++) setCell(sheet, `${col}${r}`, formula(r));
   }
 
-  test("correct path: COUNTIF, COUNTIFS, rates, ratios, SUMIFS", () => {
+  test("correct path: COUNTIF, COUNTIFS, rates, ratios, verdicts, SUMIFS", () => {
     let session = createSession(lesson);
 
     const s1 = stateFor(lesson, 0);
@@ -386,11 +386,15 @@ describe("excel-countifs: the four-fifths calculator", () => {
     session = passStep(session, lesson, s4);
 
     const s5 = stateFor(lesson, 4);
-    setCells(s5.sheets.Data, {
+    fillColumn(s5.sheets.Data, "O", (r) => `=IF(J${r}<10, "insufficient n", IF(M${r}<0.8, "FAIL", "PASS"))`);
+    session = passStep(session, lesson, s5);
+
+    const s6 = stateFor(lesson, 5);
+    setCells(s6.sheets.Data, {
       N4: '=SUMIFS($E$2:$E$101, $B$2:$B$101, I4, $G$2:$G$101, "APPROVED")',
       N7: '=SUMIFS($E$2:$E$101, $B$2:$B$101, I7, $G$2:$G$101, "APPROVED")',
     });
-    session = passStep(session, lesson, s5);
+    session = passStep(session, lesson, s6);
 
     assert.equal(isComplete(session), true);
     assert.equal(lessonScore(session, lesson).score, 1);
@@ -436,6 +440,10 @@ describe("excel-countifs: the four-fifths calculator", () => {
     ["count-approved", 1, "K", '=COUNTIFS($B$2:$B$101, I2, $G$2:$G$101, "APPROVED")', [2, 8, 9, 12, 2, 43]],
     // ratios = each group's rate / the best rate (White, .86)
     ["four-fifths-ratio", 3, "M", "=L2/MAX($L$2:$L$7)", [2 / 3, 0.8, 0.5625, 2 / 3, 2 / 3, 0.86].map((r) => r / 0.86)],
+    // THE RATE-COLUMN VARIANT of the same hole: =K2/J2 has no function name,
+    // so the mustUse-based fix above never covered column L — one real
+    // division in L2 (and L7) plus typed constants in L3:L6 passed the step.
+    ["compute-rates", 2, "L", "=K2/J2", [2 / 3, 0.8, 0.5625, 2 / 3, 2 / 3, 0.86]],
   ]) {
     test(`wrong: ${label} — a real formula in ${col}2 plus typed constants below is a method failure`, () => {
       const ts = stateFor(lesson, i);
@@ -468,6 +476,30 @@ describe("excel-countifs: the four-fifths calculator", () => {
     assert.equal(r.pass, false);
     // the formula shape is wrong AND the outcome column disagrees
     assert.ok(r.diff.some((d) => d.kind === "method" || d.kind === "wrong"), r.message);
+  });
+
+  test("verdict step: the two n=3 groups are suppressed, not FAILed", () => {
+    // The marquee claim of this build is statistical soundness: American
+    // Indian and Other sit under 0.80 but have THREE applicants each, so the
+    // verdict must read "insufficient n" — a formula that just flags M<0.8
+    // (ignoring group size) produces FAIL there and must not pass.
+    const ts = stateFor(lesson, 4);
+    for (let r = 2; r <= 7; r++) {
+      setCell(ts.sheets.Data, `O${r}`, `=IF(M${r}<0.8, "FAIL", "PASS")`);
+    }
+    const r = grade(ts, lesson.steps[4].grader);
+    assert.equal(r.pass, false, "an n-blind verdict must not pass");
+    assert.ok(r.diff.some((d) => /J\d/.test(d.hint ?? "") || d.expected === "insufficient n"), r.message);
+  });
+
+  test("verdict step: typed verdicts around one real IF must not pass", () => {
+    const ts = stateFor(lesson, 4);
+    setCell(ts.sheets.Data, "O2", '=IF(J2<10, "insufficient n", IF(M2<0.8, "FAIL", "PASS"))');
+    ["PASS", "FAIL", "FAIL", "insufficient n", "PASS"].forEach((v, i) =>
+      setCell(ts.sheets.Data, `O${i + 3}`, v));
+    const r = grade(ts, lesson.steps[4].grader);
+    assert.equal(r.pass, false);
+    assert.ok(r.diff.some((d) => d.kind === "method" && d.path === "O3"), r.message);
   });
 
   test("wrong: hardcoding /0.86 in the ratio is rejected — MAX is the method", () => {
@@ -1328,5 +1360,161 @@ describe("tableau-dashboard: loan bands", () => {
     const r = grade(ts, lesson.steps[2].grader);
     assert.equal(r.pass, false);
     assert.match(r.message, /asks for AVG/);
+  });
+});
+
+// ==============================================================================
+// The four later tableau additions. These walks exist because the first three
+// lessons above them shipped with graders no test ever invoked — tableau-size
+// was unpassable (no COUNT pill in the view) and tableau-dual-axis auto-passed
+// on expected-spec keys the engine does not have. Every step here is driven
+// through the real runner with a real build.
+// ==============================================================================
+
+describe("tableau-dual-axis: two measures, verified numbers", () => {
+  const lesson = LESSONS_BY_ID["tableau-dual-axis"];
+
+  test("correct path: income, then both measures, then the data check", () => {
+    let session = createSession(lesson);
+
+    const s1 = stateFor(lesson, 0);
+    s1.spec = putOnShelf(s1.spec, Shelf.COLUMNS, dim("race"));
+    s1.spec = putOnShelf(s1.spec, Shelf.ROWS, measure("income", "AVG"));
+    session = passStep(session, lesson, s1);
+
+    const s2 = stateFor(lesson, 1);
+    s2.spec = putOnShelf(s2.spec, Shelf.ROWS, measure("loan_amount", "AVG"));
+    session = passStep(session, lesson, s2);
+
+    // Step 3 verifies the completed two-measure view against the CSV numbers.
+    session = passStep(session, lesson, stateFor(lesson, 2));
+
+    assert.equal(isComplete(session), true);
+    assert.equal(lessonScore(session, lesson).score, 1);
+  });
+
+  test("wrong: SUM instead of AVG fails the data check with real numbers", () => {
+    const ts = stateFor(lesson, 2);
+    ts.spec = setAggregation(ts.spec, Shelf.ROWS, "income", "SUM");
+    const r = grade(ts, lesson.steps[2].grader);
+    assert.equal(r.pass, false);
+  });
+});
+
+describe("tableau-size: dimension vs measure on the Size shelf", () => {
+  const lesson = LESSONS_BY_ID["tableau-size"];
+
+  test("correct path: gender on Size, read real counts, then AVG(loan) on Size", () => {
+    let session = createSession(lesson);
+
+    const s1 = stateFor(lesson, 0);
+    s1.spec = putOnShelf(s1.spec, Shelf.SIZE, dim("gender"));
+    session = passStep(session, lesson, s1);
+
+    // Step 2 reads the split the checkpoint materializes; the grader verifies
+    // all six gender x approved counts against the CSV.
+    let session2 = passStep(session, lesson, stateFor(lesson, 1));
+
+    const s3 = stateFor(lesson, 2);
+    s3.spec = putOnShelf(s3.spec, Shelf.SIZE, measure("loan_amount", "AVG"));
+    session2 = passStep(session2, lesson, s3);
+
+    assert.equal(isComplete(session2), true);
+    assert.equal(lessonScore(session2, lesson).score, 1);
+  });
+
+  test("wrong: dropping the COUNT pill leaves the view unable to compute counts", () => {
+    // This is the exact defect the lesson originally shipped with: a
+    // checkpoint whose shelves held no measure, so COUNT(applicant_id)
+    // never existed and the step could not be passed.
+    const ts = stateFor(lesson, 1);
+    ts.spec = removeFromShelf(ts.spec, Shelf.ROWS, "applicant_id");
+    const r = grade(ts, lesson.steps[1].grader);
+    assert.equal(r.pass, false);
+  });
+
+  test("wrong: SUM(loan_amount) on Size fails against the verified averages", () => {
+    const ts = stateFor(lesson, 2);
+    ts.spec = putOnShelf(ts.spec, Shelf.SIZE, measure("loan_amount", "SUM"));
+    const r = grade(ts, lesson.steps[2].grader);
+    assert.equal(r.pass, false);
+  });
+});
+
+describe("tableau-detail: slicing without axes", () => {
+  const lesson = LESSONS_BY_ID["tableau-detail"];
+
+  test("correct path: scatter, race on Detail, gender on Color", () => {
+    let session = createSession(lesson);
+
+    const s1 = stateFor(lesson, 0);
+    s1.spec = putOnShelf(s1.spec, Shelf.COLUMNS, measure("income", "AVG"));
+    s1.spec = putOnShelf(s1.spec, Shelf.ROWS, measure("loan_amount", "AVG"));
+    session = passStep(session, lesson, s1);
+
+    const s2 = stateFor(lesson, 1);
+    s2.spec = putOnShelf(s2.spec, Shelf.DETAIL, dim("race"));
+    session = passStep(session, lesson, s2);
+
+    const s3 = stateFor(lesson, 2);
+    s3.spec = putOnShelf(s3.spec, Shelf.COLOR, dim("gender"));
+    session = passStep(session, lesson, s3);
+
+    assert.equal(isComplete(session), true);
+    assert.equal(lessonScore(session, lesson).score, 1);
+  });
+
+  test("wrong: race on Color instead of Detail is called out by the predicate", () => {
+    const ts = stateFor(lesson, 1);
+    ts.spec = putOnShelf(ts.spec, Shelf.COLOR, dim("race"));
+    const r = grade(ts, lesson.steps[1].grader);
+    assert.equal(r.pass, false);
+    assert.match(r.message, /race is not on Detail/);
+  });
+});
+
+describe("tableau-shelves-guide: the conceptual lesson still grades real builds", () => {
+  const lesson = LESSONS_BY_ID["tableau-shelves-guide"];
+
+  test("correct path: build, keep pill types, re-aggregate, add color", () => {
+    let session = createSession(lesson);
+
+    const s1 = stateFor(lesson, 0);
+    s1.spec = putOnShelf(s1.spec, Shelf.COLUMNS, dim("race"));
+    s1.spec = putOnShelf(s1.spec, Shelf.ROWS, countPill());
+    session = passStep(session, lesson, s1);
+
+    // Step 2 asserts pill discreteness on the materialized chart.
+    session = passStep(session, lesson, stateFor(lesson, 1));
+
+    const s3 = stateFor(lesson, 2);
+    s3.spec = removeFromShelf(s3.spec, Shelf.ROWS, "applicant_id");
+    s3.spec = putOnShelf(s3.spec, Shelf.ROWS, measure("loan_amount", "AVG"));
+    session = passStep(session, lesson, s3);
+
+    const s4 = stateFor(lesson, 3);
+    s4.spec = putOnShelf(s4.spec, Shelf.COLOR, dim("gender"));
+    session = passStep(session, lesson, s4);
+
+    assert.equal(isComplete(session), true);
+    assert.equal(lessonScore(session, lesson).score, 1);
+  });
+
+  test("wrong: an empty view no longer passes any step", () => {
+    // The original graders were hardcoded pass: true, so doing NOTHING
+    // completed the whole lesson. An untouched (empty) spec must now fail
+    // step 1 outright.
+    const ts = stateFor(lesson, 0);
+    const r = grade(ts, lesson.steps[0].grader);
+    assert.equal(r.pass, false);
+  });
+
+  test("wrong: SUM instead of AVG on the aggregation step is named", () => {
+    const ts = stateFor(lesson, 2);
+    ts.spec = removeFromShelf(ts.spec, Shelf.ROWS, "applicant_id");
+    ts.spec = putOnShelf(ts.spec, Shelf.ROWS, measure("loan_amount", "SUM"));
+    const r = grade(ts, lesson.steps[2].grader);
+    assert.equal(r.pass, false);
+    assert.match(r.message, /aggregated with SUM.*asks for AVG/);
   });
 });

@@ -1,7 +1,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import excelDates from "../lib/guide/lessons/excel-dates.js";
+import excelDates, { APPLICATIONS, YEARS_BETWEEN } from "../lib/guide/lessons/excel-dates.js";
+import { grade } from "../lib/guide/graders.js";
+import { startingState } from "../lib/guide/checkpoints.js";
+import { setCell } from "../lib/sheet/model.js";
+
+/** Materialized tool state for entering step `i` (no external resources needed). */
+function stateFor(i) {
+  return startingState(excelDates, i, {}).toolState;
+}
 
 test("excel-dates lesson imports and validates", () => {
   assert.ok(excelDates, "lesson should export");
@@ -18,7 +26,8 @@ test("excel-dates grader passes on intended solution state", () => {
   const step3Grader = excelDates.steps[3].grader;
 
   assert.ok(step0Grader, "step 0 should have a grader");
-  assert.equal(step0Grader.type, "cellFormula");
+  // anyOf: DATEDIF or plain =B2-A2 — the lesson accepts both day methods
+  assert.equal(step0Grader.type, "anyOf");
 
   assert.ok(step1Grader, "step 1 should have a grader");
   assert.equal(step1Grader.type, "allOf");
@@ -28,6 +37,57 @@ test("excel-dates grader passes on intended solution state", () => {
 
   assert.ok(step3Grader, "step 3 should have a grader");
   assert.equal(step3Grader.type, "allOf");
+});
+
+test("days step accepts DATEDIF and plain subtraction alike", () => {
+  for (const formula of ['=DATEDIF(A2, B2, "D")', "=B2-A2"]) {
+    const ts = stateFor(0);
+    setCell(ts.sheets.Data, "C2", formula);
+    const r = grade(ts, excelDates.steps[0].grader);
+    assert.equal(r.pass, true, `${formula}: ${r.message}`);
+  }
+});
+
+test("days step rejects a typed constant even with the right value", () => {
+  const ts = stateFor(0);
+  setCell(ts.sheets.Data, "C2", 32);
+  const r = grade(ts, excelDates.steps[0].grader);
+  assert.equal(r.pass, false);
+});
+
+test("years fill passes with =(B-A)/365.25 in every row", () => {
+  const ts = stateFor(3);
+  for (let r = 2; r <= APPLICATIONS.length + 1; r++) {
+    setCell(ts.sheets.Data, `D${r}`, `=(B${r}-A${r})/365.25`);
+  }
+  const r = grade(ts, excelDates.steps[3].grader);
+  assert.equal(r.pass, true, r.message);
+});
+
+test('the old DATEDIF("Y")+MOD hybrid is rejected — it is wrong by a full year on long spans', () => {
+  // The formula this lesson USED TO TEACH. On the 440-day row DATEDIF("Y")
+  // counts 1 calendar year while MOD(440, 365.25)/365.25 re-counts most of
+  // the same span — the value comes out near 1.2 only by luck of these
+  // dates; across start dates 17% of >1yr spans were off by a FULL year.
+  // The grader must reject it on METHOD (no 365.25-division of the raw
+  // span), and the >1yr sample row exists so that even a value-only grader
+  // regression would surface where the hybrid actually diverges.
+  const ts = stateFor(3);
+  for (let r = 2; r <= APPLICATIONS.length + 1; r++) {
+    setCell(ts.sheets.Data, `D${r}`, `=DATEDIF(A${r}, B${r}, "Y") + (MOD(B${r} - A${r}, 365.25) / 365.25)`);
+  }
+  const r = grade(ts, excelDates.steps[3].grader);
+  assert.equal(r.pass, false, "the double-counting hybrid must not pass the years fill");
+});
+
+test("the sample data includes a span longer than one year", () => {
+  // Guard for the guard: with only 30-70 day spans, correct and broken year
+  // formulas agree everywhere and the grader can't tell them apart.
+  assert.ok(
+    APPLICATIONS.some(([a, b]) => b - a > 365.25),
+    "APPLICATIONS must keep at least one >1yr span",
+  );
+  assert.ok(YEARS_BETWEEN.some(([y]) => y > 1));
 });
 
 test("excel-dates grader fails on empty state", () => {

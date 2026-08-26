@@ -1083,7 +1083,12 @@ describe("exam: a full Series 65 sitting, end to end", () => {
 
     const deck = applyReviewToDeck(defaultDeck(), review, { now: T0 });
     assert.equal(Object.keys(deck).length, 130);
-    assert.equal(Object.values(deck).filter((c) => c.lapses === 1).length, 20, "the 20 misses lapse and come back");
+    // 20 misses (AGAIN) plus the flagged-but-correct item (HARD): a guess
+    // that happened to land is not a demonstrated recall, and it must show
+    // up in `lapses` -- the old pass-at-3 mapping left lapses at 0 across
+    // the whole deck, hiding every chronically shaky concept.
+    assert.equal(Object.values(deck).filter((c) => c.lapses === 1).length, 21, "20 misses plus the flagged guess lapse and come back");
+    assert.equal(Object.values(deck).filter((c) => c.lastGrade === GRADE.HARD).length, 1, "the flagged-but-correct item is the HARD one");
 
     const retry = buildRetrySession(s, { now: at(220) });
     assert.equal(retry.form.length, 20);

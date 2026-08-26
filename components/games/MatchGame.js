@@ -95,6 +95,17 @@ export default function MatchGame({
       // so this is where that belongs.
       if (nextSolved.length === total) finish(nextEvents);
     } else {
+      // The miss must reach the deck NOW. This branch used to only shake
+      // the tile: a learner could miss a term repeatedly (or run out the
+      // clock without ever solving it) and the SRS card recorded nothing --
+      // the one game that fronts every NEW flashcard concept
+      // (generators.suggestGame) structurally could not report failure.
+      // Graded once per term, on the first wrong try: repeated flailing on
+      // the same term inside one board is one failed retrieval, not many,
+      // and the eventual multi-try solve still files its own grade above.
+      if ((attempts[sel] ?? 0) === 0) {
+        onGrade?.(sel, 0, { correct: false, tries: 1 });
+      }
       setAttempts((a) => ({ ...a, [sel]: (a[sel] ?? 0) + 1 }));
       setEvents((e) => [...e, { correct: false, conceptId: sel }]);
       setMiss(conceptId);
