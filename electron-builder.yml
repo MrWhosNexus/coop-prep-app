@@ -1,0 +1,191 @@
+# electron-builder.yml
+# Packages the Next.js static export + electron/ shell into installers.
+# Run via `npm run dist` (see electron/README.md for the exact package.json
+# scripts this expects — that file is not owned by this subsystem).
+#
+# Prereq: `npm run build` must have produced ./out (next.config.mjs needs
+# output: 'export' — see electron/README.md).
+
+appId: com.coopprep.desktop
+productName: Coop Prep
+copyright: Copyright © 2026
+
+directories:
+  output: dist-electron
+  buildResources: build
+
+# What ships inside the asar. The Next export (out/) is NOT bundled into the
+# asar as app source — it's copied as extraResources instead, and main.js
+# resolves it via process.resourcesPath in prod. This keeps main.js's
+# dev/prod path logic identical in shape (appRoot + "/out/index.html") in
+# both cases; only the value of appRoot differs.
+# main.js imports lib/store, lib/endpoints and lib/ai directly (they run in the
+# main process, so Next never bundles them). Omitting them from the asar makes
+# the packaged app crash on launch with ERR_MODULE_NOT_FOUND — the renderer's
+# own copies live inside out/ and do not cover main. Keep this list in sync with
+# main.js's import graph; test/packaging.test.js fails if it drifts.
+files:
+  - electron/**/*
+  - "!electron/README.md"
+  - lib/store/**/*
+  - lib/endpoints/**/*
+  - lib/ai/**/*
+  - package.json
+
+extraResources:
+  - from: out
+    to: out
+
+asar: true
+
+# The local voice stack (kokoro-js + @huggingface/transformers) pulls native
+# modules that dlopen shared libraries at runtime: onnxruntime-node loads its
+# .node/.so ONNX runtime, and sharp loads libvips from @img/sharp-libvips-*.
+# A dlopen from INSIDE an asar fails, so these must be unpacked to
+# app.asar.unpacked/. Miss this and voice is silently dead in the packaged app
+# while dev (loading straight off the filesystem) hides it. Keep kokoro-js and
+# @huggingface/transformers in `dependencies` so electron-builder's node_modules
+# walker copies them and their native deps in the first place.
+asarUnpack:
+  - "**/node_modules/onnxruntime-node/**"
+  - "**/node_modules/sharp/**"
+  - "**/node_modules/@img/**"
+  # electron/voice/*-worker.js run as FORKED plain-node children
+  # (ELECTRON_RUN_AS_NODE = plain Node, NO asar support), so their scripts must
+  # sit on the real filesystem, not inside app.asar. The ENTIRE electron/voice/
+  # dir is unpacked, not just the two worker files: each worker imports shared
+  # constants/helpers from its sibling `./stt-local.js` / `./tts-local.js`
+  # (e.g. LOCAL_STT_MODEL_ID), and a forked plain-node child cannot read those
+  # from inside app.asar either — the packaged worker died with
+  # "Cannot find module '.../electron/voice/stt-local.js'" until this widened
+  # from the two worker files to the whole dir. Caught by forking the PACKAGED
+  # worker, not by tests. resolveWorkerBundle (electron/voice/worker-path.js)
+  # hands the child the app.asar.unpacked/ path this produces.
+  - "electron/voice/**"
+  # Both workers do a runtime `import('@huggingface/transformers')` (Whisper)
+  # and/or `import('kokoro-js')` (TTS, which itself pulls in transformers +
+  # phonemizer) — a bare specifier node resolves from node_modules ON DISK.
+  # Packed inside app.asar it is invisible to the forked child ("Cannot find
+  # package '@huggingface/transformers'") and ALL voice dies in the packaged
+  # app, even though onnxruntime-node/sharp/@img (the NATIVE deps) are
+  # unpacked above. It is NOT enough to unpack transformers/kokoro-js alone:
+  # they pull in a whole JS chain (global-agent, tar, semver, roarr, …) that
+  # the child requires too, so it fails one level deeper unless the FULL
+  # closure is on disk. This is the exact transitive runtime set (packages
+  # with a JS entry point) reachable from ['kokoro-js', '@huggingface/
+  # transformers'] in THIS repo's own node_modules — keep it in sync with
+  # test/asar-unpack-voice-deps.test.js, which fails if a dep bump adds a
+  # package this list doesn't cover. Caught only by DRIVING the packaged app.
+  - "**/node_modules/@huggingface/**"
+  - "**/node_modules/@isaacs/fs-minipass/**"
+  - "**/node_modules/boolean/**"
+  - "**/node_modules/chownr/**"
+  - "**/node_modules/define-data-property/**"
+  - "**/node_modules/define-properties/**"
+  - "**/node_modules/detect-libc/**"
+  - "**/node_modules/detect-node/**"
+  - "**/node_modules/es-define-property/**"
+  - "**/node_modules/es-errors/**"
+  - "**/node_modules/es6-error/**"
+  - "**/node_modules/escape-string-regexp/**"
+  - "**/node_modules/global-agent/**"
+  - "**/node_modules/globalthis/**"
+  - "**/node_modules/gopd/**"
+  - "**/node_modules/has-property-descriptors/**"
+  - "**/node_modules/json-stringify-safe/**"
+  - "**/node_modules/kokoro-js/**"
+  - "**/node_modules/matcher/**"
+  - "**/node_modules/minipass/**"
+  - "**/node_modules/minizlib/**"
+  - "**/node_modules/object-keys/**"
+  - "**/node_modules/onnxruntime-common/**"
+  - "**/node_modules/phonemizer/**"
+  - "**/node_modules/roarr/**"
+  - "**/node_modules/semver/**"
+  - "**/node_modules/semver-compare/**"
+  - "**/node_modules/serialize-error/**"
+  - "**/node_modules/sprintf-js/**"
+  - "**/node_modules/tar/**"
+  - "**/node_modules/yallist/**"
+
+# Where `electron-updater` looks for new versions, and where the release
+# workflow uploads them. It must name the SAME owner/repo pinned in
+# electron/updates/updater.js — the app sets its feed explicitly at runtime, so
+# a mismatch would mean shipping builds nobody's app ever sees.
+publish:
+  provider: github
+  owner: MrWhosNexus
+  repo: coop-prep-app
+  releaseType: release
+
+# One 1024x1024 source image for all three platforms. electron-builder derives
+# the .icns and .ico from it at build time, which is why there is no checked-in
+# binary icon: the previous config pointed `win.icon` at a build/icon.ico that
+# was never committed, so every Windows build failed before it started.
+icon: build/icon.png
+
+# macOS was entirely absent from this file. electron-builder would still emit a
+# default .app, but unsigned, un-notarized, and without the entitlements the
+# voice stack needs — which fails at RUNTIME (a mic prompt that never appears)
+# rather than at build time.
+mac:
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+    - target: zip
+      arch: [arm64, x64]
+  category: public.app-category.education
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  # No Apple Developer ID on this project, so builds ship unsigned. Saying so
+  # explicitly stops electron-builder from half-signing with an ad-hoc identity
+  # it happens to find in the keychain of whoever ran the build — which
+  # produces an artifact that works on the builder's Mac and is rejected on
+  # everyone else's. `hardenedRuntime` is off for the same reason: it is
+  # meaningless without a real signature and blocks the JIT Electron needs.
+  identity: null
+  hardenedRuntime: false
+  # Requested by electron/main.js#installVoicePermissions at first use. Without
+  # these strings macOS kills the app instead of showing a prompt.
+  extendInfo:
+    NSMicrophoneUsageDescription: >-
+      Coop Prep uses the microphone for the local speech-to-text that powers
+      voice practice. Audio is transcribed on this Mac and never uploaded.
+
+# The .dmg is what a Mac user actually double-clicks; the .zip is what
+# electron-updater consumes. Both are produced from the same build.
+dmg:
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+  category: Office
+  maintainer: coop-prep
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+deb:
+  depends:
+    - libnotify4
+    - libnss3
+    - libxss1
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  # Inherits the top-level build/icon.png. The old `build/icon.ico` here did not
+  # exist in the repo, and electron-builder treats a missing icon path as a hard
+  # error — the Windows target could never have built from a clean clone.
+  artifactName: ${productName}-Setup-${version}.${ext}
+
+nsis:
+  # differentialPackage keeps update downloads small — a fix ships as a delta
+  # rather than a fresh ~200 MB installer for every cohort member.
+  differentialPackage: true
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true

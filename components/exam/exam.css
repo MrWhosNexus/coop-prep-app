@@ -1,0 +1,295 @@
+/* components/exam/exam.css — the exam simulator.
+   Scoped under .x-* so nothing here leaks into the rest of the app. Every
+   colour, radius and font comes from the globals.css token block, so both
+   themes work with no per-theme rules of our own.
+
+   A note on restraint: an exam room is not a place for delight. The glass and
+   gradients that carry the rest of the app are dialled back here on purpose —
+   during a timed form the only things that should pull the eye are the question,
+   the clock when it genuinely matters, and the navigator. */
+
+/* ─── shell ─── */
+.x-host { display: flex; flex-direction: column; gap: 18px; }
+
+.x-bar {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px 16px; border-radius: var(--r-lg);
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+  position: sticky; top: 0; z-index: 5;
+}
+.x-bar-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-1); }
+.x-bar-sub { font-size: 12px; color: var(--text-3); }
+.x-bar-spacer { flex: 1; }
+
+.x-panel {
+  padding: 24px; border-radius: var(--r-lg);
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+.x-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); }
+.x-h { font-family: var(--font-display); font-size: 21px; font-weight: 700; color: var(--text-1); margin: 0; }
+.x-sub { font-size: 13px; color: var(--text-2); line-height: 1.6; margin: 0; }
+.x-muted { font-size: 12.5px; color: var(--text-3); }
+
+/* ─── the clock ───
+   Tabular numerals are not decoration: without them the digits jitter as they
+   change and the clock twitches in the corner of the eye for three hours. */
+.x-timer {
+  display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15;
+  padding: 4px 10px; border-radius: var(--r-sm); border: 1px solid transparent;
+  transition: background .3s ease, border-color .3s ease;
+}
+.x-timer-v {
+  font-family: var(--font-mono); font-size: 20px; font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--text-1);
+}
+.x-timer-k { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+
+/* Nothing changes colour until a REAL five minutes remain. */
+.x-timer.warning { background: var(--gold-dim); border-color: var(--gold-ring); }
+.x-timer.warning .x-timer-v, .x-timer.warning .x-timer-k { color: var(--gold-2); }
+.x-timer.final { background: var(--red-dim); border-color: var(--red-ring); }
+.x-timer.final .x-timer-v, .x-timer.final .x-timer-k { color: var(--red-2); }
+.x-timer.expired { background: var(--red-dim); border-color: var(--red-ring); }
+.x-timer.expired .x-timer-v { color: var(--red-2); }
+.x-timer.none .x-timer-v { color: var(--text-3); font-size: 15px; }
+
+/* The one pulse in the file, and it earns its place: the last 60 seconds are
+   genuinely urgent. Respects prefers-reduced-motion via the globals.css rule. */
+@keyframes x-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+.x-timer.final .x-timer-v { animation: x-pulse 1s ease-in-out infinite; }
+
+.x-timer-note { font-size: 11.5px; font-weight: 600; color: var(--gold-2); }
+
+/* ─── start screen ─── */
+.x-start { display: flex; flex-direction: column; gap: 18px; }
+.x-cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.x-cert {
+  display: flex; flex-direction: column; gap: 5px; text-align: left;
+  padding: 15px 16px; border-radius: var(--r-md); cursor: pointer;
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  font-family: var(--font-body); transition: border-color .15s, background .15s, transform .15s;
+}
+.x-cert:hover { background: var(--glass-fill-hover); transform: translateY(-1px); }
+.x-cert[aria-pressed="true"] { border-color: var(--primary-ring); background: var(--primary-dim); }
+.x-cert-name { font-family: var(--font-display); font-size: 14.5px; font-weight: 700; color: var(--text-1); }
+.x-cert-meta { font-size: 11.5px; color: var(--text-3); }
+
+.x-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+.x-mode {
+  display: flex; flex-direction: column; gap: 6px; text-align: left;
+  padding: 16px; border-radius: var(--r-md); cursor: pointer;
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  font-family: var(--font-body); transition: border-color .15s, background .15s;
+}
+.x-mode:hover { background: var(--glass-fill-hover); }
+.x-mode[aria-pressed="true"] { border-color: var(--primary-ring); background: var(--primary-dim); }
+.x-mode-name { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-1); }
+.x-mode-desc { font-size: 12px; color: var(--text-2); line-height: 1.55; }
+
+/* ─── blueprint table ─── */
+.x-bp { width: 100%; border-collapse: collapse; font-size: 13px; }
+.x-bp caption { text-align: left; font-size: 12px; color: var(--text-3); padding-bottom: 8px; }
+.x-bp th, .x-bp td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--glass-border); }
+.x-bp th { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); }
+.x-bp td { color: var(--text-2); }
+.x-bp td.x-num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-1); }
+.x-bp tr:last-child td { border-bottom: none; }
+.x-bp-bar { height: 5px; border-radius: 999px; background: var(--primary); opacity: .75; min-width: 2px; }
+.x-bp-track { width: 100%; max-width: 130px; height: 5px; border-radius: 999px; background: var(--glass-fill); border: 1px solid var(--glass-border); overflow: hidden; }
+
+/* ─── the integrity notice ───
+   A short or mis-weighted form must LOOK wrong, not merely be documented as
+   wrong in a tooltip somewhere. */
+.x-notice {
+  display: flex; gap: 11px; padding: 13px 15px; border-radius: var(--r-md);
+  font-size: 13px; line-height: 1.6;
+}
+.x-notice-icon { flex-shrink: 0; margin-top: 1px; }
+.x-notice-title { font-weight: 700; margin-bottom: 2px; }
+.x-notice.warning { background: var(--gold-dim); border: 1px solid var(--gold-ring); color: var(--gold-2); }
+.x-notice.error { background: var(--red-dim); border: 1px solid var(--red-ring); color: var(--red-2); }
+.x-notice.info { background: var(--primary-dim); border: 1px solid var(--primary-ring); color: var(--primary-2); }
+.x-notice ul { margin: 6px 0 0; padding-left: 18px; }
+.x-notice li { margin-top: 3px; }
+
+/* ─── runner ─── */
+.x-runner { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 18px; align-items: start; }
+@media (max-width: 900px) { .x-runner { grid-template-columns: minmax(0, 1fr); } }
+
+.x-stem {
+  font-family: var(--font-display); font-size: 18px; font-weight: 600;
+  line-height: 1.55; color: var(--text-1); margin: 0 0 18px;
+}
+.x-qnum { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+
+/* Options are a radiogroup: one roving tab stop, arrows move, space selects.
+   That is what a screen-reader user expects from a single-answer question. */
+.x-options { display: flex; flex-direction: column; gap: 9px; }
+.x-option {
+  display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left;
+  padding: 13px 15px; border-radius: var(--r-md); cursor: pointer;
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  font-family: var(--font-body); font-size: 14px; line-height: 1.55; color: var(--text-1);
+  transition: background .12s, border-color .12s;
+}
+.x-option:hover { background: var(--glass-fill-hover); }
+.x-option[aria-checked="true"] { border-color: var(--primary-ring); background: var(--primary-dim); }
+
+/* The key badge doubles as the keyboard hint — the number you press IS the
+   number on the option, so the shortcut teaches itself. */
+.x-key {
+  flex-shrink: 0; width: 24px; height: 24px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  background: var(--glass-fill-strong); border: 1px solid var(--glass-border-2); color: var(--text-2);
+}
+.x-option[aria-checked="true"] .x-key { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+/* Warmup only — never rendered during a real form. */
+.x-option.right { border-color: var(--green-ring); background: var(--green-dim); }
+.x-option.wrong { border-color: var(--red-ring); background: var(--red-dim); }
+.x-option.right .x-key { background: var(--green); border-color: var(--green); color: #fff; }
+.x-option.wrong .x-key { background: var(--red); border-color: var(--red); color: #fff; }
+.x-opt-why { margin-top: 6px; font-size: 12.5px; line-height: 1.6; color: var(--text-2); }
+
+.x-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.x-actions-spacer { flex: 1; }
+
+.x-flag {
+  display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px;
+  border-radius: var(--r-md); font-size: 13px; font-weight: 600; cursor: pointer;
+  background: var(--glass-fill); border: 1px solid var(--glass-border); color: var(--text-2);
+  font-family: var(--font-body); transition: background .15s, color .15s, border-color .15s;
+}
+.x-flag:hover { background: var(--glass-fill-hover); color: var(--text-1); }
+.x-flag[aria-pressed="true"] { background: var(--gold-dim); border-color: var(--gold-ring); color: var(--gold-2); }
+
+/* ─── navigator ─── */
+.x-nav { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+.x-nav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
+.x-nav-cell {
+  position: relative; aspect-ratio: 1; min-height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+  background: var(--glass-fill); border: 1px solid var(--glass-border); color: var(--text-3);
+  transition: background .12s, border-color .12s, color .12s;
+}
+.x-nav-cell:hover { background: var(--glass-fill-hover); color: var(--text-1); }
+.x-nav-cell.answered { background: var(--primary-dim); border-color: var(--primary-ring); color: var(--primary-2); }
+.x-nav-cell.current { outline: 2px solid var(--primary); outline-offset: 1px; color: var(--text-1); }
+
+/* Flagged state is a corner wedge AND a border, never colour alone — a
+   red/green-blind user must still be able to triage their own exam. */
+.x-nav-cell.flagged { border-color: var(--gold); }
+.x-nav-cell.flagged::after {
+  content: ""; position: absolute; top: 0; right: 0;
+  border-width: 0 8px 8px 0; border-style: solid;
+  border-color: transparent var(--gold) transparent transparent;
+  border-top-right-radius: 7px;
+}
+.x-nav-cell.correct { background: var(--green-dim); border-color: var(--green-ring); color: var(--green-2); }
+.x-nav-cell.incorrect { background: var(--red-dim); border-color: var(--red-ring); color: var(--red-2); }
+
+.x-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; color: var(--text-3); }
+.x-legend-item { display: flex; align-items: center; gap: 5px; }
+.x-swatch { width: 11px; height: 11px; border-radius: 3px; border: 1px solid var(--glass-border); flex-shrink: 0; }
+.x-swatch.answered { background: var(--primary-dim); border-color: var(--primary-ring); }
+.x-swatch.unanswered { background: var(--glass-fill); }
+.x-swatch.flagged { background: var(--glass-fill); border-color: var(--gold); }
+
+.x-counts { display: flex; gap: 14px; flex-wrap: wrap; }
+.x-count { display: flex; flex-direction: column; }
+.x-count-v { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--text-1); font-variant-numeric: tabular-nums; }
+.x-count-k { font-size: 9.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); }
+
+/* ─── results ─── */
+.x-results { display: flex; flex-direction: column; gap: 18px; }
+.x-verdict { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding: 26px; }
+.x-score { font-family: var(--font-display); font-size: 46px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.x-score.pass { color: var(--green-2); }
+.x-score.fail { color: var(--text-1); } /* not red: a failed mock is information, not a scolding */
+.x-verdict-label { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-1); }
+.x-verdict-sub { font-size: 13px; color: var(--text-2); line-height: 1.6; margin-top: 3px; }
+
+.x-sections { display: flex; flex-direction: column; gap: 11px; }
+.x-section-row { display: grid; grid-template-columns: minmax(0, 1fr) 78px; gap: 12px; align-items: center; }
+.x-section-label { font-size: 13px; color: var(--text-1); }
+.x-section-meta { font-size: 11px; color: var(--text-3); }
+.x-section-num { text-align: right; font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--text-1); font-variant-numeric: tabular-nums; }
+.x-meter { position: relative; height: 7px; border-radius: 999px; background: var(--glass-fill); border: 1px solid var(--glass-border); overflow: hidden; margin-top: 5px; }
+.x-meter-fill { height: 100%; border-radius: 999px; transition: width .6s cubic-bezier(.16,1,.3,1); }
+.x-meter-fill.pass { background: var(--green); }
+.x-meter-fill.fail { background: var(--orange); }
+/* The pass mark drawn ON the meter — a bar with no mark cannot be read against
+   the thing that actually matters. */
+.x-meter-mark { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--text-1); opacity: .5; }
+
+/* ─── review ─── */
+.x-review { display: flex; flex-direction: column; gap: 14px; }
+.x-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.x-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px;
+  border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  background: var(--glass-fill); border: 1px solid var(--glass-border); color: var(--text-2);
+  font-family: var(--font-body); transition: background .15s, color .15s, border-color .15s;
+}
+.x-chip:hover { background: var(--glass-fill-hover); color: var(--text-1); }
+.x-chip[aria-pressed="true"] { background: var(--primary-dim); border-color: var(--primary-ring); color: var(--primary-2); }
+.x-chip-n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; opacity: .8; }
+
+.x-rev-item { padding: 20px; display: flex; flex-direction: column; gap: 13px; }
+.x-rev-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.x-rev-stem { font-family: var(--font-display); font-size: 15.5px; font-weight: 600; line-height: 1.55; color: var(--text-1); margin: 0; }
+
+/* Review options: the colour says the verdict, the icon and the label say it
+   again for anyone who cannot see the colour. */
+.x-rev-opt {
+  display: flex; gap: 11px; padding: 12px 14px; border-radius: var(--r-md);
+  border: 1px solid var(--glass-border); background: var(--glass-fill);
+}
+.x-rev-opt.correct-chosen { border-color: var(--green-ring); background: var(--green-dim); }
+.x-rev-opt.correct-missed { border-color: var(--green-ring); background: var(--green-dim); }
+.x-rev-opt.wrong-chosen { border-color: var(--red-ring); background: var(--red-dim); }
+.x-rev-opt.wrong { opacity: .85; }
+.x-rev-opt-body { flex: 1; min-width: 0; }
+.x-rev-opt-text { font-size: 14px; line-height: 1.5; color: var(--text-1); }
+.x-rev-opt-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+
+/* The single most valuable text in this whole feature. It is not a tooltip, not
+   an accordion, not hidden behind a hover — it is body copy, always on. */
+.x-why {
+  margin-top: 8px; padding-left: 11px; border-left: 2px solid var(--glass-border-2);
+  font-size: 13px; line-height: 1.65; color: var(--text-2);
+}
+.x-rev-opt.wrong-chosen .x-why { border-left-color: var(--red-ring); }
+.x-rev-opt.correct-chosen .x-why, .x-rev-opt.correct-missed .x-why { border-left-color: var(--green-ring); }
+
+.x-rev-note {
+  padding: 13px 15px; border-radius: var(--r-md);
+  background: var(--primary-dim); border: 1px solid var(--primary-ring);
+  font-size: 13px; line-height: 1.65; color: var(--text-1);
+}
+.x-rev-note-k { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--primary-2); margin-bottom: 4px; }
+
+.x-empty { padding: 34px; text-align: center; color: var(--text-3); font-size: 13.5px; }
+
+/* ─── keyboard hints ─── */
+.x-keys { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11.5px; color: var(--text-3); }
+.x-keys kbd {
+  display: inline-block; padding: 1px 6px; border-radius: 5px; min-width: 18px; text-align: center;
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+  background: var(--glass-fill-strong); border: 1px solid var(--glass-border-2); color: var(--text-2);
+}
+
+/* ─── a11y ───
+   Visually hidden but read aloud. The live regions and the roving-focus
+   instructions live in here. */
+.x-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}

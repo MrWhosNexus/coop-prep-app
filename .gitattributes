@@ -1,0 +1,38 @@
+# Line-ending policy.
+#
+# This repo is developed on Windows, where `core.autocrlf=true` materialises
+# CRLF in the working tree. Several tests encode POSIX assumptions and go
+# silently inoperative against CRLF (see docs/AUDIT_REPORT_2026-07-20.md #5/#6):
+# the packaging tripwire's `files:` regex never matches, the tool-mapping
+# mutation test becomes a no-op, and the HMDA dataset stops being byte-identical
+# to its JS twin. Pinning LF in the working tree removes that whole class.
+#
+# `eol=lf` overrides core.autocrlf on checkout, so a Windows clone gets LF too.
+* text=auto eol=lf
+
+# Explicit, so the three file classes the tests depend on can never be
+# re-guessed as binary or platform-native.
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.jsx   text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.css   text eol=lf
+*.md    text eol=lf
+*.svg   text eol=lf
+*.csv   text eol=lf
+public/data/hmda-sample.csv text eol=lf
+
+# Binaries: never touch.
+*.ico   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.icns  binary
+*.asar  binary

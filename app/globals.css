@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ════════════════════════════════════════════════════════════════════
+   COOP Prep — token block (single source of truth).
+   Reskin the whole app by editing this block. Swap palettes at runtime
+   by setting [data-theme] on the app root.
+   ════════════════════════════════════════════════════════════════════ */
+:root, [data-theme="daylight"] {
+  /* ── Backdrop environment (light, colorful blooms over a bright canvas) ── */
+  --canvas: #e9eef7;
+  --bg-grad-angle: 145deg;
+  --bg-grad-1: #cadcff;  --bg-grad-2: #ffd6e8;  --bg-grad-3: #cdf3e0;  --bg-grad-4: #ece1ff;
+  --bg-gradient:
+    radial-gradient(58% 50% at 10% 6%,  var(--bg-grad-1) 0%, transparent 62%),
+    radial-gradient(50% 46% at 94% 4%,  var(--bg-grad-2) 0%, transparent 56%),
+    radial-gradient(56% 56% at 88% 94%, var(--bg-grad-3) 0%, transparent 60%),
+    radial-gradient(46% 48% at 6% 96%,  var(--bg-grad-4) 0%, transparent 56%);
+
+  /* ── Glass ── */
+  --glass-fill: rgba(255,255,255,0.55);
+  --glass-fill-strong: rgba(255,255,255,0.72);
+  --glass-fill-hover: rgba(255,255,255,0.70);
+  --glass-border: rgba(255,255,255,0.60);
+  --glass-border-2: rgba(255,255,255,0.85);
+  --glass-highlight: rgba(255,255,255,0.90);
+  --glass-shadow: 0 8px 30px rgba(33,46,77,0.10), 0 2px 8px rgba(33,46,77,0.05);
+  --glass-shadow-lg: 0 20px 52px rgba(33,46,77,0.17), 0 5px 14px rgba(33,46,77,0.08);
+  --glass-blur: 24px;
+  --glass-sheen: linear-gradient(135deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0) 72%);
+
+  /* ── Accent families: base / -2 (deep, for text) / -dim (fill) / -ring (border) ── */
+  --primary: #0a84ff;  --primary-2: #005fd6;  --primary-dim: rgba(10,132,255,0.12);  --primary-ring: rgba(10,132,255,0.34);
+  --secondary: #5e5ce6; --secondary-2: #4644c4; --secondary-dim: rgba(94,92,230,0.12); --secondary-ring: rgba(94,92,230,0.32);
+  --gold: #f5a623;     --gold-2: #9c6b14;     --gold-dim: rgba(245,166,35,0.16);     --gold-ring: rgba(245,166,35,0.36);
+  --green: #34c759;    --green-2: #1d9c42;    --green-dim: rgba(52,199,89,0.15);     --green-ring: rgba(52,199,89,0.36);
+  --red: #ff3b30;      --red-2: #cf2a21;      --red-dim: rgba(255,59,48,0.12);       --red-ring: rgba(255,59,48,0.32);
+  --orange: #ff9500;   --orange-2: #bf6f00;   --orange-dim: rgba(255,149,0,0.15);    --orange-ring: rgba(255,149,0,0.34);
+
+  /* ── Text scale ── */
+  --text-1: #191922;  --text-2: #51516a;  --text-3: #8c8ca4;
+
+  /* ── Gradient surfaces ── */
+  --cta-gradient: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+  --sheen-gradient: var(--glass-sheen);
+
+  /* ── Radii ── */
+  --r-sm: 10px;  --r-md: 14px;  --r-lg: 20px;  --r-xl: 26px;
+  --sidebar-w: 256px;
+
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+}
+
+/* ── Alternate palette — proves the whole UI reskins from the token block alone ── */
+[data-theme="midnight"] {
+  --canvas: #0b0d14;
+  --bg-grad-1: #1b2c5a; --bg-grad-2: #3a1d44; --bg-grad-3: #13324a; --bg-grad-4: #241a48;
+  --glass-fill: rgba(255,255,255,0.07);
+  --glass-fill-strong: rgba(255,255,255,0.11);
+  --glass-fill-hover: rgba(255,255,255,0.13);
+  --glass-border: rgba(255,255,255,0.12);
+  --glass-border-2: rgba(255,255,255,0.20);
+  --glass-highlight: rgba(255,255,255,0.14);
+  --glass-shadow: 0 8px 30px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.30);
+  --glass-shadow-lg: 0 20px 52px rgba(0,0,0,0.55);
+  --glass-sheen: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.02) 42%, rgba(255,255,255,0) 72%);
+  --primary: #3aa0ff;  --primary-2: #8cc6ff;  --primary-dim: rgba(58,160,255,0.18);  --primary-ring: rgba(58,160,255,0.45);
+  --secondary: #8b87ff; --secondary-2: #b3b0ff; --secondary-dim: rgba(139,135,255,0.18); --secondary-ring: rgba(139,135,255,0.40);
+  --gold: #ffc14d;     --gold-2: #ffd98a;     --gold-dim: rgba(255,193,77,0.18);     --gold-ring: rgba(255,193,77,0.40);
+  --green: #41d967;    --green-2: #88ec9f;    --green-dim: rgba(65,217,103,0.18);    --green-ring: rgba(65,217,103,0.40);
+  --red: #ff6b61;      --red-2: #ffa39c;      --red-dim: rgba(255,107,97,0.18);      --red-ring: rgba(255,107,97,0.40);
+  --orange: #ffa733;   --orange-2: #ffc270;   --orange-dim: rgba(255,167,51,0.18);   --orange-ring: rgba(255,167,51,0.40);
+  --text-1: #f3f4fb;   --text-2: #b8bace;     --text-3: #80829a;
+  --cta-gradient: linear-gradient(135deg, #3aa0ff 0%, #8b87ff 100%);
+}
+
+html { height: 100%; }
+body {
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: var(--font-body);
+}
+
+/* ── Glass surfaces ── */
+.glass {
+  position: relative; background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border); border-radius: var(--r-lg);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+}
+.glass-strong {
+  position: relative; background: var(--glass-fill-strong);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(190%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(190%);
+  border: 1px solid var(--glass-border-2); border-radius: var(--r-lg);
+  box-shadow: var(--glass-shadow-lg), inset 0 1px 0 var(--glass-highlight);
+}
+.glass-btn { cursor: pointer; transition: transform .25s cubic-bezier(.16,1,.3,1), background .2s ease, box-shadow .25s ease, border-color .2s ease; }
+.glass-btn:hover { background: var(--glass-fill-hover); transform: translateY(-2px); box-shadow: var(--glass-shadow-lg), inset 0 1px 0 var(--glass-highlight); }
+.glass-btn:active { transform: translateY(0); }
+
+/* ── Badges ── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .02em; line-height: 1.55; white-space: nowrap; }
+.badge-primary { background: var(--primary-dim); color: var(--primary-2); border: 1px solid var(--primary-ring); }
+.badge-gold    { background: var(--gold-dim);    color: var(--gold-2);    border: 1px solid var(--gold-ring); }
+.badge-green   { background: var(--green-dim);   color: var(--green-2);   border: 1px solid var(--green-ring); }
+.badge-red     { background: var(--red-dim);     color: var(--red-2);     border: 1px solid var(--red-ring); }
+.badge-muted   { background: var(--glass-fill);  color: var(--text-2);    border: 1px solid var(--glass-border); }
+
+/* ── Buttons ── */
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 18px; border-radius: var(--r-md); font-size: 14px; font-weight: 600; font-family: var(--font-body); color: #fff; background: var(--cta-gradient); border: none; cursor: pointer; box-shadow: 0 6px 18px var(--primary-ring); transition: opacity .15s, transform .15s, box-shadow .15s; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 26px var(--primary-ring); }
+.btn-primary:active { transform: translateY(0); }
+.btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 14px; border-radius: var(--r-md); font-size: 13px; font-weight: 600; font-family: var(--font-body); color: var(--text-2); background: var(--glass-fill); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); cursor: pointer; transition: background .15s, color .15s, border-color .15s, transform .15s; }
+.btn-ghost:hover { background: var(--glass-fill-hover); color: var(--text-1); border-color: var(--glass-border-2); }
+
+/* ── Sidebar nav ── */
+.nav-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 11px; border-radius: var(--r-sm); font-size: 13.5px; font-weight: 550; color: var(--text-2); background: none; border: none; cursor: pointer; text-align: left; font-family: var(--font-body); transition: background .14s, color .14s; }
+.nav-item:hover { background: var(--glass-fill); color: var(--text-1); }
+.nav-item.active { background: var(--primary-dim); color: var(--primary-2); }
+
+/* ── Structural ── */
+.section-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--text-3); }
+.progress-track { height: 6px; width: 100%; background: var(--glass-fill); border: 1px solid var(--glass-border); border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 999px; transition: width .5s cubic-bezier(.16,1,.3,1); }
+.spinner { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--primary-dim); border-top-color: var(--primary); animation: spin .7s linear infinite; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ── Scrollbar / focus ── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass-border-2); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+*:focus-visible { outline: 2px solid var(--primary-ring); outline-offset: 2px; border-radius: 8px; }
+
+/* ── Motion ── */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scalein { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes ringfill { from { stroke-dasharray: 0 264; } }
+@keyframes floatUp { 0% { opacity: 0; transform: translateY(8px) scale(.9); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-48px) scale(1); } }
+@keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes celebrate { 0% { transform: scale(0); opacity: 0; } 55% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
+.fadein  { animation: fadein .4s cubic-bezier(.16,1,.3,1) both; }
+.scalein { animation: scalein .35s cubic-bezier(.16,1,.3,1) both; }
+.float-xp { animation: floatUp 1.4s cubic-bezier(.16,1,.3,1) both; }
+.toast-in { animation: toastIn .35s cubic-bezier(.16,1,.3,1) both; }
+.celebrate { animation: celebrate .5s cubic-bezier(.16,1,.3,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .fadein, .scalein { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* === SPOTLIGHT ===
+   Soft pulse for the spotlight ring (components/guide/guide.css). Reuses the
+   reduced-motion guard above -- no separate override needed since that guard
+   already zeroes animation-duration/iteration-count for every animation. */
+@keyframes spotlight-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--primary-dim); }
+  50% { box-shadow: 0 0 0 8px var(--primary-dim); }
+}

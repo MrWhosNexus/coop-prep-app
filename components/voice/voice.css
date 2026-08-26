@@ -1,0 +1,141 @@
+/* components/voice/voice.css
+   Nexus Voice widget. Fixed bottom-right pill, modeled on the highlight
+   selection pill (components/Dashboard.js ~line 713): a glass-strong
+   button with an icon and label, rounded to a full pill. */
+
+.nexus-voice-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-1);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  border: none;
+}
+
+.nexus-voice-disabled {
+  cursor: default;
+  color: var(--text-3);
+  font-weight: 500;
+  max-width: 280px;
+}
+
+.nexus-voice-panel {
+  width: 300px;
+  max-width: calc(100vw - 40px);
+  border-radius: var(--r-lg, 16px);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.nexus-voice-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nexus-voice-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--text-1);
+}
+
+.nexus-voice-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-3);
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+}
+
+.nexus-voice-close:hover {
+  color: var(--text-1);
+}
+
+.nexus-voice-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.nexus-voice-line {
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 8px 10px;
+  border-radius: var(--r-md, 10px);
+  border: 1px solid var(--glass-border);
+}
+
+.nexus-voice-user {
+  color: var(--text-2);
+  align-self: flex-end;
+  background: var(--glass-fill);
+}
+
+.nexus-voice-reply {
+  color: var(--text-1);
+  align-self: flex-start;
+}
+
+.nexus-voice-notice {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.nexus-voice-mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-1);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nexus-voice-mic:disabled {
+  cursor: default;
+  color: var(--text-3);
+}
+
+.nexus-voice-mic:hover:not(:disabled) {
+  background: var(--glass-fill-hover);
+}
+
+/* Free-floating companion: draggable by the panel header (expanded) or the
+   pill itself (collapsed). touch-action: none stops the browser's own pan/
+   scroll gesture from fighting the pointermove handler on touch devices. */
+.nexus-voice-drag-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.nexus-voice-drag-handle:active {
+  cursor: grabbing;
+}
+
+.nexus-voice-wake-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-3);
+  cursor: pointer;
+}

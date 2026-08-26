@@ -1,0 +1,425 @@
+/* components/settings/endpoints.css
+ * Styling for the AI endpoints settings panel.
+ *
+ * Uses the app's existing glass design tokens (app/globals.css) — no new colour
+ * values, no new radii, no new fonts. Every var referenced here is already
+ * defined for both light and dark themes, so this panel follows the theme with
+ * no per-theme rules of its own.
+ */
+
+.ep-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-family: var(--font-body);
+  color: var(--text-1);
+}
+
+.ep-panel-head h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+
+/* ─────────────── shared bits ─────────────── */
+
+.ep-hint {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-3);
+  margin: 0;
+}
+
+.ep-hint-inset { padding: 8px 10px; }
+
+.ep-mono {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  word-break: break-all;
+}
+
+.ep-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.ep-chevron {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-3);
+  transition: transform 0.18s ease;
+}
+.ep-chevron.open { transform: rotate(180deg); }
+
+.ep-input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-1);
+  font-size: 14px;
+  font-family: var(--font-body);
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ep-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-ring);
+}
+.ep-input::placeholder { color: var(--text-3); }
+
+.ep-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ep-danger { color: var(--red); }
+.ep-danger:hover { color: var(--red); border-color: var(--red-ring); background: var(--red-dim); }
+
+/* ─────────────── messages / banners ─────────────── */
+
+.ep-message {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+}
+.ep-message-ok    { color: var(--green-2); border-color: var(--green-ring); background: var(--green-dim); }
+.ep-message-error  { color: var(--red-2);   border-color: var(--red-ring);   background: var(--red-dim); }
+.ep-message-muted { color: var(--text-2); }
+
+.ep-banner {
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 11px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-2);
+}
+/* The keyless-endpoint banner is the one thing in this panel that predicts a
+   concrete future failure (a 401). It gets the warning tone. */
+.ep-banner-warn {
+  border-color: var(--orange-ring);
+  background: var(--orange-dim);
+  color: var(--orange-2);
+}
+.ep-banner strong { color: var(--text-1); }
+
+.ep-tone-ok    { color: var(--green-2); }
+.ep-tone-warn  { color: var(--orange-2); font-weight: 600; }
+.ep-tone-muted { color: var(--text-3); }
+
+/* ─────────────── sections ─────────────── */
+
+.ep-section {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  overflow: hidden;
+}
+
+.ep-section-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-1);
+  font-family: var(--font-body);
+  transition: background 0.15s;
+}
+.ep-section-head:hover { background: var(--glass-fill-hover); }
+
+.ep-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.ep-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 14px 14px;
+}
+
+.ep-added-head { padding: 12px 14px 6px; }
+
+/* ─────────────── local quickstart ─────────────── */
+
+.ep-quickstart {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.ep-quickstart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ep-runtimes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ep-runtime { font-size: 12.5px; padding: 7px 11px; }
+
+.ep-port {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+
+.ep-scan-hit {
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+}
+
+/* ─────────────── rows / cards ─────────────── */
+
+.ep-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ep-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.ep-row-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.ep-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 14px 10px;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  transition: opacity 0.15s;
+}
+/* A disabled endpoint stays fully legible — it is dimmed, not hidden, because
+   its config (and its missing key) is still what the user came here to fix. */
+.ep-card.off { opacity: 0.55; }
+
+.ep-key-row { justify-content: space-between; }
+.ep-key-state { font-size: 12.5px; }
+.ep-key-edit { flex-wrap: wrap; }
+.ep-key-edit .ep-input { flex: 1; min-width: 180px; }
+
+/* ─────────────── switch ─────────────── */
+
+.ep-switch {
+  position: relative;
+  width: 40px;
+  height: 23px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+.ep-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--text-3);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background 0.18s;
+}
+.ep-switch.on {
+  background: var(--green-dim);
+  border-color: var(--green-ring);
+}
+.ep-switch.on::after {
+  transform: translateX(17px);
+  background: var(--green);
+}
+.ep-switch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-ring);
+}
+
+/* ─────────────── pickers ─────────────── */
+
+.ep-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.ep-url-row .ep-input { flex: 1; min-width: 0; }
+
+.ep-picker { position: relative; }
+
+.ep-picker-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-1);
+  font-size: 13.5px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ep-picker-toggle:hover:not(:disabled) {
+  background: var(--glass-fill-hover);
+  border-color: var(--glass-border-2);
+}
+.ep-picker-toggle:disabled { cursor: default; color: var(--text-3); }
+.ep-picker-toggle:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-ring);
+}
+
+.ep-picker-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ep-model-picker .ep-picker-toggle { justify-content: flex-start; }
+.ep-model-picker .ep-picker-label { font-family: var(--font-mono); font-size: 12px; }
+
+.ep-price {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.ep-picker-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 260px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border-2);
+  background: var(--glass-fill-strong);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow-lg);
+}
+
+.ep-model-filter { margin-bottom: 4px; }
+
+.ep-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-1);
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.ep-picker-item:hover { background: var(--glass-fill-hover); }
+.ep-picker-item.on { background: var(--primary-dim); }
+
+.ep-picker-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ep-picker-item-label {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.ep-picker-item-url {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─────────────── narrow screens ─────────────── */
+
+@media (max-width: 560px) {
+  .ep-url-row { flex-direction: column; }
+  .ep-picker-menu { left: 0; right: 0; min-width: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ep-chevron,
+  .ep-switch,
+  .ep-switch::after,
+  .ep-picker-item,
+  .ep-input {
+    transition: none;
+  }
+}

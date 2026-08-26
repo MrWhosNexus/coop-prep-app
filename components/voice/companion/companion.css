@@ -1,0 +1,977 @@
+/* ============ Nexus companion — face + artifact panel ============
+   Ported from rileyjarvis (Ricky) and reskinned to the Abyssal Lagoon
+   tokens: dark glass, lumen-mint accent, nexus type stack. All classes
+   are cmp-prefixed; nothing leaks into shared panel styles. */
+
+.cmp-root {
+  display: grid;
+  grid-template-columns: minmax(230px, 1fr) minmax(250px, 1.15fr);
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  padding: 12px;
+  overflow: hidden;
+  container-type: inline-size;
+  font-family: var(--font-ui);
+}
+
+/* Phone-width / narrow window: stack and scroll. */
+@container (max-width: 560px) {
+  .cmp-root {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .cmp-artifact-panel {
+    min-height: 320px;
+  }
+}
+
+/* ---------- face stage ---------- */
+
+.cmp-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px 4px;
+}
+
+.cmp-face {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: min(100%, 280px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 62%),
+    var(--ink-2);
+  border: 6px solid color-mix(in srgb, var(--accent) 72%, transparent);
+  transition: border-color 240ms var(--ease), box-shadow 240ms var(--ease);
+}
+
+.cmp-face::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  pointer-events: none;
+}
+
+/* mood ring states */
+.cmp-face-listening {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: cmp-listen-pulse 1.6s infinite ease-out;
+}
+
+.cmp-face-thinking {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.cmp-face-working {
+  border-color: color-mix(in srgb, var(--accent-2) 70%, transparent);
+}
+
+.cmp-face-error {
+  border-color: color-mix(in srgb, var(--bad) 80%, transparent);
+}
+
+@keyframes cmp-listen-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent); }
+  100% { box-shadow: 0 0 0 18px transparent; }
+}
+
+/* eyes */
+
+.cmp-eye-row {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 26%;
+  transform: translateY(-14%);
+  animation: cmp-eye-look-row 6.5s infinite ease-in-out;
+}
+
+.cmp-eye {
+  position: relative;
+  width: clamp(26px, 13cqi, 44px);
+  aspect-ratio: 0.82;
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f2fffa, var(--accent));
+  animation: cmp-blink 4.6s infinite;
+  transition: transform 240ms var(--ease), background 240ms var(--ease);
+}
+
+.cmp-eye span {
+  position: absolute;
+  inset: 24% 30% 32%;
+  border-radius: 999px;
+  background: var(--ink);
+  opacity: 0.85;
+  animation: cmp-pupil-look 6.5s infinite ease-in-out;
+}
+
+.cmp-face-thinking .cmp-eye,
+.cmp-face-working .cmp-eye {
+  transform: scaleY(0.72);
+}
+
+.cmp-face-listening .cmp-eye {
+  transform: scaleY(1.08);
+}
+
+.cmp-face-error .cmp-eye {
+  background: linear-gradient(180deg, #fff3f0, var(--bad));
+}
+
+/* mouth — lip-sync channels arrive as CSS custom properties */
+
+.cmp-mouth-wrap {
+  position: absolute;
+  z-index: 2;
+  bottom: 21%;
+  display: grid;
+  place-items: center;
+  width: 62%;
+  height: 30%;
+}
+
+.cmp-mouth {
+  position: relative;
+  width: calc(34% + (var(--mouth-width, 0.18) * 34%) - (var(--mouth-round, 0) * 12%));
+  height: calc(4px + (var(--mouth-open, 0) * 26px));
+  transform-origin: center;
+  transition: width 55ms linear, height 55ms linear, transform 55ms linear;
+  transform: translateY(calc(var(--mouth-open, 0) * -4px))
+    scaleX(calc(1 - (var(--mouth-round, 0) * 0.28)));
+}
+
+.cmp-mouth-line {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(999px - (var(--mouth-round, 0) * 400px));
+  background: linear-gradient(180deg, #eafff6, var(--accent));
+  transform: scaleY(calc(0.35 + (var(--mouth-open, 0) * 0.9)));
+}
+
+.cmp-mouth-teeth {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 18%;
+  width: calc(50% + (var(--mouth-width, 0.18) * 30%));
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(var(--hi), 0.85);
+  opacity: var(--mouth-teeth, 0);
+  transform: translateX(-50%);
+}
+
+.cmp-face-speaking .cmp-mouth {
+  width: calc(38% + (var(--mouth-width, 0.18) * 38%) - (var(--mouth-round, 0) * 14%));
+  height: calc(4px + (var(--mouth-open, 0) * 32px));
+}
+
+@keyframes cmp-blink {
+  0%, 88%, 92%, 100% { transform: scaleY(1); }
+  89.5%, 93.5% { transform: scaleY(0.08); }
+}
+
+.cmp-face-thinking .cmp-eye,
+.cmp-face-working .cmp-eye {
+  animation: none; /* squint replaces blink; keeps the transform stable */
+}
+
+@keyframes cmp-eye-look-row {
+  0%, 12%, 100% { transform: translate(0, -14%); }
+  24%, 36% { transform: translate(5%, -15%); }
+  50%, 62% { transform: translate(-6%, -13%); }
+  76% { transform: translate(2%, -16%); }
+}
+
+@keyframes cmp-pupil-look {
+  0%, 12%, 100% { transform: translate(0, 0); }
+  24%, 36% { transform: translate(4px, -1px); }
+  50%, 62% { transform: translate(-5px, 1px); }
+  76% { transform: translate(2px, -2px); }
+}
+
+/* ---------- readout + demo controls ---------- */
+
+.cmp-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cmp-eyebrow {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cmp-readout-mood {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1;
+}
+
+.cmp-readout-conn {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.cmp-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.cmp-btn {
+  min-height: 26px;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-dim);
+  background: rgba(var(--hi), 0.04);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 160ms var(--ease), color 160ms var(--ease), border-color 160ms var(--ease);
+}
+
+.cmp-btn:hover {
+  color: var(--text);
+  background: rgba(var(--hi), 0.09);
+}
+
+.cmp-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cmp-btn-on {
+  color: var(--ink);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.cmp-btn-on:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--accent) 86%, white);
+}
+
+/* Muted reads as a WARNING, not as "on": a mic the user believes is live when
+   it is not is the failure that matters, so it must not look like the accent
+   state next to it. */
+.cmp-btn-muted {
+  color: var(--ink);
+  background: var(--warn, #e8c268);
+  border-color: var(--warn, #e8c268);
+}
+
+.cmp-btn-muted:hover {
+  background: color-mix(in srgb, var(--warn, #e8c268) 86%, white);
+}
+
+.cmp-note {
+  max-width: 340px;
+  margin: 0;
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ---------- transcript + typed input (Phase B voice) ---------- */
+
+.cmp-transcript {
+  width: min(100%, 360px);
+  max-height: 200px;
+  min-height: 72px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(var(--hi), 0.03);
+}
+
+.cmp-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+.cmp-line-role {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.cmp-line-user .cmp-line-role {
+  color: var(--accent-2, var(--accent));
+}
+
+.cmp-line-nexus .cmp-line-role {
+  color: var(--accent);
+}
+
+.cmp-line-nexus .cmp-line-text {
+  color: var(--text);
+}
+
+.cmp-line-tool .cmp-line-text,
+.cmp-line-system .cmp-line-text {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  overflow-wrap: anywhere;
+}
+
+.cmp-input-row {
+  display: flex;
+  gap: 6px;
+  width: min(100%, 360px);
+}
+
+.cmp-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 28px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(var(--hi), 0.04);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+
+.cmp-input::placeholder {
+  color: var(--text-faint);
+}
+
+.cmp-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ---------- artifact panel ---------- */
+
+.cmp-artifact-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) - 6px);
+  background:
+    linear-gradient(160deg, rgba(var(--hi), 0.045), rgba(var(--hi), 0.01) 40%),
+    rgba(var(--deep), 0.5);
+}
+
+.cmp-artifact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cmp-artifact-header h2 {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+/* ---------- hub rail (build D2: browsable list, not one ephemeral panel) --- */
+
+.cmp-hub-rail {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(var(--hi), 0.015);
+}
+
+.cmp-hub-item {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: stretch;
+}
+
+.cmp-hub-item-main {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  width: 76px;
+  height: 58px;
+  padding: 6px;
+  color: var(--text-dim);
+  background: rgba(var(--hi), 0.03);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.cmp-hub-item-main:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}
+
+.cmp-hub-item-active .cmp-hub-item-main {
+  border-color: var(--accent);
+  color: var(--text);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.cmp-hub-thumb {
+  width: 100%;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.cmp-hub-thumb-loading {
+  background: linear-gradient(
+    100deg,
+    rgba(var(--hi), 0.04) 30%,
+    color-mix(in srgb, var(--accent) 16%, transparent) 50%,
+    rgba(var(--hi), 0.04) 70%
+  );
+  background-size: 220% 100%;
+  animation: cmp-grid-drift 1.4s infinite linear;
+}
+
+.cmp-hub-label {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 10px;
+  line-height: 1.3;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmp-hub-kind {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cmp-hub-item-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  color: var(--text-dim);
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cmp-hub-item-remove:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.cmp-artifact-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 16px 16px;
+}
+
+.cmp-empty-artifact,
+.cmp-progress-card {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: rgba(var(--hi), 0.02);
+}
+
+.cmp-empty-artifact p,
+.cmp-progress-card p {
+  max-width: 320px;
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.cmp-progress-card {
+  gap: 16px;
+  align-content: center;
+}
+
+.cmp-progress-pulse {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--accent);
+  animation: cmp-progress-pulse 1.35s infinite ease-out;
+}
+
+@keyframes cmp-progress-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
+  100% { box-shadow: 0 0 0 26px transparent; }
+}
+
+.cmp-text-artifact,
+.cmp-code-artifact {
+  margin: 0;
+  min-height: 180px;
+  overflow: auto;
+  padding: 14px;
+  color: var(--text);
+  background: rgba(var(--hi), 0.03);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.cmp-markdown-artifact {
+  min-height: 100%;
+  padding: 18px;
+  color: var(--text);
+  background: rgba(var(--hi), 0.02);
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: 10px;
+}
+
+.cmp-markdown-artifact h1 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--text);
+  font-size: clamp(20px, 4cqi, 28px);
+  line-height: 1.1;
+}
+
+.cmp-markdown-artifact h2 {
+  margin: 20px 0 8px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cmp-markdown-artifact h3 {
+  margin: 14px 0 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.cmp-markdown-artifact p {
+  max-width: 640px;
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.56;
+}
+
+.cmp-markdown-artifact li {
+  margin: 5px 0 0 18px;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.cmp-markdown-artifact a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.cmp-markdown-artifact a:hover {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.cmp-markdown-artifact a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.cmp-markdown-gap {
+  height: 9px;
+}
+
+.cmp-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.cmp-table-wrap table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+  background: rgba(var(--hi), 0.02);
+}
+
+.cmp-table-wrap th,
+.cmp-table-wrap td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-size: 12px;
+}
+
+.cmp-table-wrap th {
+  position: sticky;
+  top: 0;
+  color: var(--accent);
+  background: var(--ink-2);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cmp-table-wrap td {
+  color: var(--text);
+  max-width: 320px;
+}
+
+.cmp-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.cmp-note-card {
+  display: flex;
+  min-height: 120px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  color: var(--text);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 6%, transparent), transparent 55%),
+    rgba(var(--hi), 0.03);
+  border: 1px solid var(--line);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 10px;
+}
+
+.cmp-note-card:nth-child(4n + 2) {
+  border-left-color: color-mix(in srgb, var(--accent-2) 55%, transparent);
+}
+
+.cmp-note-card:nth-child(4n + 3) {
+  border-left-color: color-mix(in srgb, var(--good) 55%, transparent);
+}
+
+.cmp-note-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cmp-note-card footer {
+  display: grid;
+  gap: 4px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.cmp-artifact-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  object-fit: contain;
+}
+
+.cmp-image-loading {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  align-content: center;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: 10px;
+  background: rgba(var(--hi), 0.02);
+}
+
+.cmp-image-loading-frame {
+  position: relative;
+  width: min(300px, 84%);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 36%),
+    rgba(var(--hi), 0.03);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.cmp-image-loading-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.42;
+  animation: cmp-grid-drift 5s infinite linear;
+}
+
+.cmp-image-loading-orb {
+  position: absolute;
+  inset: 24%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(214, 255, 240, 0.3), color-mix(in srgb, var(--accent) 7%, transparent) 58%, transparent 70%);
+  animation: cmp-orb-breathe 2.4s infinite ease-in-out;
+}
+
+.cmp-image-loading-scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 42%, rgba(var(--hi), 0.14) 50%, transparent 58%);
+  animation: cmp-image-scan 2.1s infinite var(--ease);
+}
+
+.cmp-image-loading-copy {
+  display: grid;
+  gap: 6px;
+  max-width: 380px;
+  text-align: center;
+}
+
+.cmp-image-loading-copy span {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cmp-image-loading-copy p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@keyframes cmp-grid-drift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(24px, 24px); }
+}
+
+@keyframes cmp-orb-breathe {
+  0%, 100% { transform: scale(0.9); opacity: 0.62; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes cmp-image-scan {
+  0% { transform: translateX(-120%); opacity: 0; }
+  20%, 80% { opacity: 1; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+/* ---------- file artifact (build D3: save-to-disk / open) ---------- */
+
+.cmp-file-card {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  min-height: 220px;
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: 10px;
+  background: rgba(var(--hi), 0.02);
+}
+
+.cmp-file-icon {
+  width: 40px;
+  height: 48px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+    rgba(var(--hi), 0.04);
+}
+
+.cmp-file-name {
+  margin: 0;
+  max-width: 320px;
+  color: var(--text);
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.cmp-file-status {
+  margin: 0;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.cmp-mermaid-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.cmp-mermaid-output {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  padding: 16px;
+  background: rgba(var(--hi), 0.03);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.cmp-mermaid-output svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.cmp-mermaid-repair {
+  color: var(--text);
+  background: color-mix(in srgb, var(--warn) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warn) 22%, transparent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.cmp-mermaid-repair summary {
+  cursor: pointer;
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.cmp-mermaid-repair summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.cmp-mermaid-repair p {
+  color: var(--text-dim);
+}
+
+.cmp-mermaid-repair pre {
+  overflow: auto;
+  margin: 8px 0 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  white-space: pre-wrap;
+}
+
+/* ---------- reduced motion: pause the face + all companion animation ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cmp-face,
+  .cmp-eye-row,
+  .cmp-eye,
+  .cmp-eye span,
+  .cmp-progress-pulse,
+  .cmp-image-loading-grid,
+  .cmp-image-loading-orb,
+  .cmp-image-loading-scan {
+    animation: none !important;
+  }
+  .cmp-mouth,
+  .cmp-face,
+  .cmp-eye,
+  .cmp-btn {
+    transition: none !important;
+  }
+}
+
+/* Separator between the companion's control groups (provider · runtime · mic). */
+.cmp-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--line);
+}
+
+/* Push-to-talk (Hermes). Idle reads as a warning, not an accent "on": this
+   button is the only thing between an always-on mic and a real shell, so it
+   should not look like an ordinary toggle. */
+.cmp-btn-ptt {
+  border-color: var(--warn, #e8c268);
+  color: var(--warn, #e8c268);
+}
+
+/* Held: unmistakably live. */
+.cmp-btn-talking {
+  color: var(--ink);
+  background: var(--bad, #f08a78);
+  border-color: var(--bad, #f08a78);
+  animation: cmp-listen-pulse 1.2s infinite ease-out;
+}

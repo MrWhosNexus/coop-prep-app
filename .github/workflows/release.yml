@@ -1,0 +1,80 @@
+name: Release
+
+# Tag a version, get installers for all three operating systems.
+#
+#   npm version minor -m "chore: v%s"   # bumps package.json, commits, tags
+#   git push --follow-tags
+#
+# Each OS builds its own artifacts — electron-builder cannot produce a signed,
+# working .dmg from Linux, and a Windows NSIS installer built elsewhere is a
+# different thing from one built on Windows. Cross-building is where "it works
+# on my machine" becomes "it works on the CI runner's machine".
+#
+# The release is created as a DRAFT. Nothing reaches the cohort until a human
+# opens it, reads the notes, and clicks publish — and until it is published,
+# electron-updater does not see it, so a half-uploaded matrix never ships.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write # required to create the release and upload assets
+
+jobs:
+  build:
+    name: build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        # A release that fails its own suite must not reach anyone, and a tag is
+        # the last place to find that out.
+        run: npm test
+
+      - name: Build and publish
+        # electron-builder reads the `publish:` block in electron-builder.yml —
+        # the same owner/repo pinned in electron/updates/updater.js — and uploads
+        # the artifacts plus the latest*.yml metadata the updater reads. That
+        # metadata carries the SHA-512 of every artifact, which is what makes an
+        # update verifiable rather than merely downloaded.
+        run: npx electron-builder --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Builds are unsigned: there is no Apple Developer ID and no Windows
+          # certificate for this project. Saying so explicitly stops
+          # electron-builder from trying to sign with whatever identity it finds
+          # on the runner, and stops it failing the build when it finds none.
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Checksums
+        # Published alongside the installers so anyone can verify a download by
+        # hand — the only integrity story an unsigned build has.
+        shell: bash
+        run: |
+          cd dist-electron
+          find . -maxdepth 1 -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.zip' \) \
+            -exec shasum -a 512 {} + > "SHA512SUMS-${{ matrix.os }}.txt" || true
+          cat "SHA512SUMS-${{ matrix.os }}.txt"
+
+      - name: Attach checksums to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${GITHUB_REF_NAME}" "dist-electron/SHA512SUMS-${{ matrix.os }}.txt" --clobber
+        shell: bash

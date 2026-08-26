@@ -1,0 +1,195 @@
+/* components/games/games.css — shell + per-game styling for the learning games.
+   Scoped under .g-* so nothing here can leak into the rest of the app. Colours,
+   radii and fonts all come from globals.css tokens so both themes work. */
+
+/* ─── shell ─── */
+.g-host { display: flex; flex-direction: column; gap: 16px; }
+
+.g-bar {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 12px 16px; border-radius: var(--r-lg);
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+.g-bar-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-1); }
+.g-bar-sub { font-size: 12px; color: var(--text-3); }
+.g-bar-spacer { flex: 1; }
+.g-stat { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
+.g-stat-v { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text-1); font-variant-numeric: tabular-nums; }
+.g-stat-k { font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); }
+
+.g-timer { min-width: 62px; }
+.g-timer.low .g-stat-v { color: var(--red); }
+
+.g-progress { height: 5px; border-radius: 999px; background: var(--glass-fill); border: 1px solid var(--glass-border); overflow: hidden; }
+.g-progress-fill { height: 100%; background: var(--cta-gradient); border-radius: 999px; transition: width .4s cubic-bezier(.16,1,.3,1); }
+
+.g-panel {
+  padding: 22px; border-radius: var(--r-lg);
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+
+.g-prompt { font-family: var(--font-display); font-size: 19px; font-weight: 650; line-height: 1.45; color: var(--text-1); margin: 0 0 4px; }
+.g-sub { font-size: 12.5px; color: var(--text-3); margin: 0; }
+.g-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); margin-bottom: 8px; }
+
+/* ─── feedback ─── */
+.g-feedback { margin-top: 14px; padding: 13px 15px; border-radius: var(--r-md); font-size: 13.5px; line-height: 1.6; animation: fadein .3s cubic-bezier(.16,1,.3,1) both; }
+.g-feedback.ok   { background: var(--green-dim); border: 1px solid var(--green-ring); color: var(--text-1); }
+.g-feedback.bad  { background: var(--red-dim);   border: 1px solid var(--red-ring);   color: var(--text-1); }
+.g-feedback.near { background: var(--gold-dim);  border: 1px solid var(--gold-ring);  color: var(--text-1); }
+.g-feedback-head { font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 7px; }
+.g-feedback-answer { font-family: var(--font-mono); font-size: 13px; padding: 2px 6px; border-radius: 6px; background: var(--glass-fill-strong); border: 1px solid var(--glass-border); }
+
+/* ─── recall drill ─── */
+.g-recall-input {
+  width: 100%; padding: 13px 15px; border-radius: var(--r-md);
+  border: 1px solid var(--glass-border); background: var(--glass-fill-strong);
+  color: var(--text-1); font-size: 16px; font-family: var(--font-body);
+  box-sizing: border-box; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.g-recall-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-ring); }
+.g-recall-input:disabled { opacity: .7; }
+.g-hint { font-family: var(--font-mono); font-size: 15px; letter-spacing: .22em; color: var(--text-3); margin-top: 10px; }
+
+/* ─── options (rapid fire) ─── */
+.g-options { display: grid; gap: 9px; margin-top: 16px; }
+.g-option {
+  display: flex; align-items: flex-start; gap: 11px; width: 100%;
+  padding: 13px 15px; border-radius: var(--r-md); text-align: left; cursor: pointer;
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  color: var(--text-1); font-size: 14px; font-family: var(--font-body); line-height: 1.5;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.g-option:hover:not(:disabled) { background: var(--glass-fill-hover); border-color: var(--glass-border-2); transform: translateY(-1px); }
+.g-option:disabled { cursor: default; }
+.g-option.correct { background: var(--green-dim); border-color: var(--green-ring); }
+.g-option.wrong   { background: var(--red-dim);   border-color: var(--red-ring); }
+.g-option.dim     { opacity: .55; }
+.g-option-key {
+  flex: none; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  background: var(--glass-fill-strong); border: 1px solid var(--glass-border); color: var(--text-2);
+}
+.g-option-why { display: block; margin-top: 6px; font-size: 12.5px; color: var(--text-2); line-height: 1.55; }
+
+/* ─── match game ─── */
+.g-match { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 1.7fr); gap: 10px; }
+.g-match-col { display: flex; flex-direction: column; gap: 8px; }
+.g-tile {
+  padding: 11px 13px; border-radius: var(--r-md); cursor: pointer; text-align: left;
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  color: var(--text-1); font-size: 13px; font-family: var(--font-body); line-height: 1.5;
+  transition: background .15s, border-color .15s, opacity .3s, transform .15s;
+}
+.g-tile:hover:not(:disabled):not(.done) { background: var(--glass-fill-hover); border-color: var(--glass-border-2); }
+.g-tile.sel { background: var(--primary-dim); border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-ring); }
+.g-tile.done { opacity: .32; cursor: default; border-style: dashed; }
+.g-tile.miss { animation: gShake .35s ease; border-color: var(--red-ring); background: var(--red-dim); }
+@keyframes gShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+/* ─── formula builder ─── */
+.g-slots {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 54px;
+  padding: 12px; border-radius: var(--r-md);
+  background: var(--glass-fill-strong); border: 1px dashed var(--glass-border-2);
+}
+.g-slots-empty { color: var(--text-3); font-size: 13px; font-style: italic; }
+.g-tokens { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.g-token {
+  padding: 7px 11px; border-radius: var(--r-sm); cursor: pointer;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+  background: var(--glass-fill); border: 1px solid var(--glass-border); color: var(--text-1);
+  transition: background .14s, border-color .14s, transform .14s;
+}
+.g-token:hover:not(:disabled) { background: var(--glass-fill-hover); border-color: var(--primary); transform: translateY(-1px); }
+.g-token.placed { background: var(--primary-dim); border-color: var(--primary-ring); }
+.g-token:disabled { opacity: .35; cursor: default; }
+
+/* ─── error hunt ─── */
+.g-sheet-wrap { overflow-x: auto; border-radius: var(--r-md); border: 1px solid var(--glass-border); }
+.g-sheet { border-collapse: collapse; font-family: var(--font-mono); font-size: 12.5px; width: 100%; min-width: 520px; }
+.g-sheet th, .g-sheet td { border: 1px solid var(--glass-border); padding: 0; text-align: left; }
+.g-sheet thead th, .g-sheet .g-rowhead {
+  background: var(--glass-fill-strong); color: var(--text-3);
+  font-size: 11px; font-weight: 700; text-align: center; padding: 5px 8px; user-select: none;
+}
+.g-cell { display: block; width: 100%; padding: 7px 9px; color: var(--text-1); font-variant-numeric: tabular-nums; }
+.g-cell.head { font-weight: 700; color: var(--text-2); }
+.g-cell-btn { background: none; border: none; cursor: pointer; font: inherit; text-align: left; }
+.g-cell-btn:hover { background: var(--primary-dim); }
+.g-cell.editing { padding: 0; }
+.g-cell-input {
+  width: 100%; padding: 6px 8px; border: none; outline: 2px solid var(--primary);
+  background: var(--glass-fill-strong); color: var(--text-1);
+  font-family: var(--font-mono); font-size: 12.5px; box-sizing: border-box;
+}
+.g-cell.bad { background: var(--red-dim); box-shadow: inset 2px 0 0 var(--red); }
+.g-formula-bar {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 8px 11px;
+  border-radius: var(--r-sm); background: var(--glass-fill-strong); border: 1px solid var(--glass-border);
+  font-family: var(--font-mono); font-size: 12.5px; color: var(--text-2); min-height: 20px;
+}
+.g-formula-bar b { color: var(--text-3); font-weight: 700; }
+
+/* ─── results ─── */
+.g-results { text-align: center; padding: 30px 22px; }
+.g-results-score { font-family: var(--font-display); font-size: 46px; font-weight: 800; color: var(--text-1); line-height: 1; }
+.g-results-grid { display: flex; justify-content: center; gap: 26px; flex-wrap: wrap; margin: 22px 0; }
+.g-results-note { font-size: 13px; color: var(--text-2); max-width: 460px; margin: 0 auto 20px; line-height: 1.65; }
+.g-actions { display: flex; gap: 9px; justify-content: center; flex-wrap: wrap; }
+.g-review { text-align: left; margin-top: 24px; display: flex; flex-direction: column; gap: 8px; }
+.g-review-item { padding: 11px 13px; border-radius: var(--r-md); background: var(--glass-fill); border: 1px solid var(--glass-border); font-size: 13px; line-height: 1.55; }
+.g-review-q { font-weight: 650; color: var(--text-1); }
+.g-review-a { color: var(--text-2); margin-top: 4px; }
+
+.g-empty { text-align: center; padding: 40px 20px; color: var(--text-3); font-size: 14px; }
+
+@media (max-width: 720px) {
+  .g-match { grid-template-columns: 1fr; }
+  .g-results-score { font-size: 38px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .g-tile, .g-token, .g-option, .g-progress-fill, .g-feedback { transition: none; animation: none; }
+}
+
+/* === GUIDED === */
+/* Step objective banner, shown above a game's body when GameHost gets an
+   `objective` prop. Kept visually light -- it is a nudge, not another panel. */
+.g-objective {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 14px; border-radius: var(--r-md);
+  background: var(--primary-dim); border: 1px solid var(--primary-ring);
+  font-size: 13px; line-height: 1.5; color: var(--text-1);
+}
+.g-objective-eyebrow {
+  flex: none; font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--primary);
+}
+.g-objective-text { color: var(--text-1); }
+
+/* The auto-advance signal in the top bar: invisible at rest, a brief pulse
+   when GameHost's guided mode catches a correct event and fires onAdvance.
+   It carries data-guide-target="game-submit" so the spotlight overlay has a
+   stable node to point a "you're done here" step at, even though guided
+   mode has no manual submit button to click. */
+.g-guide-advance { width: 0; height: 0; }
+.g-guide-advance.hit {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--green);
+  animation: gGuideHit .7s ease-out;
+}
+@keyframes gGuideHit {
+  0% { transform: scale(.4); opacity: 0; }
+  30% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .g-guide-advance.hit { animation: none; opacity: 1; }
+}

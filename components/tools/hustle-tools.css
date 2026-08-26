@@ -1,0 +1,182 @@
+/* components/tools/hustle-tools.css — shared styling for the six Hustle
+   (job-search) tools. Everything is scoped under .h-* so nothing here can leak
+   into the rest of the app. Colours, radii and fonts all come from
+   globals.css tokens, so both themes work with no per-theme rules here. */
+
+/* ─── page shell ─── */
+.h-page { max-width: 980px; margin: 0 auto; padding: 40px 48px; }
+.h-page-wide { max-width: 1180px; }
+
+.h-head { margin-bottom: 26px; }
+.h-title {
+  font-family: var(--font-display); font-size: 26px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--text-1); margin-bottom: 6px;
+}
+.h-sub { font-size: 14px; color: var(--text-3); line-height: 1.5; max-width: 68ch; }
+
+.h-card { padding: 24px; margin-bottom: 18px; }
+.h-card-tight { padding: 16px; }
+
+.h-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.h-row-top { align-items: flex-start; }
+.h-spacer { flex: 1; }
+.h-stack { display: flex; flex-direction: column; gap: 14px; }
+
+/* ─── form controls ─── */
+.h-field { margin-bottom: 16px; }
+.h-label {
+  display: block; font-size: 12px; font-weight: 600; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px;
+}
+.h-label-note { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; }
+
+.h-input, .h-textarea, .h-select {
+  width: 100%; padding: 9px 12px; border-radius: var(--r-md);
+  border: 1px solid var(--glass-border); background: var(--glass-fill);
+  color: var(--text-1); font-size: 14px; font-family: var(--font-body);
+  box-sizing: border-box;
+}
+.h-input:focus, .h-textarea:focus, .h-select:focus {
+  outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-ring);
+}
+.h-textarea { resize: vertical; line-height: 1.6; }
+.h-select { cursor: pointer; }
+.h-input-sm { padding: 6px 9px; font-size: 13px; }
+
+.h-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.h-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.h-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+@media (max-width: 900px) {
+  .h-page { padding: 24px 18px; }
+  .h-grid-2, .h-grid-3, .h-grid-4 { grid-template-columns: 1fr; }
+}
+
+/* ─── stats ─── */
+.h-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.h-stat {
+  flex: 1; min-width: 108px; padding: 14px 16px; border-radius: var(--r-lg);
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+}
+.h-stat-v {
+  font-family: var(--font-mono); font-size: 22px; font-weight: 700;
+  color: var(--text-1); font-variant-numeric: tabular-nums; line-height: 1.2;
+}
+.h-stat-k {
+  font-size: 10px; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--text-3); margin-top: 4px;
+}
+.h-stat-good .h-stat-v { color: var(--green-2); }
+.h-stat-bad .h-stat-v { color: var(--red-2); }
+
+/* ─── findings / diagnosis ─── */
+.h-finding {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 12px 14px; border-radius: var(--r-md); margin-bottom: 8px;
+  font-size: 13px; line-height: 1.55; border: 1px solid transparent;
+}
+.h-finding:last-child { margin-bottom: 0; }
+.h-finding-critical { background: var(--red-dim); border-color: var(--red-ring); color: var(--text-1); }
+.h-finding-warn { background: var(--gold-dim); border-color: var(--gold-ring); color: var(--text-1); }
+.h-finding-info { background: var(--glass-fill); border-color: var(--glass-border); color: var(--text-2); }
+.h-finding-good { background: var(--green-dim); border-color: var(--green-ring); color: var(--text-1); }
+.h-finding-icon { flex-shrink: 0; font-size: 14px; line-height: 1.4; }
+
+/* ─── tables ─── */
+.h-table-wrap { overflow-x: auto; border-radius: var(--r-md); }
+.h-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
+.h-table th {
+  text-align: left; padding: 9px 10px; font-size: 10px; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--text-3);
+  border-bottom: 1px solid var(--glass-border); white-space: nowrap;
+}
+.h-table td {
+  padding: 9px 10px; color: var(--text-1);
+  border-bottom: 1px solid var(--glass-border); vertical-align: middle;
+}
+.h-table tr:last-child td { border-bottom: none; }
+.h-table tbody tr:hover { background: var(--glass-fill); }
+.h-table .h-num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.h-td-muted { color: var(--text-3); }
+.h-row-overdue td:first-child { box-shadow: inset 3px 0 0 var(--red); }
+
+/* ─── list items ─── */
+.h-item {
+  padding: 14px 16px; border-radius: var(--r-md);
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  margin-bottom: 10px;
+}
+.h-item:last-child { margin-bottom: 0; }
+.h-item-active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-ring); }
+.h-item-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.h-item-name { font-weight: 700; font-size: 14px; color: var(--text-1); }
+.h-item-meta { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+
+/* ─── chips / tags ─── */
+.h-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.h-chip {
+  padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  background: var(--glass-fill); border: 1px solid var(--glass-border);
+  color: var(--text-2); cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+  font-family: var(--font-body);
+}
+.h-chip:hover { background: var(--glass-fill-hover); color: var(--text-1); }
+.h-chip-on { background: var(--primary-dim); border-color: var(--primary-ring); color: var(--primary-2); }
+.h-chip-gap { background: var(--red-dim); border-color: var(--red-ring); color: var(--red-2); }
+.h-chip-static { cursor: default; }
+
+/* ─── meters ─── */
+.h-meter {
+  height: 6px; border-radius: 999px; background: var(--glass-fill);
+  border: 1px solid var(--glass-border); overflow: hidden; margin: 6px 0;
+}
+.h-meter-fill { height: 100%; border-radius: 999px; background: var(--cta-gradient); transition: width .4s cubic-bezier(.16,1,.3,1); }
+.h-meter-fill-good { background: var(--green); }
+.h-meter-fill-bad { background: var(--red); }
+
+/* ─── output panes ─── */
+.h-output {
+  white-space: pre-wrap; font-family: var(--font-mono); font-size: 12.5px;
+  line-height: 1.65; color: var(--text-1); margin: 0;
+  max-height: 520px; overflow-y: auto;
+}
+.h-output-prose { font-family: var(--font-body); font-size: 14px; line-height: 1.7; }
+.h-actions {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px;
+  border-top: 1px solid var(--glass-border); padding-top: 16px;
+}
+
+/* ─── notices ─── */
+.h-notice {
+  font-size: 13px; line-height: 1.55; padding: 10px 13px;
+  border-radius: var(--r-md); margin-top: 10px;
+  background: var(--gold-dim); border: 1px solid var(--gold-ring); color: var(--text-1);
+}
+.h-notice-error { background: var(--red-dim); border-color: var(--red-ring); }
+.h-empty {
+  padding: 30px 20px; text-align: center; color: var(--text-3);
+  font-size: 13.5px; line-height: 1.6;
+}
+
+/* ─── bullet analysis ─── */
+.h-bullet { padding: 12px 14px; border-radius: var(--r-md); background: var(--glass-fill); border: 1px solid var(--glass-border); margin-bottom: 10px; }
+.h-bullet-issues { margin: 8px 0 0; padding-left: 18px; font-size: 12px; color: var(--text-2); line-height: 1.6; }
+.h-bullet-issues li { margin-bottom: 2px; }
+.h-score { font-family: var(--font-mono); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.h-score-good { color: var(--green-2); }
+.h-score-mid { color: var(--gold-2); }
+.h-score-bad { color: var(--red-2); }
+
+/* ─── rubric ─── */
+.h-rubric { display: flex; flex-direction: column; gap: 8px; }
+.h-rubric-row { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.5; }
+.h-rubric-mark { flex-shrink: 0; width: 16px; font-weight: 700; }
+.h-rubric-pass { color: var(--green-2); }
+.h-rubric-fail { color: var(--red-2); }
+.h-rubric-label { font-weight: 600; color: var(--text-1); min-width: 132px; flex-shrink: 0; }
+.h-rubric-note { color: var(--text-2); }
+
+@media (max-width: 640px) {
+  .h-rubric-row { flex-wrap: wrap; }
+  .h-rubric-label { min-width: 0; }
+}

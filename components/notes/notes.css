@@ -1,0 +1,273 @@
+/* components/notes/notes.css
+   Styles for the AI note-taker (NoteTaker.js) and the lesson-builder review
+   UI (LessonBuilder.js). All class names are prefixed .coopNotes- / .coopLb-
+   so this file is safe as a global import. Colors come exclusively from the
+   app's theme variables (app/globals.css), so light/dark both work. */
+
+/* ── shared ─────────────────────────────────────────────────────────────── */
+
+.coopNotes-panel,
+.coopLb-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.coopNotes-input,
+.coopLb-input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-1);
+  font-size: 14px;
+  font-family: var(--font-body);
+  box-sizing: border-box;
+}
+
+.coopNotes-textarea {
+  min-height: 96px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.coopNotes-label,
+.coopLb-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.coopNotes-btn,
+.coopLb-btn {
+  padding: 8px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-1);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.coopNotes-btn:disabled,
+.coopLb-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.coopNotes-btnPrimary,
+.coopLb-btnPrimary {
+  background: var(--text-1);
+  color: var(--glass-fill);
+  border-color: transparent;
+}
+
+.coopNotes-btnDanger {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.35);
+  background: transparent;
+}
+
+/* ── note taker ─────────────────────────────────────────────────────────── */
+
+.coopNotes-capture {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  background: var(--glass-fill);
+}
+
+.coopNotes-captureRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.coopNotes-captureRow > select,
+.coopNotes-captureRow > input {
+  flex: 1 1 180px;
+}
+
+.coopNotes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.coopNotes-card {
+  padding: 12px 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  background: var(--glass-fill);
+}
+
+.coopNotes-cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+
+.coopNotes-cardBody {
+  font-size: 14px;
+  color: var(--text-1);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.coopNotes-cardBody ul {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+
+.coopNotes-cardBody code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.9em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+}
+
+.coopNotes-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.coopNotes-cardActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.coopNotes-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+/* ── lesson builder ─────────────────────────────────────────────────────── */
+
+.coopLb-section {
+  padding: 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  background: var(--glass-fill);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.coopLb-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.coopLb-row > select {
+  flex: 1 1 200px;
+}
+
+.coopLb-noteCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-1);
+  line-height: 1.4;
+}
+
+.coopLb-cost {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.coopLb-error {
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.coopLb-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  color: #7c3aed;
+}
+
+.coopLb-draftTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.coopLb-para {
+  font-size: 14px;
+  color: var(--text-1);
+  line-height: 1.6;
+}
+
+.coopLb-quizItem {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.coopLb-option {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-1);
+  padding: 6px 8px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--glass-border);
+}
+
+.coopLb-optionCorrect {
+  border-color: rgba(29, 111, 66, 0.55);
+  background: rgba(29, 111, 66, 0.08);
+}
+
+.coopLb-optionWhy {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.coopLb-gameCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-1);
+  border: 1px dashed var(--glass-border);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+}

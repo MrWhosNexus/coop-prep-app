@@ -1,0 +1,262 @@
+// Series 65 - "client" section expansion, batch 3 of 4.
+// Biased toward the third slice of the topic scope: trusts/estates mechanics,
+// ERISA fiduciary specifics, retirement-account transaction mechanics (NUA,
+// backdoor Roth, rollovers, excess contributions, 72(t) SEPP), split-interest
+// and gift-tax trust structures (CRUT, Crummey powers), and 529 account
+// control rules. Avoids any dollar figures, contribution limits, RMD ages, or
+// excise-tax rates that are indexed or otherwise date-sensitive; tests the
+// underlying mechanism instead. Fixed-income ladder/barbell/bullet ground is
+// deliberately NOT covered here - it is already saturated by
+// series65-bank-vehicles.js and expansion client files 1, 2 and 4.
+// Checked against series65-bank.js, series65-bank-client.js and the sibling
+// expansion files to avoid duplicating existing questions/option sets.
+
+export const S65_CLIENT_X3 = [
+  {
+    id: "s65-cl-x301",
+    section: "client",
+    q: "A client's estate plan establishes a testamentary trust for their minor children. Compared with a revocable living (inter vivos) trust, a testamentary trust:",
+    a: "Is created by the terms of the client's will and therefore comes into existence only at death, after the will is admitted to probate",
+    explanation: "A testamentary trust is written into the will itself, so it has no independent existence during the client's lifetime; it springs into being only when the client dies and the will is probated. A revocable living trust, by contrast, is created and funded while the grantor is alive, which is what lets the assets it holds bypass probate at death.",
+    options: [
+      { text: "Is created by the terms of the client's will and therefore comes into existence only at death, after the will is admitted to probate", explanation: "Correct - being a creature of the will means the testamentary trust cannot exist until the will takes effect at death and is probated." },
+      { text: "Takes effect immediately upon signing and can be funded and administered during the client's lifetime", explanation: "Wrong - that describes a living (inter vivos) trust; a testamentary trust does nothing while the client is alive." },
+      { text: "Avoids probate for the assets used to fund it", explanation: "Wrong - this is a common misconception. The funding assets are still in the decedent's own name at death, so they must pass through probate to reach the trust; probate avoidance is a feature of a funded LIVING trust, not a testamentary one." },
+      { text: "Becomes irrevocable the moment the client signs the will, so its terms can no longer be changed", explanation: "Wrong - the client may amend or revoke the will (and with it the trust provisions) at any time while alive and competent; the trust's terms become fixed only at death." },
+    ],
+  },
+  {
+    id: "s65-cl-x302",
+    section: "client",
+    q: "A grandparent's will leaves an estate 'to my children, per stirpes.' If one child has predeceased the grandparent leaving two children of their own, per stirpes distribution means:",
+    a: "That predeceased child's share is divided equally among that child's own children",
+    explanation: "Per stirpes ('by the branch') distributes a deceased heir's share down to their own descendants, who split it among themselves, rather than that share passing up to surviving siblings or being distributed as if generations didn't matter.",
+    options: [
+      { text: "That predeceased child's share is divided equally among that child's own children", explanation: "Correct - per stirpes preserves the deceased branch's share, passing it down to that branch's descendants rather than reallocating it elsewhere." },
+      { text: "That predeceased child's share is instead divided among the surviving children", explanation: "Wrong - this describes the effect of a deceased beneficiary's share lapsing to survivors, not per stirpes distribution." },
+      { text: "All grandchildren, regardless of branch, share equally on a per-capita basis", explanation: "Wrong - this describes per capita distribution, where all living descendants at a given level share equally; per stirpes instead respects branch lines." },
+      { text: "The estate passes entirely to the state under intestacy rules", explanation: "Wrong - a valid will with a per stirpes clause is not intestate; intestacy only applies without a valid will." },
+    ],
+  },
+  {
+    id: "s65-cl-x303",
+    section: "client",
+    q: "A trust document includes a 'spendthrift clause.' The primary purpose of this provision is to:",
+    a: "Prevent a beneficiary from assigning their trust interest and generally shield it from the beneficiary's creditors",
+    explanation: "A spendthrift clause restricts a beneficiary's ability to sell, assign, or pledge their future trust interest, which also generally keeps the beneficiary's creditors from reaching trust assets before they're distributed, protecting a beneficiary who might otherwise mismanage funds.",
+    options: [
+      { text: "Prevent a beneficiary from assigning their trust interest and generally shield it from the beneficiary's creditors", explanation: "Correct - this asset-protection and anti-alienation feature is the defining purpose of a spendthrift provision." },
+      { text: "Require the trustee to distribute all income to the beneficiary annually", explanation: "Wrong - that describes a simple trust's mandatory income distribution requirement, unrelated to a spendthrift clause." },
+      { text: "Allow the grantor to revoke the trust at any time", explanation: "Wrong - revocability is a separate feature of a revocable trust and has nothing to do with spendthrift protection." },
+      { text: "Eliminate the trust's obligation to file a separate tax return", explanation: "Wrong - a spendthrift clause has no effect on the trust's tax filing obligations." },
+    ],
+  },
+  {
+    id: "s65-cl-x304",
+    section: "client",
+    q: "A married couple's estate plan uses a credit shelter (bypass) trust at the first spouse's death instead of relying solely on portability. The main reason to still use this trust-based approach is that it:",
+    a: "Removes future appreciation on the funded assets from the surviving spouse's own taxable estate",
+    explanation: "Unlike simple portability (which preserves only the deceased spouse's unused exclusion amount as a dollar figure), a credit shelter trust actually moves assets out of the survivor's estate. Any post-funding growth in those assets escapes estate tax at the second death, which portability alone does not achieve.",
+    options: [
+      { text: "Removes future appreciation on the funded assets from the surviving spouse's own taxable estate", explanation: "Correct - funding a bypass trust locks in the first spouse's exclusion against the asset's value at that time, and subsequent growth occurs outside the survivor's estate." },
+      { text: "Allows the surviving spouse to freely withdraw principal for any purpose with no restriction", explanation: "Wrong - bypass trusts typically limit the survivor's access to trust principal (often to an ascertainable standard) precisely so the assets remain outside the survivor's estate." },
+      { text: "Qualifies the trust assets for the unlimited marital deduction", explanation: "Wrong - a credit shelter trust is deliberately structured so the assets do NOT qualify for the marital deduction, since they use the first spouse's exclusion instead." },
+      { text: "Converts the trust income into tax-exempt municipal interest automatically", explanation: "Wrong - trust structure has no bearing on whether underlying investment income is taxable or tax-exempt." },
+    ],
+  },
+  {
+    id: "s65-cl-x305",
+    section: "client",
+    q: "A QTIP (qualified terminable interest property) trust is often used in second-marriage planning because it allows a grantor to:",
+    a: "Provide income to the surviving spouse for life while directing the remaining principal to the grantor's own children at the spouse's death",
+    explanation: "A QTIP trust qualifies for the marital deduction (deferring estate tax at the first death) while still letting the grantor control who ultimately receives the remaining principal, commonly children from a prior marriage, rather than leaving that decision to the surviving spouse.",
+    options: [
+      { text: "Provide income to the surviving spouse for life while directing the remaining principal to the grantor's own children at the spouse's death", explanation: "Correct - this life-income-to-spouse, remainder-to-grantor's-chosen-heirs structure is exactly what QTIP treatment is designed to accomplish." },
+      { text: "Let the surviving spouse freely redirect the remainder principal to anyone they choose", explanation: "Wrong - the entire purpose of a QTIP is that the grantor, not the surviving spouse, controls the remainder beneficiaries." },
+      { text: "Avoid the marital deduction entirely so estate tax is paid immediately at the first spouse's death", explanation: "Wrong - a QTIP trust specifically qualifies for the marital deduction, deferring tax until the second spouse's death." },
+      { text: "Give the surviving spouse full authority to withdraw all trust principal at will", explanation: "Wrong - QTIP treatment requires the spouse receive only income (all of it, at least annually) for life, not unrestricted access to principal." },
+    ],
+  },
+  {
+    id: "s65-cl-x306",
+    section: "client",
+    q: "An intentionally defective grantor trust (IDGT) is 'defective' in the sense that:",
+    a: "The grantor retains enough powers over the trust that its income is taxed to the grantor personally, even though the assets are excluded from the grantor's taxable estate",
+    explanation: "Grantor trust rules cause certain retained powers to make trust income taxable to the grantor rather than the trust or its beneficiaries. An IDGT deliberately keeps just enough of those powers to trigger grantor income taxation while still being structured (typically irrevocably) to remove the assets from the grantor's gross estate.",
+    options: [
+      { text: "The grantor retains enough powers over the trust that its income is taxed to the grantor personally, even though the assets are excluded from the grantor's taxable estate", explanation: "Correct - the 'defect' is intentional grantor-trust income tax treatment paired with successful estate-tax removal, which lets the grantor pay the trust's income taxes as an additional, tax-free gift to beneficiaries." },
+      { text: "The trust document contains a drafting error that must be corrected before it is valid", explanation: "Wrong - 'defective' here is a term of art referring to tax treatment, not a legal flaw requiring correction." },
+      { text: "The trust cannot legally hold appreciating assets", explanation: "Wrong - IDGTs are commonly funded specifically with assets expected to appreciate, to shift future growth out of the grantor's estate." },
+      { text: "The trust automatically terminates after a fixed statutory period", explanation: "Wrong - the grantor-trust income tax characterization, not a mandatory termination date, is what defines an IDGT." },
+    ],
+  },
+  {
+    id: "s65-cl-x307",
+    section: "client",
+    q: "The federal generation-skipping transfer tax (GSTT) is imposed primarily to prevent:",
+    a: "Wealthy families from avoiding a layer of transfer tax by transferring assets directly to grandchildren or later generations instead of to their children first",
+    explanation: "Without the GSTT, a family could skip an entire generation's estate tax by leaving assets directly to grandchildren rather than passing through the children's estates. The GSTT imposes an additional transfer tax on transfers to 'skip persons' to close that gap.",
+    options: [
+      { text: "Wealthy families from avoiding a layer of transfer tax by transferring assets directly to grandchildren or later generations instead of to their children first", explanation: "Correct - the GSTT specifically targets transfers that bypass a generation, ensuring transfer tax is not skipped entirely." },
+      { text: "Beneficiaries from disclaiming an inheritance they do not want", explanation: "Wrong - qualified disclaimers are a separate, permitted estate planning tool unrelated to the GSTT's purpose." },
+      { text: "Trustees from investing trust assets in growth securities", explanation: "Wrong - the GSTT is a transfer tax concept and has no bearing on a trustee's investment choices." },
+      { text: "Charitable organizations from receiving tax-deductible bequests", explanation: "Wrong - charitable transfers are unrelated to and generally not subject to the GSTT." },
+    ],
+  },
+  {
+    id: "s65-cl-x308",
+    section: "client",
+    q: "A durable power of attorney differs from a standard (nondurable) power of attorney in that a durable power of attorney:",
+    a: "Remains in effect (or becomes effective) even after the principal becomes incapacitated",
+    explanation: "A standard power of attorney automatically terminates if the principal becomes incapacitated, which defeats the purpose in most planning contexts. A durable power of attorney contains language specifying that it survives (or a 'springing' version that only begins upon) the principal's incapacity, so the agent can continue acting.",
+    options: [
+      { text: "Remains in effect (or becomes effective) even after the principal becomes incapacitated", explanation: "Correct - durability is precisely the feature that keeps the authorization valid through incapacity, when it is most needed." },
+      { text: "Automatically terminates the moment the principal becomes incapacitated", explanation: "Wrong - this describes a standard, nondurable power of attorney, the opposite of a durable one." },
+      { text: "Grants the agent authority only over medical decisions, never financial ones", explanation: "Wrong - a durable power of attorney can cover financial matters; medical decision authority is typically a separate healthcare proxy or durable power of attorney for healthcare." },
+      { text: "Requires annual renewal through a probate court filing", explanation: "Wrong - a durable power of attorney does not require ongoing court involvement to remain valid." },
+    ],
+  },
+  {
+    id: "s65-cl-x309",
+    section: "client",
+    q: "Under ERISA Section 404(c), a defined contribution plan sponsor that lets participants direct their own account investments and satisfies the section's disclosure and options requirements:",
+    a: "Is generally relieved of fiduciary liability for investment losses that result directly from a participant's own investment decisions",
+    explanation: "ERISA 404(c) offers plan fiduciaries a form of protection: if participants are given genuine control over their accounts, a sufficiently diverse menu of investment options, and adequate information to make informed choices, the fiduciary is not liable for losses that flow from the participant's own investment choices.",
+    options: [
+      { text: "Is generally relieved of fiduciary liability for investment losses that result directly from a participant's own investment decisions", explanation: "Correct - this liability shield for participant-directed losses, conditioned on meeting 404(c)'s requirements, is the section's core purpose." },
+      { text: "Is entirely exempt from all ERISA fiduciary duties for that plan", explanation: "Wrong - 404(c) provides a narrow liability shield for participant-directed investment losses; it does not eliminate the fiduciary's other duties, such as prudently selecting and monitoring the investment menu." },
+      { text: "Must guarantee each participant a minimum rate of return", explanation: "Wrong - 404(c) protection has nothing to do with guaranteeing returns; participants bear the investment risk of their own choices." },
+      { text: "Is required to limit participants to a single investment option", explanation: "Wrong - 404(c) actually requires a broad enough range of investment alternatives to let participants materially affect their risk and return." },
+    ],
+  },
+  {
+    id: "s65-cl-x310",
+    section: "client",
+    q: "Under ERISA's prohibited transaction rules, a 'party in interest' generally includes which of the following with respect to a plan?",
+    a: "The plan sponsor (employer), plan fiduciaries, and certain service providers to the plan",
+    explanation: "ERISA restricts certain transactions between a plan and 'parties in interest,' a defined group that includes the sponsoring employer, plan fiduciaries, employees who provide services to the plan, and related persons or entities, since these parties have an inherent conflict of interest in dealings with plan assets.",
+    options: [
+      { text: "The plan sponsor (employer), plan fiduciaries, and certain service providers to the plan", explanation: "Correct - these are the categories of persons ERISA identifies as parties in interest due to their close relationship with, or influence over, the plan." },
+      { text: "Only unrelated third parties who have never done business with the plan", explanation: "Wrong - this is essentially the opposite; parties in interest are defined by their close relationship to the plan, not their independence from it." },
+      { text: "Only the plan's rank-and-file participants who are not officers or owners", explanation: "Wrong - ordinary participants without a special relationship to plan administration are not, by that fact alone, parties in interest." },
+      { text: "Only government regulators who oversee the plan", explanation: "Wrong - regulatory bodies are not parties in interest; that term describes persons connected to the plan's operation and sponsorship." },
+    ],
+  },
+  {
+    id: "s65-cl-x311",
+    section: "client",
+    q: "ERISA generally requires that every plan fiduciary and every other person who handles plan funds or other plan property be:",
+    a: "Covered by a fidelity bond protecting the plan against losses from fraud or dishonesty",
+    explanation: "To protect plan assets from theft or embezzlement, ERISA requires fiduciaries and others who 'handle' plan funds to be bonded, meaning an insurer guarantees the plan will be made whole if that person commits fraud or dishonest acts involving plan property.",
+    options: [
+      { text: "Covered by a fidelity bond protecting the plan against losses from fraud or dishonesty", explanation: "Correct - ERISA's bonding requirement exists specifically to protect plan assets against loss from fraud or dishonesty by those who handle plan funds." },
+      { text: "Registered as an investment adviser representative", explanation: "Wrong - handling plan funds does not by itself require investment adviser representative registration; that depends on whether the person provides investment advice for compensation." },
+      { text: "A named fiduciary identified in the plan document", explanation: "Wrong - bonding requirements apply more broadly to anyone who handles funds, not only to persons formally named as fiduciaries in the plan document." },
+      { text: "Personally liable for all investment losses in the plan regardless of prudence", explanation: "Wrong - ERISA imposes a prudence standard on fiduciaries, not blanket personal liability for every investment loss irrespective of conduct." },
+    ],
+  },
+  {
+    id: "s65-cl-x312",
+    section: "client",
+    q: "A client retiring with employer stock inside a 401(k) plan is evaluating a net unrealized appreciation (NUA) strategy. This strategy generally involves:",
+    a: "Taking a lump-sum distribution of the stock in kind so that its appreciation over cost basis is taxed at long-term capital gains rates upon a later sale, rather than as ordinary income",
+    explanation: "NUA treatment lets a participant distribute employer stock from a qualified plan in kind (paying ordinary income tax only on the stock's original cost basis at that time) and defer tax on the built-in appreciation until the stock is later sold, at which point that appreciation is taxed at long-term capital gains rates regardless of how long the stock is then held.",
+    options: [
+      { text: "Taking a lump-sum distribution of the stock in kind so that its appreciation over cost basis is taxed at long-term capital gains rates upon a later sale, rather than as ordinary income", explanation: "Correct - this favorable capital-gains treatment on the built-in appreciation is the entire benefit that makes an NUA strategy attractive for low-basis employer stock." },
+      { text: "Rolling the employer stock into a Traditional IRA to defer all tax indefinitely", explanation: "Wrong - rolling the stock into an IRA forfeits NUA treatment; all future distributions from the IRA would then be taxed as ordinary income, including the appreciation." },
+      { text: "Converting the employer stock directly into municipal bonds tax-free", explanation: "Wrong - NUA has nothing to do with converting into municipal bonds; it concerns the tax character of gain on employer stock itself." },
+      { text: "Selling the stock inside the plan before distribution to lock in a tax-free gain", explanation: "Wrong - selling inside the plan would not preserve NUA treatment and any later distribution of the proceeds would be taxed as ordinary income." },
+    ],
+  },
+  {
+    id: "s65-cl-x313",
+    section: "client",
+    q: "A client wants a 'backdoor Roth IRA' by making a nondeductible contribution to a Traditional IRA and then converting it, but already holds a substantial pre-tax balance in another Traditional IRA. The IRS aggregation (pro-rata) rule means that:",
+    a: "The conversion is treated as coming proportionally from all of the client's traditional IRA balances combined, so it cannot be treated as tax-free even though the new contribution itself was nondeductible",
+    explanation: "For determining the taxable portion of any Roth conversion, the IRS treats all of an individual's traditional, SEP, and SIMPLE IRA balances as one combined pool. A client cannot isolate just the new nondeductible contribution for conversion; the pro-rata rule spreads pre-tax and after-tax dollars across the conversion based on the aggregate balance.",
+    options: [
+      { text: "The conversion is treated as coming proportionally from all of the client's traditional IRA balances combined, so it cannot be treated as tax-free even though the new contribution itself was nondeductible", explanation: "Correct - the pro-rata rule aggregates all traditional IRA balances, meaning most of the conversion will still be taxable given the large pre-tax balance elsewhere." },
+      { text: "Only the new nondeductible contribution is considered, so the entire conversion is tax-free regardless of other IRA balances", explanation: "Wrong - this ignores the aggregation rule, which requires combining all traditional IRA balances rather than isolating the newest contribution." },
+      { text: "The existing pre-tax IRA balance must be forfeited before any conversion is allowed", explanation: "Wrong - there is no forfeiture requirement; the client may still convert, but must recognize proportional taxable income based on the aggregate balance." },
+      { text: "The client is barred from ever converting any IRA funds to a Roth IRA", explanation: "Wrong - conversions remain permitted; the aggregation rule affects how much of the conversion is taxable, not whether conversion is allowed." },
+    ],
+  },
+  {
+    id: "s65-cl-x314",
+    section: "client",
+    q: "An investor takes a distribution from a Traditional IRA intending to complete an indirect (60-day) rollover. Which statement about this transaction is accurate?",
+    a: "The investor generally may complete only one such indirect IRA-to-IRA rollover within any 12-month period, regardless of how many IRAs are involved",
+    explanation: "The tax code allows an indirect rollover only if the funds are redeposited within 60 days, and separately limits an individual to one indirect IRA-to-IRA rollover in any rolling 12-month period across all of that individual's IRAs, regardless of how many separate IRA accounts are involved. Direct trustee-to-trustee transfers are not subject to this once-per-year limit.",
+    options: [
+      { text: "The investor generally may complete only one such indirect IRA-to-IRA rollover within any 12-month period, regardless of how many IRAs are involved", explanation: "Correct - this one-rollover-per-12-months limit applies across all of an individual's IRAs in aggregate, not on a per-account basis." },
+      { text: "The investor may complete one indirect rollover per 12-month period for each separate IRA account owned", explanation: "Wrong - the limit is aggregated across all the individual's IRAs, not counted separately per account." },
+      { text: "There is no time limit on redepositing the funds as long as they eventually return to an IRA", explanation: "Wrong - funds generally must be redeposited within 60 days of receipt or the distribution becomes taxable (and possibly subject to penalty)." },
+      { text: "A direct trustee-to-trustee transfer between IRAs is subject to the same once-per-year limit", explanation: "Wrong - direct trustee-to-trustee transfers, where the investor never takes possession of the funds, are not counted against the one-per-12-month indirect rollover limit." },
+    ],
+  },
+  {
+    id: "s65-cl-x315",
+    section: "client",
+    q: "A client discovers they made an excess contribution to their IRA for the year. To avoid an ongoing excise tax on the excess amount, the client should generally:",
+    a: "Withdraw the excess contribution, along with any earnings attributable to it, by the tax filing deadline (including extensions) for that year",
+    explanation: "Timely correcting an excess IRA contribution, removing both the excess amount and any earnings it generated by the applicable tax filing deadline (including extensions), avoids the recurring excise tax that would otherwise apply for each year the excess remains in the account.",
+    options: [
+      { text: "Withdraw the excess contribution, along with any earnings attributable to it, by the tax filing deadline (including extensions) for that year", explanation: "Correct - a timely corrective withdrawal of the excess plus earnings before the filing deadline avoids the recurring excise tax on the excess amount." },
+      { text: "Simply leave the excess in the account, since IRAs have no limit on total contributions", explanation: "Wrong - IRAs are subject to annual contribution limits, and leaving an excess in place triggers a recurring excise tax for each year it remains uncorrected." },
+      { text: "Recharacterize the excess as a rollover contribution to eliminate the issue automatically", explanation: "Wrong - simply relabeling the contribution does not cure an excess contribution; the excess (and earnings) must actually be removed or otherwise properly corrected." },
+      { text: "Wait until the following year, when the excess will no longer count against any limit", explanation: "Wrong - an uncorrected excess contribution continues to be subject to the excise tax for every year it remains in the account until properly withdrawn or absorbed." },
+    ],
+  },
+  {
+    id: "s65-cl-x316",
+    section: "client",
+    q: "Unlike a custodial UTMA account, a 529 college savings plan account generally allows the account owner to:",
+    a: "Retain control over the account, including the ability to change the designated beneficiary, even after that beneficiary reaches the age of majority",
+    explanation: "In a UTMA account, control transfers irrevocably to the beneficiary (who gains full, unrestricted access) once they reach the age of majority. A 529 plan account, by contrast, is generally controlled by the account owner indefinitely, who can change the investment options and even redirect the account to a different qualifying family member as beneficiary.",
+    options: [
+      { text: "Retain control over the account, including the ability to change the designated beneficiary, even after that beneficiary reaches the age of majority", explanation: "Correct - this ongoing owner control, including the ability to redirect the account to another eligible family member, is a key structural advantage of 529 plans over UTMA accounts." },
+      { text: "Lose all control over the account once the beneficiary reaches the age of majority, just as with a UTMA account", explanation: "Wrong - this describes UTMA treatment; a 529 plan owner does not automatically lose control when the beneficiary comes of age." },
+      { text: "Avoid ever needing to name a beneficiary for the account", explanation: "Wrong - a 529 plan must be established for a specific designated beneficiary, even though that beneficiary can later be changed." },
+      { text: "Guarantee the invested funds against any market loss", explanation: "Wrong - 529 plan investment options are typically market-based (e.g., age-based portfolios) and are not principal-guaranteed." },
+    ],
+  },
+  {
+    id: "s65-cl-x317",
+    section: "client",
+    q: "A client funds a charitable remainder unitrust (CRUT) with low-basis appreciated stock, naming themselves as the payment recipient. Compared with a charitable lead trust, this structure:",
+    a: "Pays the client a stream of payments for life or a term of years, with whatever remains in the trust passing to the charity at the end",
+    explanation: "Both are split-interest trusts, but the order of the interests is reversed. In a charitable remainder trust the noncharitable beneficiary takes the income interest first (an annuity amount in a CRAT, or a percentage of annually revalued assets in a CRUT), and the charity takes the remainder. A charitable lead trust does the opposite: the charity is paid first and the remainder returns to noncharitable beneficiaries.",
+    options: [
+      { text: "Pays the client a stream of payments for life or a term of years, with whatever remains in the trust passing to the charity at the end", explanation: "Correct - the noncharitable payment interest first and the charitable remainder last is exactly what makes this a charitable REMAINDER trust." },
+      { text: "Pays the charity a stream of payments first, with whatever remains passing to the client's heirs at the end", explanation: "Wrong - this describes a charitable LEAD trust, in which the charity holds the lead interest and noncharitable beneficiaries take the remainder." },
+      { text: "Transfers the entire trust corpus to the charity immediately upon funding, with no retained payment interest", explanation: "Wrong - that is simply an outright charitable gift; a CRUT is defined by the retained payment stream to a noncharitable recipient." },
+      { text: "Requires the client to recognize the full built-in capital gain on the stock in the year it is contributed to the trust", explanation: "Wrong - contributing appreciated stock to a CRUT does not trigger immediate gain to the donor; a qualifying CRT is itself tax-exempt, and gain is instead reported by the recipient as it is carried out in the payment stream." },
+    ],
+  },
+  {
+    id: "s65-cl-x318",
+    section: "client",
+    q: "A 52-year-old client begins taking a series of substantially equal periodic payments (SEPP) from a Traditional IRA under the Section 72(t) exception, to access the funds before age 59 1/2 without the 10% additional tax on early distributions. Under this exception, the client must:",
+    a: "Continue the payment series without modification until the later of five years from the first payment or reaching age 59 1/2, or the previously excused additional tax is recaptured with interest",
+    explanation: "The 72(t) SEPP exception is conditioned on the client sticking with the schedule. The series must run, unmodified, until the LATER of five years from the first payment or age 59 1/2 - so for a client starting at 52, the age 59 1/2 test governs, not the five-year test. Modifying or stopping early triggers a recapture of the 10% additional tax that the exception had excused for all prior years, plus interest for the deferral period.",
+    options: [
+      { text: "Continue the payment series without modification until the later of five years from the first payment or reaching age 59 1/2, or the previously excused additional tax is recaptured with interest", explanation: "Correct - the duration requirement is the LATER of the two tests, and breaking the series retroactively recaptures the excused additional tax plus interest." },
+      { text: "Continue the payment series for exactly five years, after which it may be modified at any age with no consequence", explanation: "Wrong - five years is only one of two tests, and the client must satisfy whichever ends later; a client starting at 52 would still be under 59 1/2 after five years and could not stop." },
+      { text: "Take only a single distribution, since the exception applies to one withdrawal rather than an ongoing series", explanation: "Wrong - the exception exists precisely for a SERIES of substantially equal periodic payments; a one-time withdrawal would not qualify under it." },
+      { text: "Obtain advance approval from the IRS before beginning the payment series", explanation: "Wrong - no advance IRS approval or private letter ruling is required; the taxpayer simply computes the payments using an acceptable method and reports them accordingly." },
+    ],
+  },
+  {
+    id: "s65-cl-x319",
+    section: "client",
+    q: "An irrevocable trust gives each beneficiary the right to withdraw their share of any contribution to the trust, but only for a limited window after the contribution is made (a 'Crummey' withdrawal power). The purpose of this provision is to:",
+    a: "Convert what would otherwise be a gift of a future interest into a gift of a present interest, so the contribution can qualify for the gift tax annual exclusion",
+    explanation: "The gift tax annual exclusion is available only for gifts of a present interest, and a contribution to a trust that the beneficiary cannot touch until some later date is a future interest that would not qualify. Giving the beneficiary an immediate (if brief) right to withdraw the contribution supplies the present-interest element, which is why Crummey powers are a standard feature of trusts funded with annual-exclusion gifts.",
+    options: [
+      { text: "Convert what would otherwise be a gift of a future interest into a gift of a present interest, so the contribution can qualify for the gift tax annual exclusion", explanation: "Correct - the present-interest requirement is the whole reason for the withdrawal window; without it, contributions to the trust would not qualify for the annual exclusion." },
+      { text: "Give each beneficiary permanent, unrestricted access to trust principal at any time", explanation: "Wrong - a Crummey power is deliberately narrow and time-limited, lapsing after a brief window; a permanent right to principal would defeat the point of using a trust at all." },
+      { text: "Cause the trust's assets to be included in the grantor's gross estate at death", explanation: "Wrong - estate inclusion is the opposite of what such trusts are designed for; the provision addresses gift tax qualification, not estate inclusion." },
+      { text: "Relieve the trustee of any obligation to notify beneficiaries of contributions to the trust", explanation: "Wrong - the reverse is true: the withdrawal right is only meaningful if beneficiaries receive reasonable notice of contributions and adequate time to exercise it, so notice is required rather than excused." },
+    ],
+  },
+];

@@ -1,0 +1,100 @@
+name: CI
+
+# Runs on all three operating systems the cohort actually uses.
+#
+# This is not thoroughness for its own sake: this project has already shipped a
+# Windows target that could not build (an icon path that was never committed)
+# and test guards that silently stopped testing anything on a CRLF checkout.
+# Neither is visible from a Mac. A single-OS CI would have been green for both.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push supersedes an in-flight run on the same ref.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Do not cancel the other two when one fails: "fails on Windows only" is
+      # the single most useful thing this matrix can tell us, and it is exactly
+      # what fail-fast throws away.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        # ~2,400 tests. Includes the packaging guards, the key-material scan,
+        # and the seam checks that assert call sites rather than units.
+        run: npm test
+
+      - name: Build
+        # The production static export. Catches the class of failure where the
+        # suite is green and `next build` is not.
+        run: npm run build
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Reported, not gated. The React Compiler rules flag 28 pre-existing
+      # findings in UI components written before those rules existed; they are
+      # code-quality signals, not correctness or security ones. Blocking on them
+      # would mean either a permanently red CI or a rushed refactor of working
+      # code. `test` above is the gate that matters.
+      - run: npm run lint
+        continue-on-error: true
+
+  audit:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Fails on a NEW high-severity advisory. The three known ones all sit in
+      # sharp <- @huggingface/transformers, have no fixed version available, and
+      # are image-decoder bugs in a stack this app only uses for audio — see
+      # SECURITY.md. `|| true` would make this decorative, so instead the known
+      # count is asserted: if it rises, this goes red.
+      - name: Audit
+        run: |
+          set -o pipefail
+          npm audit --audit-level=high --json > audit.json || true
+          COUNT=$(node -e "const a=require('./audit.json');console.log(a.metadata.vulnerabilities.high + a.metadata.vulnerabilities.critical)")
+          echo "high+critical advisories: $COUNT"
+          if [ "$COUNT" -gt 3 ]; then
+            echo "::error::New high-severity advisory. Known baseline is 3 (sharp/libvips, no fix available — see SECURITY.md)."
+            npm audit --audit-level=high || true
+            exit 1
+          fi

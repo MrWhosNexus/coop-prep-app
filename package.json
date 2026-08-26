@@ -1,0 +1,56 @@
+{
+  "name": "coop-prep",
+  "version": "0.2.0",
+  "description": "COOP Careers Financial Services Fellowship prep suite — FINRA exam banks (SIE, Series 65, CFI), interactive Excel/Tableau labs, guided tutorials, learning games, and on-device voice.",
+  "author": "MrWhosNexus",
+  "type": "module",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "node --test --import ./test/helpers/render.mjs",
+    "sweep:dupes": "node scripts/bank-dupe-sweep.mjs",
+    "electron:dev": "concurrently -k -n NEXT,ELECTRON -c blue,magenta \"next dev\" \"wait-on http://localhost:3000 && electron electron/main.js\"",
+    "electron:build": "next build",
+    "dist": "npm run electron:build && electron-builder",
+    "voice:check": "node scripts/voice-doctor.mjs --roundtrip",
+    "voice:fetch": "node scripts/voice-doctor.mjs --fetch",
+    "voice:status": "node scripts/voice-doctor.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "electron-updater": "^6.8.9",
+    "kokoro-js": "^1.2.1",
+    "lucide-react": "^1.18.0",
+    "next": "16.3.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "concurrently": "^10.0.3",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.3",
+    "happy-dom": "^20.10.6",
+    "tailwindcss": "^4",
+    "wait-on": "^9.0.10"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/MrWhosNexus/coop-prep-app#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrWhosNexus/coop-prep-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MrWhosNexus/coop-prep-app/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

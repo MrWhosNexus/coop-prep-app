@@ -1,0 +1,1087 @@
+// Series 65 (Uniform Investment Adviser Law Examination) — prep curriculum
+// Modules + lessons follow the EXACT shape of data/curriculum.js's MODULES export
+// so they can be merged into the same rendering path by the integration agent.
+//
+// Blueprint (130 scored questions / 180 minutes / 72% to pass = 94/130):
+//   1. Economic Factors and Business Information            ~15% (20q)
+//   2. Investment Vehicle Characteristics                   ~25% (32q)
+//   3. Client Investment Recommendations and Strategies     ~30% (39q)
+//   4. Laws, Regulations, and Guidelines (incl. Prohibited)  ~30% (39q)
+// Modules s65-captheory + s65-taxretire split section 3; s65-lawreg + s65-fiduciary split section 4.
+
+/** Metadata describing the exam blueprint, for use by an exam-mode / progress UI. */
+export const SERIES65_META = {
+  id: "series65",
+  name: "Series 65",
+  fullName: "Uniform Investment Adviser Law Examination",
+  administeredBy: "NASAA (via FINRA/Prometric)",
+  scoredQuestions: 130,
+  unscoredPretest: 10,
+  minutesAllotted: 180,
+  passingScore: 72,
+  passingCount: 94,
+  sections: [
+    { id: "economic", label: "Economic Factors and Business Information", weightPct: 15, approxQuestions: 20 },
+    { id: "vehicles", label: "Investment Vehicle Characteristics", weightPct: 25, approxQuestions: 32 },
+    { id: "client", label: "Client Investment Recommendations and Strategies", weightPct: 30, approxQuestions: 39 },
+    { id: "laws", label: "Laws, Regulations, and Guidelines, including Prohibited Activities", weightPct: 30, approxQuestions: 39 },
+  ],
+};
+
+export const SERIES65_MODULES = [
+  {
+    id: "s65-econ",
+    title: "Series 65: Economic Factors & Business Information",
+    icon: "📉",
+    color: "#7c3aed",
+    light: "#f5f3ff",
+    description: "Economic indicators, the business cycle, financial statement analysis, time value of money, and the risk landscape every IAR reasons from.",
+    coopModule: "Series 65 exam prep — Section 1 (Economic Factors and Business Information, ~15% of the exam)",
+    examSection: "economic",
+    lessons: [
+      {
+        id: "s65-econ-1",
+        title: "Economic indicators and the business cycle",
+        minutes: 8,
+        body: [
+          "The business cycle moves through four phases: expansion (rising output and employment), peak (the high point before a slowdown), contraction/recession (falling output), and trough (the low point before the next expansion begins).",
+          "Economic indicators are classified by their timing relative to the cycle. Leading indicators change before the economy does — stock prices, building permits, and the yield curve spread are classic examples used to anticipate turns. Coincident indicators move with the economy in real time — GDP, industrial production, and personal income. Lagging indicators confirm a turn only after it has already happened — the unemployment rate and CPI inflation are the standard examples.",
+          "Monetary policy (the Federal Reserve's tools — the fed funds rate, reserve requirements, open market operations) is distinct from fiscal policy (government taxation and spending, set by Congress and the executive branch). The exam tests whether you can tell which lever belongs to which body.",
+          "The yield curve — the relationship between bond yields and their maturities — normally slopes upward (long-term rates higher than short-term, compensating for time and inflation risk). An inverted yield curve, where short-term rates exceed long-term rates, has historically been watched as a recession signal.",
+        ],
+        challenge: "Given five data releases (stock index closing prices, building permits issued, the national unemployment rate, GDP growth, and CPI), classify each as leading, coincident, or lagging, and explain why.",
+        exampleOutput: "Stock index and building permits = leading; GDP growth = coincident; unemployment rate and CPI = lagging — because stock prices move on expectations before the real economy shifts, while unemployment only adjusts after employers have already reacted to a downturn.",
+        quiz: [
+          {
+            q: "Which of the following is classified as a LAGGING economic indicator?",
+            a: "The unemployment rate",
+            explanation: "Employers typically don't lay off or hire until after a downturn or upturn is already underway, so unemployment confirms a business-cycle turn rather than predicting it.",
+            options: [
+              { text: "Building permits", explanation: "Building permits are a leading indicator — construction plans are made well before the activity shows up in the broader economy." },
+              { text: "The unemployment rate", explanation: "Correct — unemployment is the standard textbook lagging indicator." },
+              { text: "Stock market index levels", explanation: "Stock prices are leading — they move on expectations of future earnings and economic conditions." },
+              { text: "The yield curve spread", explanation: "The yield curve spread is also a leading indicator, watched for early signs of a coming slowdown." },
+            ],
+          },
+          {
+            q: "Monetary policy is set by:",
+            a: "The Federal Reserve",
+            explanation: "Monetary policy — control of the money supply and interest rates via tools like the fed funds rate and open market operations — is the Federal Reserve's domain.",
+            options: [
+              { text: "Congress", explanation: "Congress and the executive branch set fiscal policy (taxation and spending), not monetary policy." },
+              { text: "The Federal Reserve", explanation: "Correct — the Fed controls monetary policy." },
+              { text: "The SEC", explanation: "The SEC regulates securities markets and registrants; it has no role in setting interest rates or the money supply." },
+              { text: "State securities administrators", explanation: "State administrators enforce state securities law; monetary policy is exclusively federal and specifically the Fed's." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-econ-2",
+        title: "Reading financial statements and ratios",
+        minutes: 8,
+        body: [
+          "The balance sheet is a snapshot: assets = liabilities + equity, at one point in time. The income statement covers a period: revenue minus expenses equals net income. Together they're the raw material for ratio analysis.",
+          "Liquidity ratios test whether a company can meet short-term obligations. Current ratio = current assets ÷ current liabilities. Quick ratio (the 'acid test') excludes inventory: (current assets − inventory) ÷ current liabilities — a stricter test, since inventory isn't always quickly convertible to cash.",
+          "Leverage and profitability ratios: debt-to-equity = total debt ÷ total equity, measuring how much a company relies on borrowed money. Return on equity (ROE) = net income ÷ shareholder equity. Return on assets (ROA) = net income ÷ total assets. Price-to-earnings (P/E) = share price ÷ earnings per share, the most common relative-valuation ratio.",
+          "None of these ratios mean much in isolation — the exam tests whether you know what each ratio measures and can compare it across companies or against an industry benchmark, not whether you can recite a 'good' number from memory.",
+        ],
+        challenge: "Company X has current assets of $500,000 (including $150,000 of inventory) and current liabilities of $250,000. Compute the current ratio and the quick ratio.",
+        exampleOutput: "Current ratio = 500,000 / 250,000 = 2.0. Quick ratio = (500,000 − 150,000) / 250,000 = 1.4. Both above 1.0 indicate the company can cover short-term obligations, with the quick ratio showing a somewhat tighter — but still solid — cushion once inventory is excluded.",
+        quiz: [
+          {
+            q: "A company's quick ratio excludes which asset that the current ratio includes?",
+            a: "Inventory",
+            explanation: "The quick ratio strips out inventory because it can't always be converted to cash quickly, giving a stricter test of short-term liquidity.",
+            options: [
+              { text: "Inventory", explanation: "Correct — inventory is excluded from the quick ratio's numerator." },
+              { text: "Cash", explanation: "Cash is kept in both the current ratio and the quick ratio — it's the most liquid asset, not the one excluded." },
+              { text: "Accounts receivable", explanation: "Receivables are kept in the quick ratio; they're considered reasonably liquid, unlike inventory." },
+              { text: "Marketable securities", explanation: "Marketable securities remain in the quick ratio's numerator since they can typically be sold quickly." },
+            ],
+          },
+          {
+            q: "Return on equity (ROE) is calculated as:",
+            a: "Net income ÷ shareholder equity",
+            explanation: "ROE measures how efficiently a company generates profit from the equity shareholders have invested.",
+            options: [
+              { text: "Net income ÷ total assets", explanation: "That formula is return on assets (ROA), a related but distinct ratio." },
+              { text: "Net income ÷ shareholder equity", explanation: "Correct — this is the ROE formula." },
+              { text: "Total debt ÷ total equity", explanation: "That's the debt-to-equity ratio, a leverage measure, not a profitability measure." },
+              { text: "Share price ÷ earnings per share", explanation: "That's the P/E ratio, a valuation measure unrelated to ROE." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-econ-3",
+        title: "Time value of money and quantitative methods",
+        minutes: 8,
+        body: [
+          "Time value of money (TVM) is the idea that a dollar today is worth more than a dollar in the future, because today's dollar can be invested and earn a return. Every TVM problem has the same variables: present value (PV), future value (FV), interest rate, number of periods, and payment — give enough of them and solve for the rest.",
+          "Net present value (NPV) discounts a series of future cash flows back to today at a required rate of return and subtracts the initial investment; a positive NPV means the investment is expected to add value at that required rate. Internal rate of return (IRR) is the discount rate at which NPV equals zero — the break-even return the investment is expected to generate.",
+          "Holding period return (HPR) measures total return over the time an investment was held: (ending value − beginning value + income) ÷ beginning value. Real return adjusts a nominal return for inflation — approximately, real return ≈ nominal return − inflation rate — because purchasing power, not just the dollar figure, is what an investor actually cares about.",
+        ],
+        challenge: "An investor buys a stock for $50, receives $2 in dividends over the year, and sells it for $54. Compute the holding period return. If inflation was 3% that year, estimate the real return.",
+        exampleOutput: "HPR = (54 − 50 + 2) / 50 = 6/50 = 12%. Real return ≈ 12% − 3% = 9%, showing that part of the nominal gain was just keeping pace with inflation rather than adding real purchasing power.",
+        quiz: [
+          {
+            q: "IRR is defined as:",
+            a: "The discount rate at which an investment's NPV equals zero",
+            explanation: "IRR is the break-even discount rate — the return at which the present value of the cash flows exactly equals the initial investment.",
+            options: [
+              { text: "The discount rate at which an investment's NPV equals zero", explanation: "Correct — that's the definition of IRR." },
+              { text: "The investor's required rate of return, chosen in advance", explanation: "That's the discount rate used as an INPUT to an NPV calculation, not IRR, which is solved for as an output." },
+              { text: "The simple ratio of profit to initial investment", explanation: "That describes a basic return-on-investment calculation, not IRR, which accounts for the time value of money across multiple cash flows." },
+              { text: "The average annual return over the holding period", explanation: "That's closer to a holding period return or CAGR concept, not IRR specifically." },
+            ],
+          },
+          {
+            q: "Real return roughly equals:",
+            a: "Nominal return minus the inflation rate",
+            explanation: "This approximation captures how much purchasing power actually grew, after removing the portion of the nominal return that just offset inflation.",
+            options: [
+              { text: "Nominal return plus the inflation rate", explanation: "Adding inflation would overstate real purchasing-power growth, not measure it." },
+              { text: "Nominal return minus the inflation rate", explanation: "Correct — this is the standard approximation for real return." },
+              { text: "Nominal return divided by the inflation rate", explanation: "Dividing by inflation isn't a recognized real-return calculation." },
+              { text: "Nominal return multiplied by the inflation rate", explanation: "Multiplying by inflation isn't a recognized real-return calculation either." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-econ-4",
+        title: "The types of investment risk",
+        minutes: 7,
+        body: [
+          "Systematic risk (market risk) affects the entire market and cannot be diversified away — interest rate risk and purchasing power (inflation) risk both fall here. Unsystematic risk is specific to a company or industry — business risk, financial risk, and default risk — and CAN be reduced through diversification.",
+          "Interest rate risk: bond prices move inversely to interest rates — rates up, existing bond prices down (since newly issued bonds now pay more). Purchasing power risk: the risk that inflation erodes real returns — this hits fixed-income and cash holdings hardest, since their payments don't adjust for inflation.",
+          "Liquidity risk: the risk of not being able to sell an asset quickly at a fair price without a significant price concession. Reinvestment risk: the risk that cash flows (like bond coupons or a maturing CD) will have to be reinvested at a lower rate than the original investment earned — a particular concern when rates are falling.",
+          "Other named risks the exam likes: currency (exchange rate) risk on foreign investments, default/credit risk (the issuer won't pay), business risk (a company's operating environment), financial risk (a company's use of leverage), and regulatory/political/legislative risk.",
+        ],
+        challenge: "A retiree holds a 20-year Treasury bond and a CD that matures in six months, during a year when the Fed has been cutting rates. Identify which risk affects each holding most, and why.",
+        exampleOutput: "The 20-year Treasury bond is most exposed to interest rate risk on its price if sold before maturity (long maturity = high sensitivity), plus purchasing power risk over such a long horizon. The six-month CD is most exposed to reinvestment risk — when it matures in a falling-rate environment, the retiree will have to reinvest the proceeds at a lower rate than the CD originally paid.",
+        quiz: [
+          {
+            q: "Which type of risk can be reduced through diversification?",
+            a: "Unsystematic risk",
+            explanation: "Unsystematic (company- or industry-specific) risk can be reduced by holding many different securities; market-wide systematic risk cannot.",
+            options: [
+              { text: "Systematic risk", explanation: "Systematic risk is market-wide and affects nearly every security, so it can't be diversified away." },
+              { text: "Unsystematic risk", explanation: "Correct — this is the risk diversification is specifically able to reduce." },
+              { text: "Purchasing power risk", explanation: "Purchasing power (inflation) risk is systematic — it affects the whole market, not just individual companies." },
+              { text: "Interest rate risk", explanation: "Interest rate risk is also systematic, since rate changes affect nearly all fixed-income securities." },
+            ],
+          },
+          {
+            q: "The risk that bond coupon payments will have to be reinvested at a lower rate than the original investment earned is called:",
+            a: "Reinvestment risk",
+            explanation: "Reinvestment risk specifically concerns what rate future cash flows can be put back to work at — a particular concern in falling-rate environments.",
+            options: [
+              { text: "Interest rate risk", explanation: "Interest rate risk is about a bond's PRICE sensitivity to rate changes, a distinct named concept from reinvesting its cash flows." },
+              { text: "Reinvestment risk", explanation: "Correct — this is exactly what reinvestment risk describes." },
+              { text: "Liquidity risk", explanation: "Liquidity risk is about the ability to sell an asset quickly at a fair price, unrelated to reinvesting coupon income." },
+              { text: "Default risk", explanation: "Default risk is about the issuer failing to pay at all, not about the rate available when reinvesting payments that were made." },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "s65-vehicles",
+    title: "Series 65: Investment Vehicle Characteristics",
+    icon: "💵",
+    color: "#0f766e",
+    light: "#ecfdf5",
+    description: "Cash equivalents, fixed income, equities, pooled vehicles, derivatives, insurance products, and alternatives — the full menu of what an IAR recommends.",
+    coopModule: "Series 65 exam prep — Section 2 (Investment Vehicle Characteristics, ~25% of the exam)",
+    examSection: "vehicles",
+    lessons: [
+      {
+        id: "s65-veh-1",
+        title: "Cash equivalents and bond fundamentals",
+        minutes: 8,
+        body: [
+          "Cash equivalents include T-bills (short-term government debt, sold at a discount with no stated coupon, maturing in one year or less), CDs (bank-issued, typically FDIC insured up to applicable limits, with an early-withdrawal penalty), commercial paper (unsecured short-term corporate debt, typically maturing within 270 days), and banker's acceptances (a time draft guaranteed by a bank, common in trade finance).",
+          "A money market MUTUAL FUND is a security aiming for a stable NAV, not FDIC insured. A money market DEPOSIT ACCOUNT is a bank product and IS FDIC insured. The exam likes to test that these sound similar but aren't the same thing.",
+          "Bond basics: par (face) value, coupon rate (the stated interest rate), current yield = annual coupon payment ÷ current market price, and yield to maturity (YTM) — the total return if held to maturity, incorporating price appreciation or depreciation toward par.",
+          "Bonds trade at a discount to par when the coupon is below prevailing market rates, and at a premium when the coupon is above market rates — the market price adjusts so the bond's effective yield stays competitive with newly issued debt.",
+        ],
+        challenge: "A bond has a $1,000 par value, a 5% coupon, and currently trades at $950. Compute its current yield.",
+        exampleOutput: "Current yield = $50 annual coupon ÷ $950 price ≈ 5.26% — higher than the stated 5% coupon rate, because the bond is trading at a discount to par.",
+        quiz: [
+          {
+            q: "Which of the following is sold at a discount from face value with no stated coupon?",
+            a: "A Treasury bill",
+            explanation: "T-bills are the classic pure-discount instrument — the investor's return comes entirely from the difference between the discounted purchase price and the face value at maturity.",
+            options: [
+              { text: "A Treasury bill", explanation: "Correct — T-bills carry no stated coupon and are sold at a discount." },
+              { text: "A corporate bond", explanation: "A standard corporate bond has a stated coupon rate and typically trades near, above, or below par based on rates, but it isn't a pure zero-coupon discount instrument by default." },
+              { text: "A certificate of deposit", explanation: "A CD pays stated interest to the depositor; it isn't sold at a pure discount with no coupon." },
+              { text: "Preferred stock", explanation: "Preferred stock pays a stated dividend, not a discount-to-par redemption like a T-bill." },
+            ],
+          },
+          {
+            q: "Current yield is calculated as:",
+            a: "Annual coupon payment ÷ current market price",
+            explanation: "Current yield relates the bond's income to what it actually costs today, not to its original face value.",
+            options: [
+              { text: "Annual coupon payment ÷ par value", explanation: "That calculation is simply the stated coupon rate, not current yield." },
+              { text: "Annual coupon payment ÷ current market price", explanation: "Correct — this is the current yield formula." },
+              { text: "Yield to maturity minus the coupon rate", explanation: "That isn't a recognized formula for current yield." },
+              { text: "Annual dividend ÷ share price", explanation: "That's the dividend yield formula for a stock, not a bond's current yield." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-veh-2",
+        title: "Bond types: munis, corporates, treasuries, and specialty structures",
+        minutes: 8,
+        body: [
+          "Municipal bonds come in two main flavors: general obligation (GO) bonds, backed by the issuer's taxing power, and revenue bonds, backed by the income from a specific project (like a toll road or utility). Municipal interest is generally exempt from federal income tax, and often from the state (and local) tax of a resident of the issuing state.",
+          "Corporate bonds may be secured (backed by specific collateral, like mortgage bonds) or unsecured (debentures, backed only by the issuer's general creditworthiness). They carry credit ratings — investment-grade (roughly BBB-/Baa3 and above) versus speculative/high-yield ('junk', below that).",
+          "Treasury securities (bills, notes, bonds, distinguished by maturity) are backed by the full faith and credit of the U.S. government; their interest is taxable federally but exempt from state and local tax. Agency securities vary in the strength of their government backing.",
+          "Zero-coupon bonds are sold deeply discounted and pay no periodic interest, but the imputed ('phantom') interest accretes and is taxed annually as ordinary income even though the investor receives no cash until maturity — unless held in a tax-deferred account. TIPS (Treasury Inflation-Protected Securities) adjust their principal with CPI to protect against inflation. Convertible bonds can be exchanged for a fixed number of common shares, trading a lower coupon for equity upside potential.",
+        ],
+        challenge: "A city issues bonds to fund a new toll bridge, to be repaid solely from bridge toll revenue. Identify the bond type and its source of repayment.",
+        exampleOutput: "This is a revenue bond — repayment depends entirely on the toll revenue the bridge generates, not on the city's general taxing power, which is what would back a general obligation bond instead.",
+        quiz: [
+          {
+            q: "A municipal revenue bond is backed by:",
+            a: "Revenue from a specific project or facility",
+            explanation: "Revenue bonds are repaid from the income the funded project itself generates, not from the issuer's broader tax base.",
+            options: [
+              { text: "The general taxing power of the issuer", explanation: "That describes a general obligation (GO) bond, the other main type of municipal bond." },
+              { text: "Revenue from a specific project or facility", explanation: "Correct — this is the defining feature of a revenue bond." },
+              { text: "The full faith and credit of the U.S. government", explanation: "That describes Treasury securities, not municipal bonds." },
+              { text: "The issuer's corporate earnings", explanation: "Municipal issuers aren't corporations with corporate earnings; this describes a corporate bond instead." },
+            ],
+          },
+          {
+            q: "'Phantom income' — taxable interest income recognized annually even though no cash is received — is a defining feature of:",
+            a: "Zero-coupon bonds",
+            explanation: "A zero-coupon bond pays nothing until maturity, but the IRS still requires the annually accreted discount to be reported and taxed as ordinary income each year in a taxable account.",
+            options: [
+              { text: "Zero-coupon bonds", explanation: "Correct — the accreted discount is the classic phantom-income example." },
+              { text: "Municipal bonds", explanation: "Municipal bond interest is generally federally tax-exempt, the opposite of a phantom-income problem." },
+              { text: "Common stock dividends", explanation: "Dividends are only taxed when actually paid in cash (or reinvested), not accrued as phantom income." },
+              { text: "Convertible bond coupons", explanation: "A convertible bond's coupon is ordinary periodic interest paid in cash, not phantom/accreted income." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-veh-3",
+        title: "Bond risk measures: duration, convexity, and credit ratings",
+        minutes: 7,
+        body: [
+          "Duration measures a bond's price sensitivity to interest rate changes, expressed in years — a bond with a duration of 7 will lose approximately 7% of its price for a 1% rise in rates (and gain roughly the same for a 1% decline). Longer maturity and lower coupon both increase duration.",
+          "Convexity describes the curvature of the bond price/yield relationship: since that relationship isn't perfectly linear, a bond gains more in price for a given rate decrease than it loses for an equal rate increase. Positive convexity is a feature bondholders want.",
+          "Credit ratings (from agencies like Moody's and S&P) split bonds into investment-grade versus speculative/high-yield ('junk') tiers. A lower rating means higher default risk, which the market compensates for with a higher required yield (a wider credit spread).",
+          "Callable bonds carry call risk: the issuer can redeem the bond early, typically when rates have fallen and refinancing is cheaper — which is exactly when the investor least wants their income stream to end. Putable bonds give the investor the opposite right.",
+        ],
+        challenge: "Rank three bonds by interest rate sensitivity: Bond A (5-year, 6% coupon), Bond B (20-year, 6% coupon), Bond C (20-year, 2% coupon).",
+        exampleOutput: "Bond C has the highest duration (longest maturity, lowest coupon), followed by Bond B (same maturity as C but a higher coupon shortens duration somewhat), with Bond A the lowest (shortest maturity). Longer maturity and lower coupon both push duration — and rate sensitivity — higher.",
+        quiz: [
+          {
+            q: "All else equal, which bond has the HIGHEST duration (the most price sensitivity to rate changes)?",
+            a: "The longest-maturity, lowest-coupon bond",
+            explanation: "Duration rises with longer maturity and lower coupon, since more of the bond's value depends on distant cash flows.",
+            options: [
+              { text: "The shortest-maturity, highest-coupon bond", explanation: "This combination produces the LOWEST duration, not the highest — short maturity and high coupon both reduce rate sensitivity." },
+              { text: "The longest-maturity, lowest-coupon bond", explanation: "Correct — long maturity and low coupon both maximize duration." },
+              { text: "The shortest-maturity, lowest-coupon bond", explanation: "Short maturity dominates here and keeps duration relatively low despite the low coupon." },
+              { text: "The longest-maturity, highest-coupon bond", explanation: "The high coupon shortens duration somewhat compared to an otherwise identical low-coupon bond of the same maturity." },
+            ],
+          },
+          {
+            q: "A bond is callable. This risk matters most to the investor because issuers tend to call bonds when:",
+            a: "Interest rates have fallen, letting the issuer refinance more cheaply",
+            explanation: "Issuers call bonds to replace expensive debt with cheaper debt — which happens precisely when falling rates hurt the investor's reinvestment options the most.",
+            options: [
+              { text: "Interest rates have risen", explanation: "Rising rates would make refinancing MORE expensive for the issuer, giving it no incentive to call." },
+              { text: "Interest rates have fallen, letting the issuer refinance more cheaply", explanation: "Correct — this is exactly when call risk is triggered." },
+              { text: "The bond's credit rating has improved", explanation: "A rating change isn't the typical driver of a call decision; the interest rate environment is." },
+              { text: "The bond's convexity turns negative", explanation: "Convexity is a mathematical property of the price/yield curve, not a trigger an issuer monitors to decide on a call." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-veh-4",
+        title: "Equity securities: common, preferred, and their features",
+        minutes: 7,
+        body: [
+          "Common stock represents ownership, carries voting rights on corporate matters, and has a residual claim on assets in liquidation — paid last, after all creditors and preferred shareholders. Dividends are not guaranteed.",
+          "Preferred stock pays a fixed dividend and has priority over common stock for both dividends and liquidation proceeds, but generally carries no voting rights; its price behaves more like a bond (sensitive to interest rates) than like common stock. Cumulative preferred stock accrues unpaid dividends, which must be paid before common dividends resume. Convertible preferred stock can be exchanged for common shares.",
+          "Rights give existing shareholders a short-term privilege to buy additional shares at a discount, typically to preserve proportional ownership ahead of a new issue. Warrants are longer-term instruments allowing the purchase of stock at a set exercise price, often attached to a bond issue as a sweetener.",
+          "ADRs (American Depositary Receipts) let U.S. investors hold shares of foreign companies, traded on U.S. exchanges in U.S. dollars, issued by a U.S. bank that holds the underlying foreign shares in custody. Stock splits increase the share count and proportionally reduce the price, with no change to total market value or ownership percentage.",
+        ],
+        challenge: "A company attaches warrants to a new bond issue. Explain why it does this and how a warrant differs from a stock right.",
+        exampleOutput: "Warrants sweeten the bond offering, letting the issuer pay a lower coupon by giving investors long-term upside potential in the stock. Unlike rights — a short-term privilege given to EXISTING shareholders ahead of a new issue — warrants are typically longer-dated and are usually attached to a security at issuance rather than distributed to current holders.",
+        quiz: [
+          {
+            q: "Which security typically carries NO voting rights but has a priority claim on dividends over common stock?",
+            a: "Preferred stock",
+            explanation: "Preferred stock trades voting power for a fixed, priority dividend claim ahead of common shareholders.",
+            options: [
+              { text: "Common stock", explanation: "Common stock carries voting rights but no dividend priority over preferred stock." },
+              { text: "Preferred stock", explanation: "Correct — this is the classic preferred stock trade-off." },
+              { text: "Rights", explanation: "Rights are a temporary purchase privilege, not an ongoing dividend claim." },
+              { text: "Warrants", explanation: "Warrants are a long-term option to purchase stock, not a dividend-priority instrument." },
+            ],
+          },
+          {
+            q: "An ADR allows a U.S. investor to:",
+            a: "Hold shares of a foreign company, traded in U.S. dollars on a U.S. exchange",
+            explanation: "ADRs package foreign shares (held in custody by a U.S. bank) into a dollar-denominated, U.S.-exchange-traded certificate.",
+            options: [
+              { text: "Directly hold shares on a foreign exchange in local currency", explanation: "That describes direct foreign investing, not an ADR, which is specifically dollar-denominated and U.S.-traded." },
+              { text: "Hold shares of a foreign company, traded in U.S. dollars on a U.S. exchange", explanation: "Correct — this is exactly what an ADR provides." },
+              { text: "Buy a fixed number of shares in the future at a set price", explanation: "That describes a warrant, not an ADR." },
+              { text: "Receive a temporary discounted right to buy new shares", explanation: "That describes a stock right, not an ADR." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-veh-5",
+        title: "Pooled vehicles: mutual funds, ETFs, UITs, hedge funds, and REITs",
+        minutes: 8,
+        body: [
+          "Open-end mutual funds continuously issue and redeem shares at NAV, calculated once daily after market close (forward pricing — an order gets the NEXT computed NAV, not the last known one). Closed-end funds issue a fixed number of shares that then trade on an exchange throughout the day, at a market price that can sit at a premium or discount to NAV.",
+          "ETFs trade intraday on an exchange like a stock, are typically passively managed to track an index, and are generally more tax-efficient than mutual funds (due to their in-kind creation/redemption mechanism) with typically lower expense ratios.",
+          "Share-class structures trade off sales-charge timing: front-end loads (often Class A) charge upfront; contingent deferred sales charges (often Class B) charge on early redemption; level-load classes (often Class C) spread ongoing costs via 12b-1 fees — an ongoing fund fee, deducted from fund assets, that pays for marketing and distribution.",
+          "UITs (Unit Investment Trusts) hold a fixed, unmanaged portfolio, are issued once, and have a set termination date. Hedge funds are privately offered — typically only to accredited or qualified investors — exempt from many Investment Company Act requirements, and can use leverage, short-selling, and derivatives freely, generally with higher fees and lock-up periods. REITs pool investor money to own or finance income-producing real estate and must distribute the large majority of their taxable income to shareholders to maintain their favorable tax status.",
+        ],
+        challenge: "An investor wants to buy shares of a fund at 2pm and asks what price they'll pay. Explain how the answer differs for an open-end mutual fund versus a closed-end fund versus an ETF.",
+        exampleOutput: "The open-end mutual fund order is filled at the NEXT calculated NAV (after market close that day), not a live 2pm price. The closed-end fund and the ETF both trade continuously on an exchange, so the 2pm order would execute near the prevailing market price at that moment — which, for the closed-end fund, may differ from its NAV (premium or discount), while an ETF's arbitrage mechanism keeps its price closely tied to its underlying NAV.",
+        quiz: [
+          {
+            q: "A closed-end fund differs from an open-end mutual fund because it:",
+            a: "Trades on an exchange at a market price that can differ from its NAV",
+            explanation: "Closed-end funds have a fixed share count and trade continuously, so supply and demand can push the price away from underlying NAV.",
+            options: [
+              { text: "Is always priced exactly at NAV", explanation: "That describes open-end fund pricing (via forward pricing), not a closed-end fund, which can trade at a premium or discount." },
+              { text: "Trades on an exchange at a market price that can differ from its NAV", explanation: "Correct — this premium/discount dynamic is the defining closed-end fund feature." },
+              { text: "Continuously issues new shares on demand", explanation: "That describes an open-end mutual fund; a closed-end fund has a fixed share count after its initial offering." },
+              { text: "Cannot be purchased by retail investors", explanation: "Closed-end funds are publicly traded and generally accessible to retail investors, just like a stock." },
+            ],
+          },
+          {
+            q: "12b-1 fees are:",
+            a: "Ongoing fund fees that pay for marketing and distribution, deducted from fund assets",
+            explanation: "12b-1 fees are an annual charge embedded in a fund's expense ratio, distinct from a one-time sales load.",
+            options: [
+              { text: "A one-time sales charge paid at purchase", explanation: "That describes a front-end load, a different and separate cost from the ongoing 12b-1 fee." },
+              { text: "Ongoing fund fees that pay for marketing and distribution, deducted from fund assets", explanation: "Correct — this is the defining feature of a 12b-1 fee." },
+              { text: "A penalty for redeeming shares early", explanation: "That describes a contingent deferred sales charge (CDSC), not a 12b-1 fee." },
+              { text: "A tax owed on the fund's capital gains distributions", explanation: "That's a tax concept entirely separate from the fund's own operating fee structure." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-veh-6",
+        title: "Derivatives, annuities, and alternative investments",
+        minutes: 8,
+        body: [
+          "A call option gives the holder the right (not the obligation) to buy the underlying at a set strike price before expiration; a put gives the right to sell. The premium is the price paid for that right. Options can hedge (a protective put) or speculate (a leveraged directional bet), and the option writer (seller) takes on the corresponding obligation if exercised.",
+          "Futures contracts are standardized, exchange-traded agreements to buy or sell an underlying asset at a set price on a future date, marked to market daily — commonly used to hedge commodity or interest rate exposure, or to speculate with leverage.",
+          "In a fixed annuity, the insurer guarantees a fixed rate of return and payout, bearing the investment risk itself (backed by the insurer's general account). In a variable annuity, premiums are invested in sub-accounts (similar to mutual funds), the value fluctuates with the market, and the ANNUITANT bears the investment risk — a variable annuity is both an insurance product and a registered security, requiring a prospectus.",
+          "Life insurance can double as a savings/investment wrapper: whole life builds cash value at a guaranteed rate, while variable life ties cash value to sub-account performance (also a registered security). Alternative investments — private equity, hedge funds, commodities, direct real estate — typically feature illiquidity, higher minimums, and less transparency, which is exactly why they're often limited to accredited or qualified investors.",
+        ],
+        challenge: "A client is deciding between a fixed and a variable annuity. Explain who bears the investment risk in each, and why a variable annuity requires a prospectus while a fixed annuity does not.",
+        exampleOutput: "In the fixed annuity, the insurance company bears the investment risk and guarantees the payout regardless of how its own portfolio performs. In the variable annuity, the client bears the investment risk since the value tracks the performance of chosen sub-accounts — and because that makes it function like a security with investment risk passed to the buyer, it is registered and must be sold with a prospectus, unlike the fixed annuity.",
+        quiz: [
+          {
+            q: "In a variable annuity, who bears the investment risk of the underlying sub-accounts?",
+            a: "The annuitant (the investor)",
+            explanation: "A variable annuity's value moves with its sub-accounts' performance, so the investor — not the insurer — absorbs gains and losses.",
+            options: [
+              { text: "The insurance company", explanation: "The insurer bears investment risk in a FIXED annuity, not a variable one." },
+              { text: "The annuitant (the investor)", explanation: "Correct — the investor bears the sub-account investment risk in a variable annuity." },
+              { text: "The state guaranty fund", explanation: "State guaranty funds are a limited backstop in case of insurer insolvency, not the party bearing normal market investment risk." },
+              { text: "The broker-dealer that sold the product", explanation: "The selling firm doesn't bear the ongoing investment performance risk of the client's sub-account choices." },
+            ],
+          },
+          {
+            q: "A call option gives the holder the right to:",
+            a: "Buy the underlying asset at a set strike price before expiration",
+            explanation: "A call is the right to BUY at the strike price; the corresponding right to sell is a put.",
+            options: [
+              { text: "Sell the underlying asset at a set strike price", explanation: "That describes a put option, not a call." },
+              { text: "Buy the underlying asset at a set strike price before expiration", explanation: "Correct — this is the definition of a call option." },
+              { text: "Receive a fixed dividend from the issuer", explanation: "Options don't carry a dividend entitlement; that's unrelated to how a call works." },
+              { text: "Convert into a fixed number of common shares", explanation: "That describes a convertible security's conversion feature, not an option contract." },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "s65-captheory",
+    title: "Series 65: Client Profiling & Capital Market Theory",
+    icon: "🧭",
+    color: "#b45309",
+    light: "#fffbeb",
+    description: "KYC and the investment policy statement, Modern Portfolio Theory, CAPM, and risk-adjusted performance — the analytical core of a suitable recommendation.",
+    coopModule: "Series 65 exam prep — Section 3, part 1 (Client Investment Recommendations and Strategies: profiling & capital market theory)",
+    examSection: "client",
+    lessons: [
+      {
+        id: "s65-cap-1",
+        title: "Client profiling, KYC, and the investment policy statement",
+        minutes: 7,
+        body: [
+          "Know Your Customer (KYC): before recommending anything, an adviser must gather a client's financial situation, investment objectives, risk tolerance, time horizon, liquidity needs, tax situation, and investment experience. This is the factual foundation the fiduciary duty of care is built on, not paperwork for its own sake.",
+          "Suitability for an investment adviser isn't a one-time checkbox — because advisers owe an ongoing fiduciary duty, a recommendation must remain suitable as the client's circumstances and the markets change, not just at the moment it was made.",
+          "The Investment Policy Statement (IPS) documents a client's objectives, constraints, and the agreed-upon strategy — it becomes the benchmark against which the adviser's ongoing recommendations and the portfolio's actual construction are judged.",
+          "Risk tolerance has two sides that can conflict: risk capacity (what the client's financial situation can actually absorb) and risk attitude (what the client is emotionally comfortable with). A good adviser reconciles the two rather than defaulting to whichever is more convenient.",
+        ],
+        challenge: "A client is young with a 30-year horizon and substantial savings (high risk capacity), but visibly panics and wants to sell during ordinary market drops (low risk attitude). How should an adviser approach the recommendation?",
+        exampleOutput: "The adviser should build a portfolio that reflects BOTH factors — not maximize risk just because capacity allows it, and not go entirely conservative just because attitude demands it. A moderate allocation with clear expectation-setting about volatility, revisited over time, respects the client's comfort while still working toward long-term goals.",
+        quiz: [
+          {
+            q: "The Investment Policy Statement (IPS) primarily serves to:",
+            a: "Document the client's objectives, constraints, and agreed-upon strategy as a benchmark for future recommendations",
+            explanation: "The IPS is the written record an adviser's later actions are measured against.",
+            options: [
+              { text: "Guarantee a minimum investment return", explanation: "No legitimate advisory document guarantees a return; that would itself be a prohibited practice." },
+              { text: "Document the client's objectives, constraints, and agreed-upon strategy as a benchmark for future recommendations", explanation: "Correct — this is the IPS's core purpose." },
+              { text: "Satisfy state advertising rules", explanation: "The IPS is a client-planning document, unrelated to advertising compliance." },
+              { text: "Replace the need for ongoing KYC updates", explanation: "The IPS doesn't replace ongoing due diligence — client circumstances still need to be revisited over time." },
+            ],
+          },
+          {
+            q: "A client has high risk capacity (substantial assets, long horizon) but a low risk attitude (very uncomfortable with volatility). An adviser should:",
+            a: "Reconcile both factors rather than relying solely on financial capacity",
+            explanation: "Ignoring either the client's stated comfort or their objective financial ability to bear risk undermines both suitability and the duty of care.",
+            options: [
+              { text: "Always defer to risk capacity since it's more objective", explanation: "Ignoring the client's stated risk attitude in favor of pure capacity can produce a portfolio the client can't emotionally tolerate, risking panic-selling at the worst time." },
+              { text: "Reconcile both factors rather than relying solely on financial capacity", explanation: "Correct — good practice balances what the client can afford to risk with what they can live with." },
+              { text: "Always defer to stated risk attitude regardless of capacity", explanation: "Overweighting attitude alone could leave a client under-invested relative to what their goals and timeline actually require." },
+              { text: "Recommend the highest-risk portfolio the capacity allows", explanation: "This ignores the client's attitude entirely and risks a suitability and fiduciary-duty problem." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-cap-2",
+        title: "Modern Portfolio Theory and diversification",
+        minutes: 8,
+        body: [
+          "MPT holds that a portfolio's risk isn't just the sum of its individual holdings' risks — how those holdings move relative to each other (their correlation) matters enormously. Correlation ranges from −1 (perfectly opposite movement) to +1 (perfectly identical movement); combining assets with low or negative correlation reduces overall portfolio volatility without necessarily reducing expected return.",
+          "Diversification reduces unsystematic (company- or industry-specific) risk — it cannot eliminate systematic (market-wide) risk, no matter how many holdings are added.",
+          "Standard deviation is MPT's standard measure of total risk/volatility for a security or portfolio — the larger the standard deviation, the wider the range of likely outcomes around the expected return.",
+          "The efficient frontier is the set of portfolios offering the highest expected return for a given level of risk (or equivalently, the lowest risk for a given expected return). Portfolios below the frontier are suboptimal, because a better risk/return combination is achievable.",
+        ],
+        challenge: "Two assets have a correlation of −0.3. A different pair of assets has a correlation of +0.9. Explain which pairing offers a bigger diversification benefit and why.",
+        exampleOutput: "The pair with −0.3 correlation offers the bigger diversification benefit — because the two assets tend to move somewhat in opposite directions, combining them smooths out portfolio volatility more effectively than the +0.9 pair, which moves almost identically and therefore provides little risk-reduction benefit when combined.",
+        quiz: [
+          {
+            q: "Combining two assets with a correlation of −0.8 in a portfolio will generally:",
+            a: "Reduce overall portfolio volatility more than combining two assets with a correlation of +0.8",
+            explanation: "Negatively correlated assets tend to offset each other's price movements, smoothing overall portfolio volatility more effectively than highly positively correlated assets.",
+            options: [
+              { text: "Increase overall portfolio volatility", explanation: "Negative correlation works in the opposite direction — it tends to dampen, not amplify, combined volatility." },
+              { text: "Reduce overall portfolio volatility more than combining two assets with a correlation of +0.8", explanation: "Correct — this is the core diversification benefit MPT describes." },
+              { text: "Have no effect on volatility", explanation: "Correlation directly affects how combined volatility behaves — it isn't a neutral factor." },
+              { text: "Only affect expected return, not risk", explanation: "Correlation is specifically a risk (volatility) concept in MPT, not an expected-return input." },
+            ],
+          },
+          {
+            q: "Diversification is most effective at reducing:",
+            a: "Unsystematic risk",
+            explanation: "Spreading investments across many uncorrelated holdings cancels out company- and industry-specific risk; it can't remove market-wide risk.",
+            options: [
+              { text: "Systematic risk", explanation: "Systematic (market) risk affects nearly everything at once and can't be diversified away." },
+              { text: "Unsystematic risk", explanation: "Correct — this is exactly the risk diversification targets." },
+              { text: "Purchasing power risk", explanation: "Purchasing power risk is systematic, affecting essentially the whole market through inflation." },
+              { text: "Interest rate risk", explanation: "Interest rate risk is broadly systematic across fixed-income holdings, not reduced by simply adding more bonds." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-cap-3",
+        title: "CAPM, beta, and risk-adjusted performance measures",
+        minutes: 8,
+        body: [
+          "Beta measures a security's systematic risk relative to the overall market: a beta of 1.0 moves with the market, above 1.0 amplifies market moves, below 1.0 dampens them, and a negative beta moves opposite the market.",
+          "CAPM: required (expected) return = risk-free rate + beta × (market return − risk-free rate). It formally links an asset's systematic risk (beta) to the return investors should demand for bearing it.",
+          "Alpha is the excess return earned above what CAPM/beta would predict — a positive alpha means an investment or manager outperformed on a risk-adjusted basis; Jensen's Alpha is this measure formalized.",
+          "Sharpe ratio = (portfolio return − risk-free rate) ÷ portfolio standard deviation — excess return per unit of TOTAL risk, appropriate for an undiversified holding or a whole portfolio. Treynor ratio = (portfolio return − risk-free rate) ÷ beta — excess return per unit of SYSTEMATIC risk only, more appropriate when comparing well-diversified portfolios.",
+        ],
+        challenge: "A stock has a beta of 1.5, the risk-free rate is 3%, and the expected market return is 9%. Compute the CAPM expected return.",
+        exampleOutput: "Expected return = 3% + 1.5 × (9% − 3%) = 3% + 9% = 12%. Because the stock's beta is above 1.0, it's expected to require — and, on average, deliver — a higher return than the market itself to compensate for its amplified systematic risk.",
+        quiz: [
+          {
+            q: "A stock has a beta of 1.5. If the market rises 10%, the stock is expected to:",
+            a: "Rise more than 10%, roughly 15% (all else equal)",
+            explanation: "A beta above 1.0 amplifies market moves — a 1.5 beta implies roughly 1.5 times the market's move, in the same direction.",
+            options: [
+              { text: "Rise exactly 10%", explanation: "That would describe a stock with a beta of exactly 1.0, not 1.5." },
+              { text: "Rise more than 10%, roughly 15% (all else equal)", explanation: "Correct — a 1.5 beta amplifies the market's move by that factor." },
+              { text: "Fall", explanation: "A positive beta moves in the SAME direction as the market, so it wouldn't be expected to fall when the market rises." },
+              { text: "Be unaffected", explanation: "A beta of 1.5 is far from zero, so the stock is expected to be significantly affected by market moves." },
+            ],
+          },
+          {
+            q: "The Treynor ratio differs from the Sharpe ratio because it measures excess return relative to:",
+            a: "Beta (systematic risk only), not total standard deviation",
+            explanation: "Treynor isolates systematic risk in its denominator, making it more appropriate for comparing already-diversified portfolios where unsystematic risk has largely been eliminated.",
+            options: [
+              { text: "Total standard deviation", explanation: "That's the Sharpe ratio's denominator, not Treynor's." },
+              { text: "Beta (systematic risk only), not total standard deviation", explanation: "Correct — this is the key distinction between Treynor and Sharpe." },
+              { text: "Alpha", explanation: "Alpha is a separate, distinct performance measure — it isn't used as the Treynor ratio's denominator." },
+              { text: "The risk-free rate", explanation: "The risk-free rate appears in the NUMERATOR of both ratios; it isn't what distinguishes their denominators." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-cap-4",
+        title: "Asset allocation and portfolio construction strategies",
+        minutes: 7,
+        body: [
+          "Strategic asset allocation sets a long-term target mix based on the client's objectives and risk tolerance, periodically rebalanced back to target; tactical asset allocation makes short-term deviations from that target to try to exploit perceived market opportunities.",
+          "Rebalancing (selling what's grown to overweight and buying what's underweight, back to target percentages) enforces disciplined 'buy low, sell high' behavior and controls risk drift — though it does have transaction costs and potential tax consequences in a taxable account.",
+          "Active management tries to beat a benchmark through security selection and/or market timing (higher fees, manager risk). Passive management tries to replicate a benchmark's return as closely as possible (lower fees, no security-selection risk, and by design cannot outperform its index net of fees).",
+          "Style classifications: growth investing targets companies expected to grow earnings faster than the market (often trading at higher valuations, e.g., a higher P/E). Value investing targets companies that appear cheap relative to fundamentals (lower P/E, higher dividend yield), seeking a margin of safety.",
+        ],
+        challenge: "A portfolio's target allocation is 60% stocks / 40% bonds. After a strong stock rally, it has drifted to 72% stocks / 28% bonds. Describe the rebalancing trade needed.",
+        exampleOutput: "The adviser sells enough of the now-overweight stock position and buys enough bonds to bring the mix back to 60/40 — locking in some of the stock gains and restoring the portfolio's original risk profile, rather than letting the drift compound.",
+        quiz: [
+          {
+            q: "Rebalancing a portfolio back to its target allocation after a strong stock rally typically requires:",
+            a: "Selling some of the now-overweight asset class and buying the underweight one",
+            explanation: "Rebalancing restores the original target weights by trimming what has grown and adding to what has lagged.",
+            options: [
+              { text: "Selling the entire portfolio and moving to cash", explanation: "That drastically overcorrects and abandons the strategic allocation entirely, rather than simply restoring it." },
+              { text: "Selling some of the now-overweight asset class and buying the underweight one", explanation: "Correct — this is the standard rebalancing trade." },
+              { text: "Buying more of whatever outperformed", explanation: "That would increase the overweight further, moving the portfolio away from its target rather than back toward it." },
+              { text: "Doing nothing, since allocations self-correct", explanation: "Allocation drift doesn't correct itself — it persists (or worsens) without an active rebalancing trade." },
+            ],
+          },
+          {
+            q: "A passively managed index fund's goal is to:",
+            a: "Replicate the return of its benchmark index as closely as possible",
+            explanation: "Passive management deliberately forgoes trying to beat the benchmark in favor of tracking it closely at low cost.",
+            options: [
+              { text: "Consistently beat its benchmark", explanation: "That's the goal of ACTIVE management, not passive management." },
+              { text: "Replicate the return of its benchmark index as closely as possible", explanation: "Correct — this is the defining goal of passive/index management." },
+              { text: "Time the market to avoid downturns", explanation: "Passive funds don't attempt market timing; they stay invested to track the index." },
+              { text: "Concentrate holdings in the manager's highest-conviction picks", explanation: "That describes concentrated active management, the opposite of a broad, passive index-tracking approach." },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "s65-taxretire",
+    title: "Series 65: Taxation, Retirement & Performance Measurement",
+    icon: "🧮",
+    color: "#be123c",
+    light: "#fff1f2",
+    description: "How investments are taxed, how retirement plans and ERISA work, order types and margin, and how to measure performance the right way.",
+    coopModule: "Series 65 exam prep — Section 3, part 2 (Client Investment Recommendations and Strategies: tax, retirement, trading, and performance)",
+    examSection: "client",
+    lessons: [
+      {
+        id: "s65-tax-1",
+        title: "Taxation of investments",
+        minutes: 8,
+        body: [
+          "Capital gains held one year or less are short-term and taxed as ordinary income; gains held more than one year are long-term and get preferential capital gains tax rates. Cost basis (purchase price plus commissions/fees, adjusted for reinvested distributions) is what determines the gain or loss.",
+          "The wash sale rule disallows claiming a tax loss if a 'substantially identical' security is bought within 30 days before or after the sale (a 61-day window total) — the disallowed loss is added to the cost basis of the replacement shares rather than lost entirely.",
+          "Tax-loss harvesting deliberately realizes losses to offset realized capital gains (and a limited amount of ordinary income per year, with any excess carried forward). This is a legitimate planning strategy, distinct from an improper wash sale.",
+          "Municipal bond interest is generally exempt from federal income tax (and often state tax for in-state residents). Tax-equivalent yield lets you compare a muni to a taxable bond on an apples-to-apples basis: tax-equivalent yield = muni yield ÷ (1 − investor's marginal tax rate).",
+        ],
+        challenge: "An investor in the 32% marginal tax bracket is considering a municipal bond yielding 3%. Compute the tax-equivalent yield.",
+        exampleOutput: "Tax-equivalent yield = 3% ÷ (1 − 0.32) = 3% ÷ 0.68 ≈ 4.41%. A taxable bond would need to yield about 4.41% to match the muni's after-tax benefit for this investor.",
+        quiz: [
+          {
+            q: "A gain on a security held for exactly 8 months is taxed as:",
+            a: "Short-term (ordinary income rates)",
+            explanation: "The holding period must exceed one year to qualify for long-term capital gains treatment; 8 months falls short of that.",
+            options: [
+              { text: "Short-term (ordinary income rates)", explanation: "Correct — 8 months is under the one-year threshold for long-term treatment." },
+              { text: "Long-term capital gain", explanation: "Long-term treatment requires a holding period of MORE than one year; 8 months doesn't qualify." },
+              { text: "Automatically tax-exempt", explanation: "No general rule makes a security automatically tax-exempt based on holding period alone." },
+              { text: "It depends only on the investor's total income, not the holding period", explanation: "The holding period itself is what determines short- vs. long-term status; total income affects the RATE applied within each category, not the classification." },
+            ],
+          },
+          {
+            q: "The wash sale rule disallows a tax loss when a substantially identical security is repurchased within:",
+            a: "30 days before or after the sale",
+            explanation: "The rule creates a 61-day window (30 days on each side of the sale date) during which a repurchase disqualifies the loss.",
+            options: [
+              { text: "30 days after only", explanation: "The rule covers both the 30 days before AND after the sale, not just afterward." },
+              { text: "30 days before or after the sale", explanation: "Correct — this is the wash sale window." },
+              { text: "90 days after only", explanation: "That's not the wash sale rule's window; it's both shorter and applies before the sale too." },
+              { text: "12 months before or after", explanation: "That window is far longer than the actual 30-day-each-side wash sale rule." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-tax-2",
+        title: "Retirement plans and ERISA",
+        minutes: 8,
+        body: [
+          "Traditional IRA: contributions may be tax-deductible (subject to income and plan-coverage limits), earnings grow tax-deferred, and withdrawals in retirement are taxed as ordinary income. Roth IRA: contributions are made with after-tax dollars (subject to income limits), but qualified withdrawals — including all growth — are entirely tax-free.",
+          "Early withdrawals from most retirement accounts before age 59½ generally trigger ordinary income tax plus a 10% early withdrawal penalty, subject to specific exceptions.",
+          "Required Minimum Distributions (RMDs) require owners of traditional IRAs and most employer plans to begin withdrawing a minimum amount starting at a specified age (73 under current law) — Roth IRAs are not subject to RMDs during the original owner's lifetime.",
+          "Qualified plans (e.g., 401(k)s, pension plans) must meet ERISA and IRC requirements, including nondiscrimination rules that prevent favoring only highly compensated employees, and generally offer creditor protection. Nonqualified plans (e.g., executive deferred compensation) can discriminate in favor of select employees but don't receive the same tax-deferral guarantees or creditor protections. ERISA imposes fiduciary duties on plan managers: duty of loyalty, duty of prudence (the 'prudent expert' standard), diversification of plan assets, and adherence to plan documents.",
+        ],
+        challenge: "A 30-year-old and a 63-year-old are each deciding between a Traditional and a Roth IRA. Explain how the tax-treatment tradeoff differs for each.",
+        exampleOutput: "The Roth generally favors the 30-year-old, who has decades for tax-free growth to compound and may expect to be in a higher bracket later. The Traditional IRA's upfront deduction may be more valuable for the 63-year-old if they expect a lower tax bracket in retirement — though the right answer depends on each client's specific income trajectory and tax situation, not a blanket age rule.",
+        quiz: [
+          {
+            q: "Qualified withdrawals from a Roth IRA are:",
+            a: "Entirely tax-free, including all investment growth",
+            explanation: "Because Roth contributions are made with after-tax dollars, qualified withdrawals — principal and growth alike — are not taxed again.",
+            options: [
+              { text: "Entirely tax-free, including all investment growth", explanation: "Correct — this is the core Roth IRA benefit." },
+              { text: "Taxed as ordinary income", explanation: "That describes a Traditional IRA's withdrawal treatment, not a Roth's." },
+              { text: "Taxed at capital gains rates", explanation: "Retirement account withdrawals aren't taxed as capital gains regardless of type; Roth withdrawals that qualify are simply tax-free." },
+              { text: "Tax-free only on original contributions, not growth", explanation: "Qualified Roth withdrawals are tax-free on the growth too, not just the original contributions." },
+            ],
+          },
+          {
+            q: "ERISA's 'prudent expert' standard requires a plan fiduciary to:",
+            a: "Manage plan assets with the skill and care a prudent expert in the field would use",
+            explanation: "This is a professional-standard-of-care requirement, not a guarantee of results.",
+            options: [
+              { text: "Guarantee a minimum investment return to participants", explanation: "No fiduciary standard requires guaranteeing investment results." },
+              { text: "Manage plan assets with the skill and care a prudent expert in the field would use", explanation: "Correct — this is the ERISA prudent expert standard." },
+              { text: "Invest only in the plan sponsor's own company stock", explanation: "That would often violate the duty to diversify plan assets, rather than satisfy the prudent expert standard." },
+              { text: "Avoid all investment risk entirely", explanation: "Prudence is about the SKILL and PROCESS applied to decisions, not the elimination of all risk." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-tax-3",
+        title: "Trading practices, order types, and margin",
+        minutes: 7,
+        body: [
+          "A market order executes immediately at the best available price, guaranteeing execution but not price. A limit order executes only at a specified price or better, guaranteeing price but not execution. A stop order is dormant until the stop price is reached, then becomes a MARKET order — useful for limiting a loss or protecting a gain, but subject to the same no-price-guarantee risk as any market order once triggered. A stop-limit order becomes a LIMIT order (not a market order) once triggered, guaranteeing price but risking non-execution in a fast-moving market.",
+          "Buying on margin means borrowing part of the purchase price from the broker-dealer, using account securities as collateral; margin amplifies both gains and losses, involves interest charges, and can trigger a margin call requiring more funds or forced liquidation.",
+          "Short selling: an investor borrows shares and sells them, hoping to buy them back later at a lower price to return to the lender. Because a stock's price can theoretically rise without limit, the potential loss on a short sale is theoretically unlimited — unlike a long position, whose maximum loss is capped at the amount invested.",
+        ],
+        challenge: "An investor wants to lock in gains on a long stock position but doesn't want to sell below a specific price even if it means the order might not execute. What order type fits, and why?",
+        exampleOutput: "A stop-limit order fits best: once the stop price triggers, it becomes a limit order rather than a market order, guaranteeing the investor won't sell below their specified price — accepting the tradeoff that in a fast-moving market, the order might not fill at all.",
+        quiz: [
+          {
+            q: "An investor wants to guarantee they will not sell below a specific price, even if it means the order might not execute at all in a fast-moving market. They should use a:",
+            a: "Limit order (or stop-limit order)",
+            explanation: "A limit order guarantees the price floor but never guarantees a fill.",
+            options: [
+              { text: "Market order", explanation: "A market order guarantees execution, but explicitly does NOT guarantee a price." },
+              { text: "Limit order (or stop-limit order)", explanation: "Correct — this guarantees the price the investor is willing to accept, at the cost of possible non-execution." },
+              { text: "A basic stop order", explanation: "Once triggered, a plain stop order becomes a MARKET order, which still carries no price guarantee." },
+              { text: "An all-or-none order", explanation: "That instruction concerns whether the FULL quantity must fill, not the price the investor will accept." },
+            ],
+          },
+          {
+            q: "The maximum potential loss on a short sale is:",
+            a: "Theoretically unlimited, since a stock's price can rise indefinitely",
+            explanation: "Because there's no ceiling on how high a stock's price can climb, a short seller's loss (the cost to buy back and return the shares) has no theoretical cap.",
+            options: [
+              { text: "Limited to the amount initially received from the sale", explanation: "Losses keep growing as the price rises above the sale price — they aren't capped at the original sale proceeds." },
+              { text: "Theoretically unlimited, since a stock's price can rise indefinitely", explanation: "Correct — this is the defining risk of a short position." },
+              { text: "Limited to the margin deposited", explanation: "Margin is collateral posted to support the position; it doesn't cap the investor's actual loss, which can exceed it and trigger further margin calls." },
+              { text: "Always less than a long position's maximum loss", explanation: "It's actually the opposite — a short position's loss potential is unlimited, while a long position's maximum loss is capped at the amount invested." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-tax-4",
+        title: "Measuring portfolio performance",
+        minutes: 7,
+        body: [
+          "Time-weighted return measures the compound growth rate of a portfolio, neutralizing the distorting effect of client-controlled cash flows (deposits/withdrawals) — it's the standard for comparing a manager's skill against a benchmark, since it isn't affected by when the client happened to add or remove money.",
+          "Dollar-weighted return (essentially an IRR calculation on the account's cash flows) reflects the ACTUAL return the specific investor experienced, including the effect of the timing and size of their own deposits and withdrawals — useful for the client's own experience, but not for isolating manager skill.",
+          "A benchmark must be appropriate to be meaningful: comparing a small-cap growth portfolio's performance to a large-cap value index tells you very little, because the two aren't exposed to comparable risk factors or opportunity sets.",
+          "Performance should always be evaluated on a risk-adjusted basis (Sharpe, Treynor, or alpha) — a higher raw return achieved by taking on substantially more risk isn't necessarily better performance.",
+        ],
+        challenge: "Two managers both returned 10% last year. Manager A's portfolio had a standard deviation of 8%; Manager B's had a standard deviation of 18%. Using the Sharpe ratio concept, which manager delivered the better risk-adjusted performance?",
+        exampleOutput: "Manager A, because the same 10% return was achieved with meaningfully less volatility — a higher Sharpe ratio (more excess return per unit of total risk) than Manager B, who took on more than twice the risk for an identical result.",
+        quiz: [
+          {
+            q: "Which return measure is unaffected by the timing of client deposits and withdrawals, making it the standard for judging manager skill?",
+            a: "Time-weighted return",
+            explanation: "Time-weighted return isolates the manager's actual investment decisions from the timing of the client's own cash flows.",
+            options: [
+              { text: "Time-weighted return", explanation: "Correct — this is exactly why it's the industry standard for evaluating manager performance." },
+              { text: "Dollar-weighted return", explanation: "Dollar-weighted return is explicitly sensitive to when and how much the client deposited or withdrew." },
+              { text: "Nominal return", explanation: "A simple nominal return figure doesn't isolate or adjust for cash flow timing at all." },
+              { text: "Holding period return", explanation: "A basic holding period return is also affected by when flows occur within that period." },
+            ],
+          },
+          {
+            q: "Comparing a small-cap growth fund's performance against a large-cap value index is problematic because:",
+            a: "The benchmark doesn't reflect the fund's actual risk/opportunity set, making the comparison meaningless",
+            explanation: "A valid benchmark needs to represent the same style, size, and risk exposures as the portfolio being measured.",
+            options: [
+              { text: "Small-cap funds always underperform large-cap funds", explanation: "That's not a reliable categorical truth — relative performance varies across market cycles." },
+              { text: "The benchmark doesn't reflect the fund's actual risk/opportunity set, making the comparison meaningless", explanation: "Correct — a mismatched benchmark undermines any conclusion drawn from the comparison." },
+              { text: "Growth funds are never appropriate for any client", explanation: "This is an unrelated overreach; the issue here is benchmark mismatch, not the suitability of growth investing generally." },
+              { text: "Indexes cannot be used as benchmarks at all", explanation: "Indexes are routinely and appropriately used as benchmarks — they just need to match the fund's style and market-cap focus." },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "s65-lawreg",
+    title: "Series 65: The Investment Advisers Act & Uniform Securities Act",
+    icon: "⚖️",
+    color: "#1e3a8a",
+    light: "#eff6ff",
+    description: "Who counts as an investment adviser, federal vs. state registration, Form ADV, and the exemptions that let some advisers skip registration entirely.",
+    coopModule: "Series 65 exam prep — Section 4, part 1 (Laws, Regulations, and Guidelines: registration framework)",
+    examSection: "laws",
+    lessons: [
+      {
+        id: "s65-law-1",
+        title: "Who is an 'investment adviser'?",
+        minutes: 8,
+        body: [
+          "The Investment Advisers Act of 1940 defines an investment adviser using a three-prong test: a person or firm that (1) provides advice, or issues reports/analyses, regarding securities; (2) as part of a regular business (not merely incidentally); (3) for compensation. All three prongs generally must be met.",
+          "Several categories are specifically EXCLUDED from the definition entirely (not merely exempt from a requirement): banks and bank holding companies; lawyers, accountants, teachers, and engineers whose investment advice is 'solely incidental' to their professional practice and who receive no special compensation for it (the classic 'LATE' mnemonic); broker-dealers whose advice is solely incidental to their brokerage business with no special compensation for the advice itself; and publishers of bona fide, general-circulation publications not tailored to any individual's specific portfolio.",
+          "'Solely incidental' and 'no special compensation' are the two conditions that keep a professional from crossing into investment adviser status — charging a separate fee specifically for investment advice, or making advice a primary part of the business rather than a byproduct, defeats the exclusion.",
+          "An EXCLUSION (never counted as an IA for this activity, per the statutory definition) is a different legal concept from an EXEMPTION (is an IA, but excused from a specific requirement like registration) — the exam tests whether you can tell these apart.",
+        ],
+        challenge: "An accountant begins charging clients a separate advisory fee specifically for picking stocks, on top of normal accounting fees. Does the LATE exclusion still apply?",
+        exampleOutput: "No — once the accountant charges special/separate compensation specifically for the investment advice (rather than the advice being an incidental, unbilled part of accounting services), the exclusion no longer applies, and the accountant meets the definition of an investment adviser.",
+        quiz: [
+          {
+            q: "Under the 'LATE' exclusion, a lawyer's investment advice to a client is NOT considered investment advisory activity as long as it is:",
+            a: "Solely incidental to the legal practice and involves no special compensation for the advice itself",
+            explanation: "Both conditions — incidental nature and no separate compensation — must hold for the exclusion to apply.",
+            options: [
+              { text: "Given only to institutional clients", explanation: "Client type isn't the test for this exclusion; incidental nature and compensation structure are." },
+              { text: "Solely incidental to the legal practice and involves no special compensation for the advice itself", explanation: "Correct — these are the two defining conditions of the LATE exclusion." },
+              { text: "Limited to fewer than five clients per year", explanation: "That numeric threshold describes the unrelated state-law de minimis exemption, not the LATE exclusion." },
+              { text: "Provided free of charge only", explanation: "The actual test is 'no SPECIAL or separate compensation,' not that all services must be free — ordinary legal fees don't defeat the exclusion." },
+            ],
+          },
+          {
+            q: "A broker-dealer's registered representative gives investment advice to clients but doesn't charge a separate fee for it — the advice is part of the normal brokerage relationship. Under the Investment Advisers Act, this representative is generally:",
+            a: "Excluded from the definition of investment adviser, because the advice is solely incidental to brokerage services and involves no special compensation",
+            explanation: "This mirrors the LATE exclusion's logic, applied specifically to broker-dealers.",
+            options: [
+              { text: "Automatically required to register as an investment adviser anyway", explanation: "This contradicts the broker-dealer exclusion, which specifically applies when advice is incidental and uncompensated separately." },
+              { text: "Excluded from the definition of investment adviser, because the advice is solely incidental to brokerage services and involves no special compensation", explanation: "Correct — this is the broker-dealer exclusion." },
+              { text: "Exempt only if the firm manages more than $100 million", explanation: "This confuses the exclusion with the unrelated federal/state AUM registration threshold." },
+              { text: "Required to register only in states where the client resides", explanation: "The exclusion applies regardless of state, since the activity isn't considered investment advisory activity in the first place." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-law-2",
+        title: "Federal vs. state registration: NSMIA and the AUM thresholds",
+        minutes: 8,
+        body: [
+          "The National Securities Markets Improvement Act of 1996 (NSMIA) divided regulatory jurisdiction over investment advisers between the SEC (federal) and the states, largely by assets under management (AUM), to eliminate duplicative dual registration.",
+          "Under the current framework, an adviser with AUM below $100 million generally registers with the state(s) where it does business, rather than the SEC (subject to exceptions, such as advisers to registered investment companies, who are federal covered regardless of size).",
+          "Advisers with AUM between $100 million and $110 million sit in a buffer zone: they MAY register with the SEC or remain state-registered — it's their choice. Once AUM reaches $110 million, SEC registration becomes mandatory.",
+          "Once SEC-registered, an adviser doesn't have to withdraw and switch to state registration unless AUM subsequently falls below $90 million — this asymmetric buffer prevents advisers from repeatedly flipping registration status as AUM fluctuates near the line. A 'federal covered adviser' is the term for any SEC-registered adviser; states cannot require a federal covered adviser to also register, though most states can still require notice filing and a fee, and state anti-fraud authority always applies regardless of registration status.",
+        ],
+        challenge: "Classify the required registration for: (a) an adviser with $60M AUM, (b) one with $105M AUM, (c) one with $150M AUM, and (d) an SEC-registered adviser whose AUM drops to $95M.",
+        exampleOutput: "(a) State-registered. (b) Adviser's choice (buffer zone, $100M–$110M). (c) Mandatory SEC registration. (d) Stays SEC-registered, since it's still above the $90M floor that would force a switch back to state registration.",
+        quiz: [
+          {
+            q: "An investment adviser with $150 million in assets under management must:",
+            a: "Register with the SEC",
+            explanation: "$150 million is above the $110 million mandatory-federal-registration threshold.",
+            options: [
+              { text: "Register with each state where it has clients", explanation: "Above $110M, SEC registration is mandatory — state-only registration is no longer the applicable path." },
+              { text: "Register with the SEC", explanation: "Correct — $150M AUM is well above the $110M mandatory federal threshold." },
+              { text: "Choose freely between SEC or state registration", explanation: "That discretion only exists in the narrower $100M–$110M buffer zone, not above $110M." },
+              { text: "Register with FINRA", explanation: "FINRA regulates broker-dealers, not investment advisers, which register with the SEC or the states." },
+            ],
+          },
+          {
+            q: "An SEC-registered adviser's AUM falls to $95 million. Under the buffer rule, this adviser:",
+            a: "May remain SEC-registered, since AUM is still above the $90 million threshold that would require switching to state registration",
+            explanation: "The downward trigger to force a switch back to state registration is $90 million, not $100 million.",
+            options: [
+              { text: "Must immediately switch to state registration", explanation: "The $90M floor, not $100M, is what forces a switch downward — $95M is still above that floor." },
+              { text: "May remain SEC-registered, since AUM is still above the $90 million threshold that would require switching to state registration", explanation: "Correct — this is exactly what the asymmetric buffer allows." },
+              { text: "Must register with both the SEC and every state simultaneously", explanation: "Dual registration in this way isn't how the buffer rule works, and it isn't the point of NSMIA's jurisdiction-splitting design." },
+              { text: "Loses federal covered status the moment AUM drops below $100 million", explanation: "The downward trigger is $90M, not $100M, precisely because of the buffer that prevents frequent status flipping." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-law-3",
+        title: "Registration process: Form ADV, the brochure rule, and recordkeeping",
+        minutes: 7,
+        body: [
+          "Form ADV is the uniform application used for both SEC and state registration. Part 1 is a structured, check-the-box disclosure (business practices, disciplinary history, ownership) filed electronically and largely public. Part 2 is the 'brochure' — a narrative, plain-English document describing the firm's services, fees, conflicts of interest, and disciplinary history — plus brochure supplements describing the specific individuals providing advice.",
+          "The 'brochure rule' requires an adviser to deliver the Part 2 brochure (and relevant supplements) to a client before or at the time of entering into the advisory agreement, and to offer an updated brochure at least annually, or promptly if there are material changes.",
+          "Books and records requirements obligate advisers to maintain specified records — client agreements, communications, trade records, financial records — for a defined retention period, so regulators can reconstruct and examine the adviser's activities.",
+          "Registration isn't a one-time event: advisers must file periodic amendments to Form ADV (at least annually, and promptly for material changes) to keep the disclosure current.",
+        ],
+        challenge: "Identify which Form ADV part contains the plain-English narrative on fees and conflicts of interest, and explain when it must first be delivered to a new client.",
+        exampleOutput: "Form ADV Part 2 (the brochure) contains the plain-English fee and conflicts-of-interest narrative. It must be delivered to the client before or at the time the advisory agreement is entered into — not after the relationship has already begun.",
+        quiz: [
+          {
+            q: "The narrative document that describes an adviser's fees, services, and conflicts of interest in plain English, and must be delivered to clients, is:",
+            a: "Form ADV Part 2 (the brochure)",
+            explanation: "Part 2 is written as an investor-facing narrative, distinct from Part 1's structured public disclosure filing.",
+            options: [
+              { text: "Form ADV Part 1", explanation: "Part 1 is the structured, check-the-box disclosure filing, not the plain-English narrative brochure." },
+              { text: "Form ADV Part 2 (the brochure)", explanation: "Correct — this is the brochure containing the plain-English fee and conflicts disclosure." },
+              { text: "Form U4", explanation: "Form U4 is the uniform application for an INDIVIDUAL's registration in the securities industry, not an adviser firm's client-facing brochure." },
+              { text: "Form ADV-W", explanation: "Form ADV-W is used to withdraw from registration, not to disclose fees and conflicts to clients." },
+            ],
+          },
+          {
+            q: "Under the brochure rule, when must an adviser first deliver its Part 2 brochure to a new client?",
+            a: "Before or at the time of entering into the advisory agreement",
+            explanation: "Delivery is required at the outset of the relationship, not as an afterthought.",
+            options: [
+              { text: "Within 90 days after the relationship begins", explanation: "Delivery is required at or before the START of the relationship, not up to 90 days afterward." },
+              { text: "Before or at the time of entering into the advisory agreement", explanation: "Correct — this is when the brochure rule requires delivery." },
+              { text: "Only if the client specifically requests it", explanation: "Delivery is a default obligation on the adviser, not something that only happens on client request." },
+              { text: "Only once assets under management exceed $100,000", explanation: "The delivery obligation isn't tied to any account-size threshold." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-law-4",
+        title: "Exemptions from registration and the de minimis rule",
+        minutes: 6,
+        body: [
+          "Registration exemptions differ from the exclusions covered earlier: an exempt adviser IS an investment adviser under the definition, but is excused from the registration requirement itself, typically due to a narrow client base or the nature of the clients served.",
+          "The Uniform Securities Act's classic 'de minimis' exemption lets an adviser with no place of business in a state avoid registering in that state if it has only a small number of retail clients resident there in the preceding 12 months — commonly cited as a threshold of no more than five such clients — since institutional and certain other clients typically don't count toward that limit.",
+          "At the federal level, certain private fund advisers (for example, advisers solely to qualifying venture capital funds, or to private funds below a specified asset threshold) are exempt from SEC registration, though they may still owe basic reporting obligations.",
+          "An adviser relying on an exemption is still fully subject to the antifraud provisions of both federal and state securities law — no registration status ever excuses fraud.",
+        ],
+        challenge: "An adviser has no office in State X but has 3 individual retail clients who happen to live there. Does the adviser need to register in State X?",
+        exampleOutput: "Generally no — with no place of business in the state and only 3 retail clients resident there (under the commonly cited five-client threshold), the adviser can typically rely on the de minimis exemption from registering in State X, though it remains subject to that state's antifraud authority regardless.",
+        quiz: [
+          {
+            q: "The 'de minimis' exemption under the Uniform Securities Act generally exempts an adviser with no place of business in a state from registering there if the adviser has:",
+            a: "Only a small number of retail clients (commonly cited as five or fewer) resident in that state in the preceding 12 months",
+            explanation: "The de minimis exemption is about client count and location, not the adviser's overall size or age.",
+            options: [
+              { text: "Fewer than $100 million in AUM", explanation: "This confuses the de minimis client-count exemption with the unrelated federal/state AUM registration threshold." },
+              { text: "Been in business for less than one year", explanation: "Firm age isn't the actual test — client count and location are." },
+              { text: "Only a small number of retail clients (commonly cited as five or fewer) resident in that state in the preceding 12 months", explanation: "Correct — this is the de minimis standard." },
+              { text: "No institutional clients at all", explanation: "This is inverted — institutional clients are typically what DON'T count toward the retail client limit, not a disqualifying factor." },
+            ],
+          },
+          {
+            q: "An adviser properly relies on a registration exemption. This means the adviser:",
+            a: "Is still subject to state and federal antifraud provisions despite not being registered",
+            explanation: "Registration exemptions never extend to a pass on fraud.",
+            options: [
+              { text: "Is completely outside the reach of securities law", explanation: "Exemption from registration is not exemption from antifraud law, which always still applies." },
+              { text: "Is still subject to state and federal antifraud provisions despite not being registered", explanation: "Correct — antifraud authority applies regardless of registration status." },
+              { text: "Is excluded from the definition of investment adviser entirely", explanation: "That describes an EXCLUSION, a different legal concept from an EXEMPTION — an exempt adviser is still an investment adviser by definition." },
+              { text: "No longer owes any fiduciary duty to clients", explanation: "Fiduciary duty flows from the advisory relationship itself, not from registration status." },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "s65-fiduciary",
+    title: "Series 65: Fiduciary Duty, Ethics & Prohibited Practices",
+    icon: "🛡️",
+    color: "#7f1d1d",
+    light: "#fef2f2",
+    description: "The fiduciary standard, Reg BI, and the classic prohibited practices — the conceptual heart of the exam and the most heavily tested topic in this track.",
+    coopModule: "Series 65 exam prep — Section 4, part 2 (Laws, Regulations, and Guidelines: fiduciary duty, ethics, and prohibited conduct)",
+    examSection: "laws",
+    lessons: [
+      {
+        id: "s65-fid-1",
+        title: "The fiduciary standard vs. Reg BI vs. suitability — the conceptual heart of the exam",
+        minutes: 9,
+        body: [
+          "An investment adviser owes clients a FIDUCIARY duty — the highest standard of care in financial services. This standard was read into the Investment Advisers Act of 1940 by the Supreme Court in SEC v. Capital Gains Research Bureau (1963), which described an affirmative duty of 'utmost good faith, full and fair disclosure of all material facts,' and an obligation to avoid misleading clients. It is CONTINUOUS — it applies for the entire duration of the advisory relationship, not just at the moment of a recommendation.",
+          "Fiduciary duty has two core components: the duty of care (act in the client's best interest, base advice on the client's objectives, seek best execution, monitor the relationship over time) and the duty of loyalty (avoid or fully disclose conflicts of interest, never put the adviser's own interest ahead of the client's).",
+          "Broker-dealers historically operated under a suitability standard (FINRA Rule 2111): a recommendation had to be suitable for the client based on their profile, but the broker-dealer did not have to recommend the single best or lowest-cost option, and had no ongoing duty to monitor after the transaction.",
+          "Regulation Best Interest (Reg BI), effective 2020, raised the bar for broker-dealers recommending to retail customers above plain suitability — it requires acting in the retail customer's best interest without placing the firm's or representative's own financial interest ahead of the customer's, through four component obligations (disclosure, care, conflict of interest, and compliance). Critically, Reg BI is STILL NOT a fiduciary duty: it applies at the time of the recommendation (not continuously), and it doesn't require monitoring the account afterward. The adviser's fiduciary standard remains the stricter, ongoing standard.",
+        ],
+        challenge: "Contrast an IAR managing a discretionary account for a client over several years with a registered representative recommending a single mutual fund purchase to a retail client. Which standard governs each, and why?",
+        exampleOutput: "The IAR managing the discretionary account owes a continuous fiduciary duty — care and loyalty apply for as long as the relationship lasts, including ongoing monitoring. The registered rep's single recommendation to a retail customer is governed by Reg BI, which requires acting in the customer's best interest at the point of that recommendation but does not require ongoing monitoring or guarantee the single best available option.",
+        quiz: [
+          {
+            q: "Which standard applies continuously for the full duration of the relationship, not just at the moment of a recommendation?",
+            a: "The fiduciary duty owed by an investment adviser",
+            explanation: "Fiduciary duty is an ongoing relationship-level obligation, unlike the point-in-time standards that apply to broker-dealer recommendations.",
+            options: [
+              { text: "The fiduciary duty owed by an investment adviser", explanation: "Correct — fiduciary duty is continuous for the life of the advisory relationship." },
+              { text: "Regulation Best Interest", explanation: "Reg BI applies at the point of a recommendation to a retail customer, not continuously across the relationship." },
+              { text: "FINRA suitability", explanation: "Suitability is also assessed at the point of a recommendation, not as a continuous relationship-wide duty." },
+              { text: "The de minimis exemption", explanation: "That's a registration exemption concept, not a standard of conduct at all." },
+            ],
+          },
+          {
+            q: "Regulation Best Interest (Reg BI) differs from an investment adviser's fiduciary duty because Reg BI:",
+            a: "Applies only at the time of a recommendation to a retail customer and does not require ongoing account monitoring",
+            explanation: "This is the core distinction the exam wants you to be able to draw between the two standards.",
+            options: [
+              { text: "Applies only at the time of a recommendation to a retail customer and does not require ongoing account monitoring", explanation: "Correct — this is exactly how Reg BI differs from the continuous fiduciary standard." },
+              { text: "Is actually a stricter standard than fiduciary duty", explanation: "Reg BI is understood to be a distinct standard, not a stricter one than the adviser fiduciary duty." },
+              { text: "Requires the broker-dealer to always recommend the single lowest-cost product", explanation: "Neither Reg BI nor suitability require recommending THE single best or cheapest option available." },
+              { text: "Eliminates all broker-dealer conflicts of interest", explanation: "Reg BI requires disclosure and mitigation of conflicts, not their outright elimination." },
+            ],
+          },
+          {
+            q: "SEC v. Capital Gains Research Bureau (1963) is significant because it:",
+            a: "Established that the Investment Advisers Act imposes a fiduciary duty of utmost good faith and full disclosure on advisers",
+            explanation: "This Supreme Court case is the foundational source of the adviser fiduciary standard, read directly into the 1940 Act.",
+            options: [
+              { text: "Established that the Investment Advisers Act imposes a fiduciary duty of utmost good faith and full disclosure on advisers", explanation: "Correct — this is the case's core holding." },
+              { text: "Created Regulation Best Interest", explanation: "Reg BI is a 2020 SEC rule, unrelated to this 1963 Supreme Court case." },
+              { text: "Established the de minimis registration exemption", explanation: "That's a Uniform Securities Act state-registration concept, unrelated to this case." },
+              { text: "Defined the three-prong test for who is an investment adviser", explanation: "That test comes from the statutory definition in the Investment Advisers Act itself, not from this case." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-fid-2",
+        title: "Duty of loyalty, duty of care, and conflicts of interest",
+        minutes: 7,
+        body: [
+          "Duty of loyalty means an adviser must never subordinate a client's interest to its own (or to a third party's) — and where a conflict of interest can't be avoided, it must be fully and fairly disclosed so the client can give informed consent.",
+          "Common conflicts requiring disclosure: recommending proprietary products (funds managed by the adviser or an affiliate) that generate extra revenue for the firm; receiving compensation from a third party (such as a mutual fund's revenue-sharing arrangement) tied to which products are recommended; and principal trading — buying a security from or selling one to a client out of the adviser's own account, which requires the client's consent before the trade settles.",
+          "Duty of care requires an adviser's advice to be based on a reasonable understanding of the client's objectives, and requires reasonable diligence and monitoring — a duty of care violation doesn't require dishonest intent, just a failure of the process a fiduciary owes.",
+          "Best execution is part of the duty of care: an adviser directing trades must seek the most favorable terms reasonably available for the client's transactions, considering price, speed, and likelihood of execution — not simply routing to whichever broker-dealer benefits the adviser most.",
+        ],
+        challenge: "An adviser recommends its own firm's proprietary mutual fund to a client without mentioning that the firm earns extra revenue from that fund. Identify the fiduciary breach.",
+        exampleOutput: "This is a duty of loyalty breach — the proprietary product itself isn't automatically prohibited, but failing to disclose the conflict of interest (the extra revenue the firm earns) denies the client the chance to give informed consent, which is exactly what the duty of loyalty requires.",
+        quiz: [
+          {
+            q: "An adviser recommends its own affiliated mutual fund, which pays the adviser's firm additional revenue, without telling the client about this arrangement. This is a breach of:",
+            a: "The duty of loyalty, because the conflict of interest was not disclosed",
+            explanation: "The undisclosed financial conflict — not the mere existence of a proprietary product — is what breaches the duty of loyalty.",
+            options: [
+              { text: "No duty at all, since proprietary products are always permitted", explanation: "Proprietary products aren't automatically prohibited, but the UNDISCLOSED conflict is exactly the violation here." },
+              { text: "The duty of loyalty, because the conflict of interest was not disclosed", explanation: "Correct — nondisclosure of a material conflict is a duty of loyalty breach." },
+              { text: "The de minimis exemption", explanation: "That's an unrelated state-registration exemption concept, not a fiduciary duty." },
+              { text: "Regulation Best Interest, since this is a broker-dealer issue only", explanation: "This scenario describes an adviser's fiduciary-duty violation, not a broker-dealer Reg BI matter." },
+            ],
+          },
+          {
+            q: "'Best execution' as part of an adviser's duty of care requires:",
+            a: "Seeking the most favorable overall terms reasonably available for a client's trade, not just the lowest commission or whichever venue benefits the adviser",
+            explanation: "Best execution weighs multiple factors together, not a single number in isolation.",
+            options: [
+              { text: "Seeking the most favorable overall terms reasonably available for a client's trade, not just the lowest commission or whichever venue benefits the adviser", explanation: "Correct — this is the best execution standard." },
+              { text: "Always using the broker-dealer that charges the absolute lowest commission", explanation: "Best execution weighs price, speed, and execution likelihood together, not commission alone." },
+              { text: "Routing all trades through the adviser's own affiliated broker-dealer", explanation: "That specifically raises a conflict-of-interest concern rather than satisfying a best-execution safe harbor." },
+              { text: "Is only required for discretionary accounts", explanation: "Best execution is a general duty-of-care obligation, not limited to discretionary accounts." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-fid-3",
+        title: "Prohibited and unethical practices",
+        minutes: 8,
+        body: [
+          "Guaranteeing a client against loss, or promising a specific investment result, is prohibited outright — no legitimate investment carries a guaranteed return, and making such a guarantee is a hallmark of fraud.",
+          "Scalping: an adviser recommends a security to clients (often via a published report) and then trades ahead of that recommendation for its own account, profiting from the price movement the recommendation itself is likely to cause. This is the exact fact pattern behind SEC v. Capital Gains Research Bureau.",
+          "Churning: excessive trading in a client's account, generating commissions or fees for the adviser or representative, without regard to the client's objectives — the hallmark is that the trading's PURPOSE is generating compensation rather than pursuing the client's goals.",
+          "Cherry-picking: allocating profitable trades from a block/omnibus trade disproportionately to favored accounts (e.g., the adviser's own account), while pushing losing trades into other client accounts — a serious breach of the duty of loyalty and fair dealing.",
+          "Front-running: trading ahead of a large, anticipated client order using advance knowledge of that pending order, to profit from the price impact the client's own trade is about to cause. Commingling: mixing client funds or securities with the adviser's own assets rather than keeping them properly segregated — a serious custody violation regardless of intent. Unauthorized trading: executing a trade in a client's account without authorization (or without properly documented discretionary authority) — even a profitable trade is still a violation if unauthorized.",
+        ],
+        challenge: "Read four short vignettes and identify which prohibited practice each describes: (1) trading ahead of a soon-to-be-published buy recommendation, (2) excessive trading generating commissions with no link to the client's goals, (3) allocating winning trades to a favored account and losers to others, (4) executing a trade in a client's account with no authorization on file.",
+        exampleOutput: "(1) Scalping. (2) Churning. (3) Cherry-picking. (4) Unauthorized trading — each distinguished by WHEN the improper self-dealing happens and WHAT specifically is being manipulated (a recommendation's timing, trade frequency, trade allocation, or authorization, respectively).",
+        quiz: [
+          {
+            q: "An adviser publishes a buy recommendation on a stock, then buys shares for its own account just before the report is released, planning to sell once client buying pushes the price up. This is:",
+            a: "Scalping",
+            explanation: "Trading ahead of one's own published recommendation to profit from its anticipated market impact is the classic definition of scalping.",
+            options: [
+              { text: "Scalping", explanation: "Correct — this is the textbook scalping fact pattern." },
+              { text: "Churning", explanation: "Churning concerns excessive trading VOLUME or frequency in a client account, not trading ahead of a research report." },
+              { text: "Cherry-picking", explanation: "Cherry-picking concerns unfairly allocating trade RESULTS between accounts after execution, not front-running a public recommendation." },
+              { text: "Commingling", explanation: "Commingling concerns mixing client and adviser assets/custody, unrelated to this fact pattern." },
+            ],
+          },
+          {
+            q: "A representative trades a client's account frequently — generating substantial commissions — with no clear connection to the client's stated objectives. This is best described as:",
+            a: "Churning",
+            explanation: "Churning is defined by excessive trading driven by compensation rather than the client's goals.",
+            options: [
+              { text: "Churning", explanation: "Correct — this is the churning fact pattern." },
+              { text: "Scalping", explanation: "Scalping specifically involves trading ahead of a public recommendation, not generic excessive trading." },
+              { text: "Front-running", explanation: "Front-running requires a specific pending large client order being traded ahead of, not general excessive trading." },
+              { text: "Unauthorized trading", explanation: "Unauthorized trading is about lack of consent for a specific trade, not about trading frequency." },
+            ],
+          },
+          {
+            q: "An adviser allocates the profitable trades from a single block order to its own account and allocates the losing trades to client accounts. This is:",
+            a: "Cherry-picking",
+            explanation: "Selectively steering favorable outcomes to a favored account after a block trade executes is the defining feature of cherry-picking.",
+            options: [
+              { text: "Cherry-picking", explanation: "Correct — this is the cherry-picking fact pattern." },
+              { text: "Churning", explanation: "Churning concerns trade frequency and commission generation, not selective allocation of results." },
+              { text: "Scalping", explanation: "Scalping is about trading ahead of a public recommendation, not about allocating an already-executed block trade." },
+              { text: "Front-running", explanation: "Front-running is trading ahead of a pending order, not allocating results of a trade that has already been executed." },
+            ],
+          },
+        ],
+      },
+      {
+        id: "s65-fid-4",
+        title: "Advertising, custody, and solicitor arrangements",
+        minutes: 7,
+        body: [
+          "The SEC's Marketing Rule governs adviser advertising and, since 2021, folded the older separate solicitation rule into the same framework. Advertisements generally may not include untrue statements of material fact or unsubstantiated claims, and testimonials/endorsements are permitted only with proper disclosure of compensation and any material conflicts involved; performance advertising has specific requirements around showing net-of-fee results.",
+          "Cash or non-cash compensation paid to a solicitor (someone who refers clients to the adviser for compensation) must be disclosed to the prospective client, along with the nature of the arrangement, so the client understands the referral wasn't a neutral recommendation.",
+          "Custody means an adviser (or a related person) holds client funds or securities directly, OR has any arrangement giving it the ability to obtain possession of client funds/securities (e.g., serving as trustee, or having a standing letter of authorization permitting withdrawals to third parties). Advisers with custody must generally use a qualified custodian to hold those assets and are typically subject to an independent, surprise verification exam.",
+          "Simply deducting an advisory fee directly from a client's account is a narrower form of custody with lighter-touch requirements than full custody of client assets, but it still requires specific safeguards, such as the client's written authorization and notice to the custodian.",
+        ],
+        challenge: "An adviser has a standing letter of authorization allowing it to move a client's funds to a specified third party without the client's signature on each transfer. Does this constitute custody?",
+        exampleOutput: "Generally yes — custody isn't limited to physically holding client assets; the ABILITY to direct or obtain client funds under a standing arrangement like this triggers the custody rule's safeguards, even though the adviser never takes physical possession of the money.",
+        quiz: [
+          {
+            q: "An adviser has a standing letter of authorization allowing it to move a client's funds to a specified third party without the client's signature on each transfer. Under SEC guidance, this arrangement:",
+            a: "Generally constitutes custody, triggering the custody rule's safeguards",
+            explanation: "Custody includes the ability to direct client assets, not only physical possession of them.",
+            options: [
+              { text: "Never constitutes custody, since the adviser never physically possesses the funds", explanation: "Custody covers the ABILITY to obtain or direct client assets, not only physical possession." },
+              { text: "Generally constitutes custody, triggering the custody rule's safeguards", explanation: "Correct — this type of standing authorization is treated as custody under SEC guidance." },
+              { text: "Only constitutes custody if the third party is the adviser itself", explanation: "Third-party transfers under a standing authorization can still trigger custody; the recipient doesn't have to be the adviser." },
+              { text: "Is prohibited outright and can never be structured compliantly", explanation: "Such arrangements CAN be structured compliantly with the right safeguards; they aren't banned outright." },
+            ],
+          },
+          {
+            q: "Under the Marketing Rule, an adviser wants to use a client testimonial in an advertisement. This is:",
+            a: "Permitted, provided required disclosures about compensation and material conflicts are made",
+            explanation: "The 2021 rule allows testimonials and endorsements, reversing the older blanket prohibition, subject to disclosure conditions.",
+            options: [
+              { text: "Always prohibited under any circumstances", explanation: "The current Marketing Rule specifically permits testimonials and endorsements with proper disclosure — that's a change from the old blanket prohibition." },
+              { text: "Permitted, provided required disclosures about compensation and material conflicts are made", explanation: "Correct — this is the Marketing Rule's current approach." },
+              { text: "Permitted only for institutional clients", explanation: "The rule's testimonial provisions aren't limited to institutional-client advertising." },
+              { text: "Permitted only if the client is compensated at least $1,000", explanation: "There's no such fixed dollar threshold — any compensation, cash or non-cash, triggers the disclosure requirement." },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];

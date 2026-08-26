@@ -1,0 +1,493 @@
+// Series 65 (Uniform Investment Adviser Law Examination) — practice question bank
+// Additional items for the ECONOMIC FACTORS AND BUSINESS INFORMATION section.
+// Same quiz-item shape as data/certs/series65-bank.js: {id, section, q, a, explanation, options:[{text, explanation}]}.
+// section: "economic" — folded into SERIES65_BANK by a merge step.
+// These 35 items deliberately cover ground the existing 45 "economic" items do NOT:
+// quantitative methods (mean/median/mode, std dev, variance, correlation, beta, alpha,
+// Sharpe/Treynor, R-squared, duration), financial statement types (balance sheet vs
+// income statement vs cash flow statement), additional ratios (dividend yield, dividend
+// payout, P/B, EPS formula, leverage's effect on ROE vs ROA), additional TVM nuances
+// (Rule of 72, NPV/IRR reinvestment-rate assumption, discount rate vs PV), stagflation,
+// and risk types not previously asked as their own question (opportunity cost,
+// reinvestment, call, legislative/regulatory, political, timing).
+
+export const S65_BANK_ECONOMIC = [
+  {
+    id: "s65b-eco-46",
+    section: "economic",
+    q: "A statistic that measures the total dispersion of an investment's returns around its average — capturing both systematic and unsystematic risk — is:",
+    a: "Standard deviation",
+    explanation: "Standard deviation measures total volatility of returns, unlike beta, which isolates only the market-related (systematic) component.",
+    options: [
+      { text: "Standard deviation", explanation: "Correct — standard deviation captures total dispersion of returns, both systematic and unsystematic." },
+      { text: "Beta", explanation: "Beta measures only a security's sensitivity to market (systematic) movements, not its total dispersion of returns." },
+      { text: "R-squared", explanation: "R-squared measures how much of a portfolio's movement is explained by a benchmark, not total return dispersion." },
+      { text: "Sharpe ratio", explanation: "The Sharpe ratio measures risk-adjusted return, not dispersion itself, though it uses standard deviation as an input." },
+    ],
+  },
+  {
+    id: "s65b-eco-47",
+    section: "economic",
+    q: "A stock has a beta of 1.5. Relative to the overall market, this stock has historically been:",
+    a: "About 50% more volatile than the market, moving in the same direction",
+    explanation: "A beta above 1.0 indicates greater sensitivity to market moves; 1.5 means roughly 1.5x the market's movement, in the same direction.",
+    options: [
+      { text: "About 50% more volatile than the market, moving in the same direction", explanation: "Correct — a beta of 1.5 means about 1.5x the market's movement, same direction." },
+      { text: "About 50% less volatile than the market", explanation: "A beta below 1.0, not 1.5, would indicate lower volatility than the market." },
+      { text: "Uncorrelated with the overall market", explanation: "A beta near 0, not 1.5, would indicate little correlation with the market." },
+      { text: "Riskier only because of company-specific factors", explanation: "Beta measures systematic (market-related) risk, not company-specific (unsystematic) risk." },
+    ],
+  },
+  {
+    id: "s65b-eco-48",
+    section: "economic",
+    q: "A security has a beta of -0.5. This security would be expected to:",
+    a: "Move opposite the market, with about half the market's magnitude of movement",
+    explanation: "A negative beta indicates an inverse relationship with the market; the magnitude (0.5) scales how strongly it moves.",
+    options: [
+      { text: "Move opposite the market, with about half the market's magnitude of movement", explanation: "Correct — a beta of -0.5 means inverse movement at roughly half the market's magnitude." },
+      { text: "Move with the market, at about half its magnitude", explanation: "That would describe a beta of +0.5, not a negative beta." },
+      { text: "Have no correlation with the market at all", explanation: "A beta near 0, not -0.5, would indicate essentially no correlation." },
+      { text: "Be immune to all forms of investment risk", explanation: "A negative beta only describes the direction and degree of market sensitivity; unsystematic risk can still exist." },
+    ],
+  },
+  {
+    id: "s65b-eco-49",
+    section: "economic",
+    q: "A portfolio manager's alpha is reported as +2%. This indicates the portfolio:",
+    a: "Outperformed its risk-adjusted (benchmark) expectation by 2%",
+    explanation: "Alpha isolates the portion of return attributable to manager skill, above or below what the portfolio's risk level (beta) would predict.",
+    options: [
+      { text: "Outperformed its risk-adjusted (benchmark) expectation by 2%", explanation: "Correct — this is what a positive alpha represents." },
+      { text: "Has a beta that is 2% higher than the benchmark's", explanation: "Alpha and beta are distinct statistics; alpha does not describe a change in beta." },
+      { text: "Simply earned a 2% raw return, without any risk adjustment", explanation: "Alpha is specifically a risk-adjusted excess return, not a raw, unadjusted return figure." },
+      { text: "Took on 2% more market risk than the benchmark", explanation: "Market risk exposure is described by beta, not alpha." },
+    ],
+  },
+  {
+    id: "s65b-eco-50",
+    section: "economic",
+    q: "A mutual fund has an R-squared of 0.95 relative to the S&P 500. This indicates that:",
+    a: "About 95% of the fund's price movements can be explained by movements in the S&P 500",
+    explanation: "R-squared measures how much of a portfolio's variability is attributable to movements in the benchmark used for comparison.",
+    options: [
+      { text: "About 95% of the fund's price movements can be explained by movements in the S&P 500", explanation: "Correct — this is what R-squared measures." },
+      { text: "The fund outperformed the S&P 500 by 95%", explanation: "R-squared says nothing about relative performance; it measures correlation of movement, not outperformance." },
+      { text: "The fund's beta is exactly 0.95", explanation: "R-squared and beta are different statistics; a high R-squared doesn't fix beta at that same number." },
+      { text: "95% of the fund's assets are invested in S&P 500 companies", explanation: "R-squared describes statistical correlation of returns, not the fund's actual portfolio composition." },
+    ],
+  },
+  {
+    id: "s65b-eco-51",
+    section: "economic",
+    q: "The Sharpe ratio is calculated as:",
+    a: "(Portfolio return − risk-free rate) ÷ standard deviation of the portfolio's returns",
+    explanation: "The Sharpe ratio measures excess return earned per unit of total risk (standard deviation).",
+    options: [
+      { text: "(Portfolio return − risk-free rate) ÷ standard deviation of the portfolio's returns", explanation: "Correct — this is the Sharpe ratio formula." },
+      { text: "(Portfolio return − risk-free rate) ÷ beta", explanation: "That formula describes the Treynor ratio, which uses beta instead of standard deviation." },
+      { text: "Portfolio return ÷ standard deviation, with no risk-free rate subtracted", explanation: "The Sharpe ratio specifically uses EXCESS return (over the risk-free rate), not raw portfolio return." },
+      { text: "Alpha ÷ R-squared", explanation: "This isn't a recognized risk-adjusted performance formula." },
+    ],
+  },
+  {
+    id: "s65b-eco-52",
+    section: "economic",
+    q: "Which risk-adjusted performance measure divides excess return by BETA rather than by standard deviation, making it especially suited to evaluating a security held as part of a diversified portfolio?",
+    a: "Treynor ratio",
+    explanation: "The Treynor ratio uses beta (systematic risk) as its risk measure, appropriate when unsystematic risk is assumed to be diversified away.",
+    options: [
+      { text: "Sharpe ratio", explanation: "The Sharpe ratio divides excess return by standard deviation (total risk), not by beta." },
+      { text: "Treynor ratio", explanation: "Correct — the Treynor ratio divides excess return by beta." },
+      { text: "Alpha", explanation: "Alpha is itself a risk-adjusted excess return figure, not a ratio dividing return by beta." },
+      { text: "R-squared", explanation: "R-squared measures correlation with a benchmark, not a risk-adjusted return ratio." },
+    ],
+  },
+  {
+    id: "s65b-eco-53",
+    section: "economic",
+    q: "Bond duration is best described as a measure of:",
+    a: "A bond's approximate price sensitivity to a change in interest rates",
+    explanation: "Duration expresses, in years, how much a bond's price is expected to move for a given change in interest rates.",
+    options: [
+      { text: "A bond's approximate price sensitivity to a change in interest rates", explanation: "Correct — this is what duration measures." },
+      { text: "The exact number of years until the bond matures", explanation: "Duration is related to but not identical to time to maturity, since it also weighs the timing of coupon payments." },
+      { text: "The bond issuer's creditworthiness", explanation: "Credit quality is assessed through ratings and credit analysis, not duration." },
+      { text: "The bond's total return over its life", explanation: "Duration measures interest-rate sensitivity, not a bond's total realized return." },
+    ],
+  },
+  {
+    id: "s65b-eco-54",
+    section: "economic",
+    q: "All else equal, a bond with a HIGHER coupon rate will have:",
+    a: "A shorter duration than an otherwise identical bond with a lower coupon",
+    explanation: "Higher coupons return more of the bond's cash flows sooner, reducing the weighted-average time to receive those cash flows.",
+    options: [
+      { text: "A shorter duration than an otherwise identical bond with a lower coupon", explanation: "Correct — higher coupons shorten duration by returning cash flows earlier." },
+      { text: "A longer duration than an otherwise identical bond with a lower coupon", explanation: "This is the opposite of the actual relationship between coupon rate and duration." },
+      { text: "Exactly the same duration regardless of coupon", explanation: "Coupon rate is one of the direct inputs that changes a bond's duration calculation." },
+      { text: "No meaningful duration at all", explanation: "Every coupon-paying bond has a calculable duration; a higher coupon doesn't eliminate it." },
+    ],
+  },
+  {
+    id: "s65b-eco-55",
+    section: "economic",
+    q: "Between two bonds with identical coupon rates and credit quality, the bond with the LONGER duration will be:",
+    a: "More sensitive to a given change in interest rates",
+    explanation: "Duration and interest-rate sensitivity move together — the longer the duration, the larger the expected price swing for a given rate change.",
+    options: [
+      { text: "More sensitive to a given change in interest rates", explanation: "Correct — longer duration means greater interest-rate sensitivity." },
+      { text: "Less sensitive to a given change in interest rates", explanation: "This reverses the actual relationship between duration and rate sensitivity." },
+      { text: "Equally sensitive, since duration doesn't affect price sensitivity", explanation: "Duration is precisely the measure of that differing sensitivity." },
+      { text: "Immune to interest rate risk", explanation: "A longer duration means MORE interest rate risk, not immunity from it." },
+    ],
+  },
+  {
+    id: "s65b-eco-56",
+    section: "economic",
+    q: "For combining two assets in a portfolio to meaningfully reduce overall risk through diversification, the assets should ideally have a correlation coefficient that is:",
+    a: "Low or negative",
+    explanation: "Assets that don't move in lockstep (low or negative correlation) can offset each other's swings, reducing overall portfolio volatility.",
+    options: [
+      { text: "Low or negative", explanation: "Correct — low or negative correlation provides the greatest diversification benefit." },
+      { text: "High and positive, close to +1.0", explanation: "Assets that move together closely provide little to no diversification benefit." },
+      { text: "Exactly zero, since any other value defeats diversification", explanation: "Negative correlation (below zero) can provide diversification benefit too, not only a correlation of precisely zero." },
+      { text: "Irrelevant — diversification works regardless of correlation", explanation: "Correlation is central to how much risk reduction diversification actually provides." },
+    ],
+  },
+  {
+    id: "s65b-eco-57",
+    section: "economic",
+    q: "Two securities have a correlation coefficient of +1.0. Combining them into a portfolio will:",
+    a: "Provide no diversification benefit, since the two securities move in perfect lockstep",
+    explanation: "A correlation of +1.0 is the maximum possible positive correlation; the securities always move together, so combining them doesn't smooth out volatility.",
+    options: [
+      { text: "Provide no diversification benefit, since the two securities move in perfect lockstep", explanation: "Correct — perfect positive correlation eliminates any diversification benefit." },
+      { text: "Eliminate all risk in the combined portfolio", explanation: "This is the opposite outcome — perfect positive correlation provides no risk reduction at all." },
+      { text: "Provide the maximum possible diversification benefit", explanation: "The maximum diversification benefit comes from low or negative correlation, not perfect positive correlation." },
+      { text: "This scenario is impossible, since correlation cannot exceed 0.5", explanation: "Correlation coefficients range from -1.0 to +1.0; a value of +1.0 is a valid, if extreme, result." },
+    ],
+  },
+  {
+    id: "s65b-eco-58",
+    section: "economic",
+    q: "Assuming a normal distribution of investment returns, approximately what percentage of outcomes fall within one standard deviation of the mean?",
+    a: "68%",
+    explanation: "Under a normal distribution, about 68% of observations fall within ±1 standard deviation, about 95% within ±2, and about 99.7% within ±3.",
+    options: [
+      { text: "68%", explanation: "Correct — approximately 68% of outcomes fall within one standard deviation of the mean." },
+      { text: "95%", explanation: "That percentage corresponds to approximately TWO standard deviations from the mean, not one." },
+      { text: "99.7%", explanation: "That percentage corresponds to approximately THREE standard deviations from the mean, not one." },
+      { text: "50%", explanation: "50% simply splits the distribution at the median/mean, not the one-standard-deviation range." },
+    ],
+  },
+  {
+    id: "s65b-eco-59",
+    section: "economic",
+    q: "A data set of annual returns contains one extreme outlier year. Compared to the mean of that data set, the median is:",
+    a: "Less affected by the extreme outlier",
+    explanation: "The median depends only on the middle value's position, while the mean is pulled toward extreme values by their magnitude.",
+    options: [
+      { text: "Less affected by the extreme outlier", explanation: "Correct — the median is more resistant to distortion from a single extreme value." },
+      { text: "More affected by the extreme outlier", explanation: "This reverses the actual relationship — it's the mean, not the median, that outliers distort more." },
+      { text: "Unaffected, just like the mean is unaffected", explanation: "The mean IS affected by an extreme outlier, since every value contributes to its calculation." },
+      { text: "Always identical to the mean regardless of outliers", explanation: "The median and mean can differ substantially, especially in a data set with outliers or skew." },
+    ],
+  },
+  {
+    id: "s65b-eco-60",
+    section: "economic",
+    q: "In a data set of annual returns, the value that occurs most frequently is called the:",
+    a: "Mode",
+    explanation: "The mode is the most frequently occurring value in a data set, distinct from the mean (average) and median (middle value).",
+    options: [
+      { text: "Mean", explanation: "The mean is the arithmetic average of the data set, not the most frequent value." },
+      { text: "Median", explanation: "The median is the middle value when the data is ordered, not the most frequent value." },
+      { text: "Mode", explanation: "Correct — the mode is the most frequently occurring value." },
+      { text: "Variance", explanation: "Variance measures dispersion around the mean, not the most frequently occurring value." },
+    ],
+  },
+  {
+    id: "s65b-eco-61",
+    section: "economic",
+    q: "Standard deviation is calculated as:",
+    a: "The square root of the variance",
+    explanation: "Variance is the average of the squared deviations from the mean; taking its square root converts it back into the same units as the original data, producing the standard deviation.",
+    options: [
+      { text: "The square root of the variance", explanation: "Correct — standard deviation is the square root of variance." },
+      { text: "The variance squared", explanation: "Squaring the variance again is not how standard deviation is derived." },
+      { text: "The simple average of all the deviations from the mean", explanation: "Averaging raw deviations from the mean always yields zero; variance and standard deviation use squared deviations instead." },
+      { text: "The range of the data set divided by 2", explanation: "This isn't how standard deviation is calculated — it depends on every observation's squared deviation from the mean, not just the range." },
+    ],
+  },
+  {
+    id: "s65b-eco-62",
+    section: "economic",
+    q: "Using the Rule of 72, an investment earning a constant 8% annual return will approximately double in value in:",
+    a: "9 years",
+    explanation: "The Rule of 72 approximates years to double as 72 ÷ interest rate; 72 ÷ 8 = 9 years.",
+    options: [
+      { text: "9 years", explanation: "Correct — 72 ÷ 8 ≈ 9 years." },
+      { text: "8 years", explanation: "That figure would result from 72 ÷ 9, not 72 ÷ 8." },
+      { text: "16 years", explanation: "This doesn't match the Rule of 72's approximation for an 8% rate." },
+      { text: "72 years", explanation: "This is simply the rule's numerator alone, not divided by the rate as the rule requires." },
+    ],
+  },
+  {
+    id: "s65b-eco-63",
+    section: "economic",
+    q: "One key conceptual difference between the NPV and IRR methods of capital budgeting is that:",
+    a: "NPV implicitly assumes interim cash flows are reinvested at the required rate of return, while IRR assumes reinvestment at the IRR itself",
+    explanation: "This reinvestment-rate assumption is a classic distinction tested between the two methods, and can cause them to rank mutually exclusive projects differently.",
+    options: [
+      { text: "NPV implicitly assumes interim cash flows are reinvested at the required rate of return, while IRR assumes reinvestment at the IRR itself", explanation: "Correct — this is the standard reinvestment-rate distinction between the two methods." },
+      { text: "NPV is expressed as a percentage, while IRR is expressed in dollars", explanation: "This reverses the actual output types — NPV is a dollar figure, and IRR is a percentage rate." },
+      { text: "IRR accounts for the time value of money, while NPV ignores it", explanation: "Both NPV and IRR are discounted cash flow methods that account for the time value of money." },
+      { text: "NPV cannot be calculated unless a project's IRR is already known", explanation: "NPV is calculated independently, directly from projected cash flows and a chosen discount rate — it doesn't require the IRR as an input." },
+    ],
+  },
+  {
+    id: "s65b-eco-64",
+    section: "economic",
+    q: "All else equal, increasing the discount rate used in a present value calculation will:",
+    a: "Decrease the present value of a given future sum",
+    explanation: "A higher discount rate more heavily discounts future cash flows, reducing their value in today's dollars.",
+    options: [
+      { text: "Decrease the present value of a given future sum", explanation: "Correct — a higher discount rate lowers present value." },
+      { text: "Increase the present value of a given future sum", explanation: "This is the opposite of the actual relationship between discount rate and present value." },
+      { text: "Have no effect on present value", explanation: "The discount rate is a direct input into the present value calculation and changes the result." },
+      { text: "Only affect future value calculations, not present value ones", explanation: "The discount rate is central to present value calculations specifically; it's the rate used to discount future amounts back to today." },
+    ],
+  },
+  {
+    id: "s65b-eco-65",
+    section: "economic",
+    q: "An economy simultaneously experiencing high inflation, high unemployment, and stagnant economic growth is best described as:",
+    a: "Stagflation",
+    explanation: "Stagflation is the unusual combination of inflation and economic stagnation occurring together, defying the typical inverse relationship between inflation and unemployment.",
+    options: [
+      { text: "Stagflation", explanation: "Correct — this is the definition of stagflation." },
+      { text: "A normal economic expansion", explanation: "Expansion involves rising output and falling unemployment, not stagnation paired with high unemployment." },
+      { text: "Deflation", explanation: "Deflation refers to a general decline in prices, the opposite of the high inflation described here." },
+      { text: "An ordinary business cycle contraction", explanation: "A typical contraction is usually associated with easing (not high) inflation, unlike the stagflation scenario described." },
+    ],
+  },
+  {
+    id: "s65b-eco-66",
+    section: "economic",
+    q: "Which financial statement presents a company's assets, liabilities, and equity as of a specific point in time?",
+    a: "The balance sheet",
+    explanation: "The balance sheet is a snapshot as of a single date, unlike the income statement or cash flow statement, which cover a period of time.",
+    options: [
+      { text: "The balance sheet", explanation: "Correct — the balance sheet is a point-in-time snapshot of assets, liabilities, and equity." },
+      { text: "The income statement", explanation: "The income statement reports revenues and expenses over a PERIOD of time, not a single point in time." },
+      { text: "The statement of cash flows", explanation: "The cash flow statement reports cash inflows and outflows over a PERIOD of time, not a single point in time." },
+      { text: "The statement of retained earnings", explanation: "This statement tracks changes in retained earnings over a period, not a point-in-time snapshot of the full balance sheet." },
+    ],
+  },
+  {
+    id: "s65b-eco-67",
+    section: "economic",
+    q: "The income statement primarily reports a company's:",
+    a: "Revenues and expenses over a specific period, resulting in net income or loss",
+    explanation: "The income statement measures operating performance over a period, in contrast to the balance sheet's point-in-time snapshot.",
+    options: [
+      { text: "Revenues and expenses over a specific period, resulting in net income or loss", explanation: "Correct — this is what the income statement reports." },
+      { text: "Assets and liabilities as of a single date", explanation: "That describes the balance sheet, not the income statement." },
+      { text: "Cash receipts and disbursements over a period", explanation: "That describes the statement of cash flows, a distinct statement from the income statement." },
+      { text: "Only the company's tax obligations", explanation: "The income statement covers all revenues and expenses, not solely tax obligations." },
+    ],
+  },
+  {
+    id: "s65b-eco-68",
+    section: "economic",
+    q: "The statement of cash flows organizes a company's cash activity during a period into which three categories?",
+    a: "Operating, investing, and financing activities",
+    explanation: "These three categories separate cash generated from core operations, from long-term asset purchases/sales, and from debt/equity transactions.",
+    options: [
+      { text: "Operating, investing, and financing activities", explanation: "Correct — these are the three standard categories on the cash flow statement." },
+      { text: "Assets, liabilities, and equity", explanation: "Those are balance sheet categories, not cash flow statement categories." },
+      { text: "Revenues, expenses, and net income", explanation: "Those are income statement categories, not cash flow statement categories." },
+      { text: "Current, fixed, and intangible activities", explanation: "This isn't a recognized breakdown used on the statement of cash flows." },
+    ],
+  },
+  {
+    id: "s65b-eco-69",
+    section: "economic",
+    q: "A company reports positive net income on its income statement but negative cash flow from operations for the same period. This discrepancy is most plausibly explained by:",
+    a: "Accrual accounting recognizing revenue before the related cash is actually collected (for example, a rising accounts receivable balance)",
+    explanation: "Under accrual accounting, revenue and expenses are recorded when earned or incurred, not necessarily when cash changes hands, which can cause net income and operating cash flow to diverge.",
+    options: [
+      { text: "Accrual accounting recognizing revenue before the related cash is actually collected (for example, a rising accounts receivable balance)", explanation: "Correct — this accrual timing difference is a common, legitimate explanation for the discrepancy." },
+      { text: "The company must be committing accounting fraud", explanation: "This divergence is a routine, legitimate feature of accrual accounting, not inherently evidence of fraud." },
+      { text: "Net income and operating cash flow must always be equal under GAAP", explanation: "GAAP accrual accounting frequently causes net income and operating cash flow to differ; they aren't required to match." },
+      { text: "The company has no current liabilities", explanation: "The level of current liabilities isn't the direct cause of this particular net income vs. cash flow discrepancy." },
+    ],
+  },
+  {
+    id: "s65b-eco-70",
+    section: "economic",
+    q: "A company's dividend payout ratio is calculated as:",
+    a: "Dividends per share ÷ earnings per share",
+    explanation: "The payout ratio shows what portion of earnings a company distributes to shareholders as dividends, rather than retaining for reinvestment.",
+    options: [
+      { text: "Dividends per share ÷ earnings per share", explanation: "Correct — this is the dividend payout ratio formula." },
+      { text: "Dividends per share ÷ stock price", explanation: "That formula describes dividend YIELD, a distinct ratio from the payout ratio." },
+      { text: "Earnings per share ÷ dividends per share", explanation: "This inverts the correct payout ratio formula." },
+      { text: "Stock price ÷ dividends per share", explanation: "This isn't a standard, recognized dividend-related ratio." },
+    ],
+  },
+  {
+    // Replaces a dividend-yield calculation that was the same question as
+    // s65b-veh-54 with different numbers — the bank's own near-duplicate test
+    // caught it at 1.00 similarity (its tokenizer strips digits, correctly
+    // treating a renumbered clone as a repeat). Dividend yield is already
+    // covered in the vehicles section; capacity utilization had zero coverage
+    // anywhere in the bank and is squarely a Section 1 economic indicator.
+    id: "s65b-eco-71",
+    section: "economic",
+    q: "Capacity utilization has climbed for several quarters and now sits well above its long-run average. An adviser should read this as a signal of:",
+    a: "Rising inflationary pressure, because producers have little spare capacity left to absorb new demand",
+    explanation:
+      "Capacity utilization is actual output as a share of potential output. When it runs high, firms are near their physical limits: additional demand is met by bidding up inputs and wages rather than by producing more, so prices rise. That is why the Fed watches it as part of the inflation picture — it says how much slack is left in the real economy.",
+    options: [
+      {
+        text: "Rising inflationary pressure, because producers have little spare capacity left to absorb new demand",
+        explanation:
+          "Correct — high utilization means little slack. Extra demand shows up in prices rather than in output.",
+      },
+      {
+        text: "Falling prices, because higher utilization means more goods are being produced",
+        explanation:
+          "This confuses the level of output with the amount of slack. More output does push supply up, but utilization measures how close firms are to their CEILING — near it, the constraint binds and input costs rise. Rising output and rising prices routinely occur together late in an expansion.",
+      },
+      {
+        text: "An imminent contraction, since firms run hottest immediately before cutting back",
+        explanation:
+          "High utilization is characteristic of a late expansion, not a reliable timing signal for a downturn. Reading any single indicator as a turning-point predictor is the error here — the business cycle is dated on a range of measures, not one.",
+      },
+      {
+        text: "Nothing macroeconomic — capacity utilization is a firm-level operating statistic",
+        explanation:
+          "It is reported in aggregate for industry as a whole and is a standard macro indicator of real-economy slack. Firms do track their own utilization, but the published series is an economy-wide measure.",
+      },
+    ],
+  },
+  {
+    id: "s65b-eco-72",
+    section: "economic",
+    q: "The price-to-book (P/B) ratio compares a stock's market price per share to:",
+    a: "The company's net asset value per share (total equity ÷ shares outstanding)",
+    explanation: "P/B relates market price to the company's accounting (book) value, offering a different valuation lens than earnings-based ratios like the P/E.",
+    options: [
+      { text: "The company's net asset value per share (total equity ÷ shares outstanding)", explanation: "Correct — this is book value per share, the denominator of the P/B ratio." },
+      { text: "The company's earnings per share", explanation: "Comparing price to earnings per share describes the P/E ratio, a distinct valuation measure." },
+      { text: "The company's total annual revenue", explanation: "P/B compares price to book value per share, not to total revenue." },
+      { text: "The company's total outstanding debt", explanation: "Total debt alone isn't the basis for the P/B ratio, which uses total equity per share." },
+    ],
+  },
+  {
+    id: "s65b-eco-73",
+    section: "economic",
+    q: "Earnings per share (EPS) is calculated as:",
+    a: "Net income available to common shareholders ÷ weighted average shares outstanding",
+    explanation: "EPS allocates a company's earnings across its outstanding shares, giving a per-share profitability figure used in ratios like the P/E.",
+    options: [
+      { text: "Net income available to common shareholders ÷ weighted average shares outstanding", explanation: "Correct — this is the EPS formula." },
+      { text: "Total revenue ÷ shares outstanding", explanation: "This uses revenue rather than net income, which doesn't produce EPS." },
+      { text: "Net income ÷ total assets", explanation: "That calculation produces return on assets (ROA), not earnings per share." },
+      { text: "Total dividends paid ÷ shares outstanding", explanation: "That calculation produces dividends per share, a different figure from earnings per share." },
+    ],
+  },
+  {
+    id: "s65b-eco-74",
+    section: "economic",
+    q: "A company increases its use of debt financing while its net income and total assets remain unchanged. All else equal, this will tend to:",
+    a: "Increase return on equity (ROE) more than return on assets (ROA), since equity — ROE's denominator — shrinks as a proportion of the balance sheet",
+    explanation: "Since assets equal debt plus equity, more debt at the same asset level means less equity; with net income unchanged, ROE (net income ÷ equity) rises even though ROA (net income ÷ assets) is unaffected.",
+    options: [
+      { text: "Increase return on equity (ROE) more than return on assets (ROA), since equity — ROE's denominator — shrinks as a proportion of the balance sheet", explanation: "Correct — added leverage boosts ROE without changing ROA when assets and net income are held constant." },
+      { text: "Increase ROA and ROE by the same amount", explanation: "ROA's denominator (total assets) is unchanged in this scenario, so ROA itself wouldn't move the way ROE does." },
+      { text: "Have no effect on either ratio", explanation: "Increasing leverage while holding equity down does affect ROE, even if it leaves ROA unchanged." },
+      { text: "Only affect the company's current ratio, not its profitability ratios", explanation: "The scenario describes a change in capital structure, which directly affects ROE, a profitability ratio, not merely a liquidity ratio like the current ratio." },
+    ],
+  },
+  {
+    id: "s65b-eco-75",
+    section: "economic",
+    q: "The risk that an investor forgoes a potentially better return elsewhere by committing capital to a particular investment is known as:",
+    a: "Opportunity cost (risk)",
+    explanation: "Opportunity cost risk reflects the value of the next-best alternative given up when capital is committed to one specific investment.",
+    options: [
+      { text: "Opportunity cost (risk)", explanation: "Correct — this is the definition of opportunity cost risk." },
+      { text: "Reinvestment risk", explanation: "Reinvestment risk specifically concerns reinvesting future cash flows at a lower rate, not forgoing an alternative investment upfront." },
+      { text: "Timing risk", explanation: "Timing risk concerns the consequences of entering or exiting a position at a particular moment, not the general cost of a forgone alternative." },
+      { text: "Legislative risk", explanation: "Legislative risk concerns adverse changes in law or regulation, unrelated to forgoing an alternative investment." },
+    ],
+  },
+  {
+    id: "s65b-eco-76",
+    section: "economic",
+    q: "Reinvestment risk is most directly the risk that:",
+    a: "Future coupon or interest payments will have to be reinvested at a lower rate than the original investment earned",
+    explanation: "Reinvestment risk is especially relevant to bonds with periodic coupons and to callable bonds, where proceeds may need to be reinvested at reduced prevailing rates.",
+    options: [
+      { text: "Future coupon or interest payments will have to be reinvested at a lower rate than the original investment earned", explanation: "Correct — this is the definition of reinvestment risk." },
+      { text: "The issuer will default on scheduled payments", explanation: "That describes default (credit) risk, a distinct concept from reinvestment risk." },
+      { text: "Bond prices will fall as interest rates rise", explanation: "That describes interest rate (price) risk, a related but distinct concept from reinvestment risk." },
+      { text: "An asset cannot be sold quickly without a price concession", explanation: "That describes liquidity risk, unrelated to reinvesting cash flows." },
+    ],
+  },
+  {
+    id: "s65b-eco-77",
+    section: "economic",
+    q: "Call risk — the risk that a bond will be redeemed by its issuer prior to maturity — is most likely to materialize when:",
+    a: "Interest rates have fallen, allowing the issuer to refinance its debt at a lower cost",
+    explanation: "Issuers call bonds when it's economically advantageous to refinance at now-lower rates, leaving investors to reinvest the proceeds at those same lower rates.",
+    options: [
+      { text: "Interest rates have fallen, allowing the issuer to refinance its debt at a lower cost", explanation: "Correct — falling rates create the incentive for issuers to call and refinance existing debt." },
+      { text: "Interest rates have risen sharply", explanation: "Rising rates give issuers no incentive to call and refinance at a HIGHER cost, so calls are less likely then." },
+      { text: "The issuer is approaching default", explanation: "Calling a bond typically requires the issuer to access cheaper financing, which is unlikely for an issuer in financial distress." },
+      { text: "The bond has just been issued at par", explanation: "A bond newly issued at par isn't inherently more likely to be called; the driver is a subsequent decline in rates." },
+    ],
+  },
+  {
+    id: "s65b-eco-78",
+    section: "economic",
+    q: "The risk that a change in tax law or securities regulation will adversely affect the value of an investment is best described as:",
+    a: "Legislative (regulatory) risk",
+    explanation: "Legislative risk concerns changes made through the ordinary legal and regulatory process, distinct from political risk's association with instability or expropriation abroad.",
+    options: [
+      { text: "Legislative (regulatory) risk", explanation: "Correct — this is the definition of legislative risk." },
+      { text: "Political risk", explanation: "Political risk is more closely associated with government instability or actions like expropriation, particularly in a foreign-investment context, rather than ordinary tax or regulatory changes." },
+      { text: "Business risk", explanation: "Business risk concerns a company's operating environment and industry, not changes in law or regulation." },
+      { text: "Systematic risk", explanation: "Systematic risk is the broad, market-wide risk category; legislative risk is a more specific type of risk within that broader landscape." },
+    ],
+  },
+  {
+    id: "s65b-eco-79",
+    section: "economic",
+    q: "An investor holds stock in a company operating in a foreign country that undergoes a coup, after which the new government nationalizes the company's assets. This is a clear example of:",
+    a: "Political risk",
+    explanation: "Political risk covers losses stemming from government action or instability, such as coups, war, or expropriation of assets — especially relevant to foreign investments.",
+    options: [
+      { text: "Political risk", explanation: "Correct — expropriation following political instability is a textbook example of political risk." },
+      { text: "Currency (exchange rate) risk", explanation: "Currency risk concerns exchange-rate movements, a different risk from a government seizing assets outright." },
+      { text: "Legislative risk", explanation: "Legislative risk typically refers to changes in tax or securities law through ordinary process, not the seizure of assets following a coup." },
+      { text: "Business risk", explanation: "Business risk concerns a company's normal operating and industry environment, not government expropriation." },
+    ],
+  },
+  {
+    id: "s65b-eco-80",
+    section: "economic",
+    q: "An investor sells a security near a market low, only to see it rebound sharply shortly afterward. This is a real-world illustration of:",
+    a: "Timing risk",
+    explanation: "Timing risk is the risk of entering or exiting a position at an unfavorable moment, distinct from the underlying investment's fundamentals.",
+    options: [
+      { text: "Timing risk", explanation: "Correct — this describes the risk of poor entry or exit timing." },
+      { text: "Opportunity cost", explanation: "Opportunity cost concerns forgoing a better alternative investment, a distinct concept from mistiming a single trade." },
+      { text: "Liquidity risk", explanation: "Liquidity risk concerns the ability to sell an asset without a price concession, not the consequences of a poorly timed sale." },
+      { text: "Systematic risk", explanation: "Systematic (market-wide) risk is too broad a label for this specific individual timing decision." },
+    ],
+  },
+];
