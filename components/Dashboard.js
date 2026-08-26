@@ -245,6 +245,12 @@ function hexA(hex, a) {
 export default function Dashboard() {
   const [progress, setProgress] = useState(null);
   const [days, setDays] = useState(0);
+  // Phase-aware countdown state. `days` alone froze at 0 the day the target
+  // passed, so every surface that renders it must also know WHICH phase the
+  // program is in (lib.fellowshipPhase) and, during the program, how far in
+  // we are (lib.daysIntoFellowship) — "Day 15" is true; "0 days" was not.
+  const [phase, setPhase] = useState("before");
+  const [dayOf, setDayOf] = useState(0);
   const [theme, setTheme] = useState("daylight");
 
   const [view, setView] = useState("home");
@@ -348,6 +354,8 @@ export default function Dashboard() {
        settles, or a just-migrated key would read as "no AI". */
     ensureLegacyAIConfigMigrated(window.coop?.endpoints).finally(refreshAiOn);
     setDays(lib.daysUntilFellowship());
+    setPhase(lib.fellowshipPhase());
+    setDayOf(lib.daysIntoFellowship());
     return () => {
       cancelled = true;
       window.removeEventListener("pagehide", flushStore);
@@ -564,9 +572,12 @@ export default function Dashboard() {
   const highlightCount = Object.values(progress.highlights || {}).reduce((n, arr) => n + arr.length, 0);
   const savedCount = bookmarkCount + highlightCount;
 
-  // sidebar countdown urgency
+  // sidebar countdown urgency — deadline pressure only exists while there IS
+  // a deadline ahead; after the program the chip is informational, and
+  // letting days=0 fall through would paint it permanently red.
   let cdBg, cdBorder, cdColor;
-  if (days < 20) { cdBg = "var(--red-dim)"; cdBorder = "var(--red-ring)"; cdColor = "var(--red-2)"; }
+  if (phase === "after") { cdBg = "var(--primary-dim)"; cdBorder = "var(--primary-ring)"; cdColor = "var(--primary-2)"; }
+  else if (days < 20) { cdBg = "var(--red-dim)"; cdBorder = "var(--red-ring)"; cdColor = "var(--red-2)"; }
   else if (days < 45) { cdBg = "var(--gold-dim)"; cdBorder = "var(--gold-ring)"; cdColor = "var(--gold-2)"; }
   else { cdBg = "var(--primary-dim)"; cdBorder = "var(--primary-ring)"; cdColor = "var(--primary-2)"; }
 
@@ -663,7 +674,14 @@ export default function Dashboard() {
 
               <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: "var(--r-sm)", background: cdBg, border: `1px solid ${cdBorder}` }}>
                 <Icon name="calendar" size={13} color={cdColor} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: cdColor }}>{days} days to {lib.FELLOWSHIP_TARGET_LABEL}</span>
+                {/* Phase-aware copy: a plain countdown read "0 days" forever
+                    once the date passed. During the program, "Day N" is the
+                    number that is actually true and useful. */}
+                <span style={{ fontSize: 12, fontWeight: 600, color: cdColor }}>
+                  {phase === "before" ? `${days} days to fellowship start`
+                    : phase === "during" ? `Day ${dayOf} of the fellowship · ${days} days to ${lib.FELLOWSHIP_TARGET_LABEL}`
+                    : "Fellowship complete"}
+                </span>
               </div>
 
               <div style={{ display: "flex", gap: 8 }}>
@@ -692,7 +710,7 @@ export default function Dashboard() {
 
         {/* ══════════ MAIN ══════════ */}
         <main style={{ marginLeft: "var(--sidebar-w)", flex: 1, minHeight: "100vh" }}>
-          {view === "home" && <HomeView {...{ CORE_MODULES, NAV_MODULES, FLASHCARDS, progress, days, readiness, doneLessons, totalLessons, openModule, openLesson, go }} />}
+          {view === "home" && <HomeView {...{ CORE_MODULES, NAV_MODULES, FLASHCARDS, progress, days, phase, dayOf, readiness, doneLessons, totalLessons, openModule, openLesson, go }} />}
           {view === "module" && <ModuleView {...{ MODULES: NAV_MODULES, progress, activeModuleId, openLesson, go }} />}
           {view === "lesson" && (
             <LessonView
@@ -797,7 +815,7 @@ export default function Dashboard() {
 }
 
 /* ─────────────────────────────────────────── HOME ─────────────────────────────────────────── */
-function HomeView({ CORE_MODULES, NAV_MODULES, FLASHCARDS, progress, days, readiness, doneLessons, totalLessons, openModule, openLesson, go }) {
+function HomeView({ CORE_MODULES, NAV_MODULES, FLASHCARDS, progress, days, phase, dayOf, readiness, doneLessons, totalLessons, openModule, openLesson, go }) {
   const quizPasses = Object.values(progress.quizScores).filter((s) => s.correct === s.total).length;
 
   const lvl = lib.levelFromXp(progress.xp);
@@ -865,7 +883,9 @@ function HomeView({ CORE_MODULES, NAV_MODULES, FLASHCARDS, progress, days, readi
       {/* greeting */}
       <div className="fadein" style={{ marginBottom: 30 }}>
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 700, letterSpacing: "-0.025em", lineHeight: 1.15, color: "var(--text-1)" }}>{greeting}</h1>
-        <p style={{ marginTop: 8, fontSize: 15, color: "var(--text-2)", lineHeight: 1.5 }}>COOP Financial Services Fellowship in progress — {days} days to program end ({lib.FELLOWSHIP_TARGET_LABEL}).</p>
+        <p style={{ marginTop: 8, fontSize: 15, color: "var(--text-2)", lineHeight: 1.5 }}>{phase === "before" ? `COOP Financial Services Fellowship starts in ${days} days.`
+          : phase === "during" ? `COOP Financial Services Fellowship in progress — Day ${dayOf}, ${days} days to program end (${lib.FELLOWSHIP_TARGET_LABEL}).`
+          : "COOP Financial Services Fellowship complete — keep the skills warm."}</p>
       </div>
 
       {/* hero */}
@@ -912,7 +932,7 @@ function HomeView({ CORE_MODULES, NAV_MODULES, FLASHCARDS, progress, days, readi
         ) : (
           <div className="glass" style={{ height: "100%", padding: 32, display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--text-1)", marginBottom: 8 }}>All {totalLessons} lessons complete</div>
-            <div style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.5 }}>Review flashcards and practice your pitch. Fellowship is {days} days away.</div>
+            <div style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.5 }}>Review flashcards and practice your pitch. {phase === "before" ? `Fellowship is ${days} days away.` : phase === "during" ? `You are on Day ${dayOf} of the fellowship.` : "The fellowship is complete."}</div>
           </div>
         )}
       </div>
@@ -1567,8 +1587,10 @@ function GamesTool({ state, dispatch, guided = false, onAdvance }) {
   // and starting again plans a fresh session against the updated deck.
   const [session, setSession] = useState(null);
 
-  // CRITICAL: recompute the horizon at each review — it is the distance left
-  // to the program-end deadline (FELLOWSHIP_END), not a fixed cap (floors at 1 after it).
+  // CRITICAL: recompute the horizon at each review — before program end it is
+  // the distance left to FELLOWSHIP_END; after it, horizonTo switches to its
+  // rolling window (ROLLING_WINDOW_DAYS). It used to floor at 1 past the
+  // deadline, which silently made every card due every day.
   const handleGrade = (conceptId, grade) => {
     dispatch((prev) => ({
       ...prev,
@@ -1701,7 +1723,8 @@ function ExamSimTool({ state, dispatch }) {
      mistake here shows up as a missing promise rather than a false one.
 
      Same horizon rule as GamesTool: recompute the cap at every review so nothing
-     schedules past the fellowship start. Exam card ids are bank item ids, which
+     schedules past program end while it is still ahead, and so the cap becomes
+     the rolling window (never 1) once it has passed. Exam card ids are bank item ids, which
      are already unique across the certs, so they share the games' deck safely. */
   const onSrsReview = (review) => {
     dispatch((prev) => ({

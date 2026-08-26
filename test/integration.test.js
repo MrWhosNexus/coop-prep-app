@@ -47,7 +47,7 @@ import { createRegistry } from "../lib/endpoints/registry.js";
 import { getAIConfig, setAIConfig, migrateLegacyAIConfig, hasAIKey } from "../lib/ai/config.js";
 
 import { extractConcepts, extractFormulas } from "../lib/games/generators.js";
-import { reviewInDeck, horizonTo, GRADE } from "../lib/games/srs.js";
+import { reviewInDeck, horizonTo, ROLLING_WINDOW_DAYS, GRADE } from "../lib/games/srs.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.join(__dirname, "..");
@@ -921,8 +921,13 @@ describe("games seam", () => {
     assert.ok(formulas.length >= 1);
   });
 
-  test("reviews scheduled with the fellowship horizon never land past program end", () => {
-    const now = Date.now();
+  /* Time is pinned in these tests. The previous version used Date.now(), so
+     it asserted a "nothing lands past the deadline" invariant that became
+     unsatisfiable the day the deadline passed — the exact time bomb that also
+     froze the countdown UI. Each phase gets its own pinned clock so the suite
+     is green for ANY real "now". */
+  test("before program end: reviews scheduled with the fellowship horizon never land past it", () => {
+    const now = new Date("2026-09-01T12:00:00.000Z").getTime(); // pinned: during the program, end still ahead
     const horizon = horizonTo(FELLOWSHIP_END, now);
     assert.ok(horizon >= 1);
     let deck = {};
@@ -933,6 +938,30 @@ describe("games seam", () => {
     const due = new Date(deck["card:test"].due).getTime();
     const deadline = new Date(FELLOWSHIP_END).getTime() + 24 * 3600 * 1000; // day-granular schedule slack
     assert.ok(due <= deadline, `due ${deck["card:test"].due} is on or before program end`);
+  });
+
+  test("after program end: the horizon becomes a rolling window and spacing is preserved", () => {
+    const now = "2027-02-01T12:00:00.000Z"; // pinned: well past FELLOWSHIP_END
+    const horizon = horizonTo(FELLOWSHIP_END, now);
+    assert.equal(horizon, ROLLING_WINDOW_DAYS);
+    assert.ok(horizon > 1, "the horizon must never collapse back to 1 past the deadline");
+    // Walk repeated EASY reviews at their due dates: intervals must GROW
+    // (spaced repetition working) yet stay inside the rolling window.
+    let deck = {};
+    let day = now;
+    let prevInterval = 0;
+    for (let i = 0; i < 6; i++) {
+      deck = reviewInDeck(deck, "card:test", GRADE.EASY, {
+        now: day,
+        maxIntervalDays: horizonTo(FELLOWSHIP_END, day),
+      });
+      const card = deck["card:test"];
+      assert.ok(card.intervalDays <= ROLLING_WINDOW_DAYS);
+      assert.ok(card.intervalDays >= prevInterval, "intervals never shrink on a pass");
+      prevInterval = card.intervalDays;
+      day = `${card.due}T12:00:00.000Z`;
+    }
+    assert.ok(deck["card:test"].intervalDays > 1, "the deck is not stuck due-every-day");
   });
 });
 

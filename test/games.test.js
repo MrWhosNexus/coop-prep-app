@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   GRADE, MIN_EASE, MAX_EASE, DEFAULT_EASE, normalizeGrade,
   dayISO, addDays, daysBetween, newCard, isNew, isDue, overdueDays,
-  retrievability, reviewCard, horizonTo, defaultDeck, getCard, reviewInDeck,
+  retrievability, reviewCard, horizonTo, ROLLING_WINDOW_DAYS, defaultDeck, getCard, reviewInDeck,
   pruneDeck, dueCardIds, buildQueue, deckStats,
 } from "../lib/games/srs.js";
 
@@ -53,8 +53,13 @@ describe("srs: dates", () => {
 
   test("horizonTo counts days to the fellowship start", () => {
     assert.equal(horizonTo("2026-08-12", NOW), 28);
-    // A deadline in the past still yields a usable (floored) horizon.
-    assert.equal(horizonTo("2026-07-01", NOW), 1);
+    // A deadline in the past must NOT collapse to 1 (the old floor turned the
+    // scheduler into "everything due daily"); it falls back to the rolling window.
+    assert.equal(horizonTo("2026-07-01", NOW), ROLLING_WINDOW_DAYS);
+    assert.ok(ROLLING_WINDOW_DAYS > 1);
+    // The day-of boundary: 0 days remaining counts as "passed".
+    assert.equal(horizonTo("2026-07-15", NOW), ROLLING_WINDOW_DAYS);
+    assert.equal(horizonTo("2026-07-16", NOW), 1);
   });
 });
 
@@ -182,15 +187,22 @@ describe("srs: scheduling", () => {
     assert.equal(c.due, START);
   });
 
-  test("past the deadline the horizon stops constraining, and study continues", () => {
+  test("past the deadline the horizon stops constraining, and spacing survives", () => {
     // A horizon is a deadline, not a cliff: once the fellowship has started
-    // the schedule keeps running rather than jamming or throwing.
-    const c = reviewCard(newCard("x", { now: "2026-09-01" }), GRADE.EASY, {
-      now: "2026-09-01",
-      maxIntervalDays: horizonTo("2026-08-12", "2026-09-01"),
-    });
-    assert.equal(c.intervalDays, 1);
-    assert.equal(c.due, "2026-09-02");
+    // the schedule keeps running under the rolling window. The regression
+    // this guards: the old floor of 1 capped EVERY interval at 1 day, so
+    // repeated passes never spaced out and the whole deck was due daily.
+    let c = newCard("x", { now: "2026-09-01" });
+    let day = "2026-09-01T12:00:00.000Z";
+    for (let i = 0; i < 6; i++) {
+      c = reviewCard(c, GRADE.EASY, {
+        now: day,
+        maxIntervalDays: horizonTo("2026-08-12", day),
+      });
+      assert.ok(c.intervalDays <= ROLLING_WINDOW_DAYS, `interval ${c.intervalDays} exceeded the rolling window`);
+      day = `${c.due}T12:00:00.000Z`;
+    }
+    assert.ok(c.intervalDays > 1, "spacing must grow past 1 day after the deadline");
   });
 
   test("card history is bounded", () => {
