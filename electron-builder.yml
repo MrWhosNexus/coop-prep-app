@@ -116,7 +116,12 @@ publish:
   provider: github
   owner: MrWhosNexus
   repo: coop-prep-app
-  releaseType: release
+  # draft, NOT release: the release job runs three OS builds in parallel and any
+  # one of them can fail. Publishing as it goes would mean a live release that
+  # Mac users can download and Windows users cannot, and electron-updater would
+  # start handing it out mid-matrix. A draft is invisible to the updater until a
+  # human opens it, checks all the artifacts arrived, and clicks publish.
+  releaseType: draft
 
 # One 1024x1024 source image for all three platforms. electron-builder derives
 # the .icns and .ico from it at build time, which is why there is no checked-in
