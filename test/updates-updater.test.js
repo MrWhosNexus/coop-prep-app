@@ -14,6 +14,7 @@
 
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
+import path from "node:path";
 
 import {
   createUpdater,
@@ -131,7 +132,14 @@ describe("macBundleIsSigned", () => {
       },
     });
     assert.equal(signed, true);
-    assert.equal(seen[0], "/Applications/Coop Prep.app/Contents/_CodeSignature/CodeResources");
+    // Built with path.join, not written as a POSIX literal. This function only
+    // ever RUNS on macOS, but the suite runs on all three OSes, and on Windows
+    // path.join/normalize emit backslashes — a literal here asserts the runner's
+    // platform rather than the path being derived. CI caught exactly this.
+    assert.equal(
+      seen[0],
+      path.join("/Applications/Coop Prep.app/Contents", "_CodeSignature", "CodeResources"),
+    );
   });
 
   test("an unreadable bundle counts as unsigned", () => {

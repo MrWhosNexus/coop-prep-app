@@ -585,7 +585,15 @@ describe("store", () => {
   });
 
   test("the env override wins and is a DIRECTORY, not a key", () => {
-    assert.equal(resolveStoreDir({ env: { [ENDPOINTS_DIR_ENV]: "/tmp/xyz" } }), "/tmp/xyz");
+    // path.resolve, not a literal: resolveStoreDir resolves the override, and on
+    // Windows resolving "/tmp/xyz" yields a DRIVE-qualified "D:\\tmp\\xyz". A
+    // hardcoded POSIX literal here asserts the test runner's platform rather than
+    // the function's contract, and failed the moment CI first ran on Windows.
+    // The contract is "an absolute, normalised path" — assert that.
+    assert.equal(
+      resolveStoreDir({ env: { [ENDPOINTS_DIR_ENV]: "/tmp/xyz" } }),
+      path.resolve("/tmp/xyz"),
+    );
   });
 
   test("an injected Electron app resolves under userData", () => {
@@ -598,7 +606,13 @@ describe("store", () => {
 
   test("without Electron it resolves XDG_CONFIG_HOME — NOT a Windows path", () => {
     const resolved = resolveStoreDir({ env: { XDG_CONFIG_HOME: "/home/u/.config" } });
-    assert.equal(resolved, path.join("/home/u/.config", "coop-prep"));
+    // Same platform trap as the override case above: the implementation resolves
+    // XDG_CONFIG_HOME before joining, so mirror that here instead of assuming
+    // path.join's output equals path.resolve's on every OS. The point of the test
+    // — that an XDG value is honoured rather than swapped for %APPDATA% — is
+    // carried by the assertion below, which is what the name is really about.
+    assert.equal(resolved, path.join(path.resolve("/home/u/.config"), "coop-prep"));
+    assert.ok(!resolved.includes("AppData"), "must not hardcode a Windows-shaped path");
   });
 
   test("with neither, it falls back under the home directory", () => {
