@@ -15,6 +15,11 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 import {
   createUpdater,
@@ -117,6 +122,37 @@ describe("sanitizeUpdateInfo", () => {
     // renderer links to GitHub instead.
     const out = sanitizeUpdateInfo({ version: "2.0.0", releaseNotes: "<script>x</script>" });
     assert.equal("releaseNotes" in out, false);
+  });
+});
+
+describe("the pinned feed and the publish config agree", () => {
+  test("electron-builder publishes to exactly the repo the app asks for updates from", () => {
+    // Two independent statements of the same fact, in two file formats, that
+    // nothing else compares. If they drift, the failure is silent and total:
+    // releases upload to one repo while every installed app polls another, so
+    // the cohort simply never sees an update and nothing anywhere errors.
+    //
+    // The app sets its feed EXPLICITLY at runtime rather than inheriting the
+    // app-update.yml baked into the build (so a repackaged artifact cannot
+    // silently inherit someone else's feed) — which is exactly what makes the
+    // two able to disagree.
+    const yaml = readFileSync(join(repoRoot, "electron-builder.yml"), "utf8");
+    const block = yaml.slice(yaml.indexOf("\npublish:"));
+    const owner = block.match(/^\s*owner:\s*(\S+)/m)?.[1];
+    const repo = block.match(/^\s*repo:\s*(\S+)/m)?.[1];
+
+    assert.ok(owner && repo, "electron-builder.yml declares a github publish target");
+    assert.equal(owner, UPDATE_OWNER, "publish owner matches updater.js UPDATE_OWNER");
+    assert.equal(repo, UPDATE_REPO, "publish repo matches updater.js UPDATE_REPO");
+  });
+
+  test("releases publish as drafts, so a half-finished matrix never ships", () => {
+    // Three OS builds run in parallel and any one can fail. electron-updater
+    // does not see draft releases, so a draft is what stops a live release that
+    // Mac users can download and Windows users cannot.
+    const yaml = readFileSync(join(repoRoot, "electron-builder.yml"), "utf8");
+    const block = yaml.slice(yaml.indexOf("\npublish:"));
+    assert.match(block.match(/^\s*releaseType:\s*(\S+)/m)?.[1] ?? "", /^draft$/);
   });
 });
 
