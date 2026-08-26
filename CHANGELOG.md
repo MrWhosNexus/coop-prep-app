@@ -42,6 +42,14 @@ Coop Prep for the first time, start here.
 - **The Windows build could not run at all** from a clean clone: the config
   pointed at `build/icon.ico`, a file that was never committed, and
   electron-builder treats a missing icon as a hard error.
+- **Node 22.15 is required, not Node 20.** Three test files use an API that
+  only exists from 22.15, so on Node 20 the whole suite died with a message that
+  named no version. The new cross-platform CI caught this on its very first run,
+  and CI now pins a job to exactly 22.15.0 so the stated minimum stays true.
+- **Three tests asserted the wrong thing on Windows** — they compared file paths
+  against hardcoded forward-slash strings, which only hold on macOS and Linux.
+  Two of those were long-standing: any Windows contributor running the tests
+  would have hit them. Nobody had run the suite on Windows until now.
 - **A false-failing test** that demanded `onnxruntime-web` be unpacked into every
   build — 91 MB of WebAssembly that the Node build of the voice stack never
   loads. The exemption now re-derives the real module graph on every run, so it
