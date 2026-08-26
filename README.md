@@ -26,6 +26,9 @@ Grab the file for your machine from the [latest release](https://github.com/MrWh
 
 They are large (250–570 MB) because the voice engine ships its own ONNX runtime.
 
+**Never installed something from GitHub before?** [docs/INSTALL.md](docs/INSTALL.md)
+walks through it click by click, including the warning screens below.
+
 These builds are **not code-signed** — signing certificates cost money we haven't
 spent. That is why your OS warns you. The warning means "nobody paid Apple or
 Microsoft to vouch for this", not "this is malware". Every release is built by
