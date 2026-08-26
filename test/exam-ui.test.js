@@ -798,3 +798,84 @@ describe("the announcer stays quiet across the confirm panel", () => {
     assert.deepEqual(said, [1800, 900, 300, 60, 0], "exactly five, each exactly once");
   });
 });
+
+/* ══════════════════════════════════════════════════════════════════
+   CALL SITE: the anti-memorisation draw is actually supplied.
+
+   lib/exam/blueprint.js has preferred unseen items via `exclude` since
+   it landed, and covers the full bank in ~6 sittings when supplied —
+   but the only UI entry point passed `seed: Date.now()` and nothing
+   else, so repeat mocks drew with no memory and a learner met the
+   whole bank, explanations included, then scored on recognition. A
+   unit test of drawForm's exclude handling proved nothing about this;
+   the suite below drives the REAL ExamHost through two sittings and
+   asserts what exam.start was handed at the moment of the click.
+   ══════════════════════════════════════════════════════════════════ */
+describe("ExamHost supplies the exclude list (anti-memorisation call site)", () => {
+  test("second sitting excludes the first sitting's items — in-mount and across a remount", async () => {
+    const { render } = await import("./helpers/render.mjs");
+    const React = await import("react");
+    const { default: ExamHost } = await import("../components/exam/ExamHost.js");
+    const adapter = await import("../components/exam/adapter.js");
+
+    // Spy on the one seam ExamHost calls. Wrapping (not stubbing) keeps the
+    // whole real engine in the loop — the sitting genuinely starts, submits
+    // and scores, so this cannot pass while the UI flow is broken.
+    const calls = [];
+    const realStart = adapter.exam.start;
+    adapter.exam.start = (opts) => { calls.push(opts); return realStart(opts); };
+
+    const seenLists = [];
+    // Mounted handles are unmounted in `finally`: a failing assertion must
+    // not leave ExamTimer's 250ms interval alive, or the whole test run
+    // hangs instead of reporting red (observed while mutation-testing this).
+    let ui = null;
+    let ui2 = null;
+    try {
+      /* Sitting 1: nothing seen yet. */
+      ui = await render(React.createElement(ExamHost, {
+        onItemsSeen: (ids) => seenLists.push(ids),
+      }));
+      await ui.click(ui.button(/^Start /));
+      assert.equal(calls.length, 1, "Start must go through exam.start");
+      assert.deepEqual(calls[0].exclude, [], "a first-ever sitting has nothing to exclude");
+      assert.ok(seenLists.length >= 1 && seenLists.at(-1).length > 0,
+        "the started form's item ids must be reported through onItemsSeen for the host to persist");
+      const firstIds = seenLists.at(-1);
+
+      /* Submit sitting 1 and start sitting 2 from the results screen —
+         the retake flow a real learner takes, with no host wiring at all. */
+      await ui.click(ui.button("Submit"));
+      await ui.click(ui.button("Submit for scoring"));
+      await ui.click(ui.button("New form"));
+      await ui.click(ui.button(/^Start /));
+      assert.equal(calls.length, 2);
+      assert.ok(Array.isArray(calls[1].exclude) && calls[1].exclude.length > 0,
+        "the second sitting must supply a NON-EMPTY exclude — this is the defect: drawing with no memory");
+      assert.deepEqual([...calls[1].exclude].sort(), [...firstIds].sort(),
+        "and it must be exactly the items the learner has already seen");
+      await ui.unmount();
+      ui = null;
+
+      /* Sitting 3, fresh mount: the host hands back what it persisted. */
+      ui2 = await render(React.createElement(ExamHost, {
+        recentItemIds: seenLists.at(-1),
+      }));
+      await ui2.click(ui2.button(/^Start /));
+      assert.equal(calls.length, 3);
+      assert.ok(calls[2].exclude.length >= firstIds.length,
+        "a remount seeded with the persisted list must exclude across app restarts too");
+    } finally {
+      adapter.exam.start = realStart;
+      if (ui) await ui.unmount();
+      if (ui2) await ui2.unmount();
+    }
+  });
+
+  test("the exclude is wired in the component's own start call, not a test-only shim", () => {
+    // Source anchor for the behavioural test above: the exclude must be the
+    // rolling seen-items ref, inside the exam.start options.
+    assert.match(HOST_SRC, /exam\.start\(\{[\s\S]*?exclude:\s*seenItemsRef\.current[\s\S]*?\}\)/,
+      "ExamHost must pass its seen-items list as exam.start's exclude");
+  });
+});

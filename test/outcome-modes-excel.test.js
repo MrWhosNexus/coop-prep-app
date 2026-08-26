@@ -154,3 +154,113 @@ describe("outcome modes: excel/stats labs", () => {
     });
   }
 });
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Inherited method-locked graders.
+
+   An outcome override with NO grader of its own silently inherits the BASE
+   grader. When that base grader is method-locked (mustUse/mustNotUse/pattern),
+   the outcome learner is graded against constraints the outcome instruction
+   never stated — which is how excel-dates/years-with-decimal re-created the
+   exact reject-a-correct-answer trap Phase 1 removed: the outcome text said
+   "express the span as a fraction of an average-length year" while the
+   inherited grader demanded (B2-A2)/365.25 literally and banned DATEDIF, so
+   =C2/365.25 was marked wrong.
+
+   The sweep below makes that class of regression impossible to reintroduce
+   silently: every override that inherits a method-locked grader must appear
+   in the allowlist, and each allowlist entry exists only because its outcome
+   instruction names the exact cells the pattern demands (verified by hand
+   2026-08-26), so the inherited constraint is satisfiable from the outcome
+   text alone:
+     - excel-references/relative-works: "J2 against J8", "no pinning" — the
+       unpinned J2/J8 shape IS the step's outcome.
+     - excel-references/copy-and-break: "copy K2 into K3" — the translated
+       J3/J9 and its error emerge mechanically from the instructed copy.
+     - excel-iferror/meet-div0: "compute its approval rate from those two
+       cells" (K2, J2) — the pattern pins cells the instruction names.
+   Adding a NEW inheriting override fails here until it either gets its own
+   outcome grader or is justified and allowlisted in review.
+   ══════════════════════════════════════════════════════════════════════════ */
+describe("outcome overrides never inherit a method-locked base grader unvetted", () => {
+  /** Does this grader (or any allOf/anyOf member) carry a method lock? */
+  function methodLocked(g) {
+    if (!g) return false;
+    if ((g.mustUse?.length ?? 0) > 0 || (g.mustNotUse?.length ?? 0) > 0 || g.pattern) return true;
+    if (Array.isArray(g.of)) return g.of.some(methodLocked);
+    return false;
+  }
+
+  const ALLOWED = [
+    "excel-iferror/meet-div0",
+    "excel-references/copy-and-break",
+    "excel-references/relative-works",
+  ];
+
+  test("the inheriting set is exactly the vetted allowlist", () => {
+    const inheriting = [];
+    for (const lesson of CONVERTED) {
+      for (const step of lesson.steps) {
+        const ov = step.modes?.outcome;
+        if (!ov || ov.grader) continue; // no override, or it graded itself
+        if (methodLocked(step.grader)) inheriting.push(`${lesson.id}/${step.id}`);
+      }
+    }
+    assert.deepEqual(inheriting.sort(), ALLOWED,
+      "an outcome override is inheriting a mustUse/mustNotUse/pattern base grader " +
+      "its instruction may not support — give it an outcome grader of its own, " +
+      "or verify the instruction names what the pattern demands and allowlist it");
+  });
+
+  test("anti-vacuity: methodLocked recognises locks, including nested ones", () => {
+    // If this detector rotted, the sweep above would pass over anything.
+    assert.equal(methodLocked({ type: "cellFormula", pattern: "A1" }), true);
+    assert.equal(methodLocked({ type: "cellFormula", mustNotUse: ["DATEDIF"] }), true);
+    assert.equal(methodLocked({ type: "allOf", of: [{ type: "cellValue" }, { type: "cellFormula", mustUse: ["IF"] }] }), true);
+    assert.equal(methodLocked({ type: "rangeValues" }), false);
+  });
+});
+
+/* The remediation itself: in outcome mode, years-with-decimal must credit
+   every correct route to "the span as a fraction of a year", while still
+   refusing the DATEDIF("Y")+MOD hybrid the lesson header documents. Graded
+   through resolveLessonMode + the real grade() — the exact path the runner
+   takes — so a regression to the inherited base grader goes red here. */
+describe("excel-dates/years-with-decimal outcome grader accepts every correct route", () => {
+  const resolved = resolveLessonMode(excelDates, "outcome");
+  const stepIdx = excelDates.steps.findIndex((s) => s.id === "years-with-decimal");
+
+  async function gradeD2(formulaOrValue) {
+    const { grade } = await import("../lib/guide/graders.js");
+    const { startingState } = await import("../lib/guide/checkpoints.js");
+    const { setCell } = await import("../lib/sheet/model.js");
+    const ts = startingState(excelDates, stepIdx, {}).toolState;
+    setCell(ts.sheets.Data, "D2", formulaOrValue);
+    return grade(ts, resolved.steps[stepIdx].grader);
+  }
+
+  test("the override carries its own grader — it no longer inherits the method-locked base", () => {
+    assert.ok(excelDates.steps[stepIdx].modes.outcome.grader,
+      "years-with-decimal outcome override lost its grader — it would fall back to the (B2-A2)/365.25 pattern");
+    assert.notEqual(resolved.steps[stepIdx].grader, excelDates.steps[stepIdx].grader);
+  });
+
+  test("correct routes all pass: taught form, days-column division, DATEDIF-D division", async () => {
+    // =C2/365.25 divides the days column built in the previous step — the
+    // natural move, and the exact input the inherited grader marked wrong.
+    for (const f of ["=(B2-A2)/365.25", "=C2/365.25", '=DATEDIF(A2,B2,"D")/365.25']) {
+      const r = await gradeD2(f);
+      assert.equal(r.pass, true, `${f} is correct under the outcome instruction: ${r.message}`);
+    }
+  });
+
+  test("the double-counting hybrid still fails, even though its value agrees on this row", async () => {
+    const r = await gradeD2('=DATEDIF(A2,B2,"Y") + (MOD(B2-A2,365.25)/365.25)');
+    assert.equal(r.pass, false, "the hybrid must stay out of outcome mode too");
+  });
+
+  test("a typed constant and a wrong value both fail", async () => {
+    assert.equal((await gradeD2(0.0876)).pass, false, "typed value is not a computed fraction");
+    assert.equal((await gradeD2("=(B2-A2)/365")).pass, false, "365 is not the average year length");
+  });
+});

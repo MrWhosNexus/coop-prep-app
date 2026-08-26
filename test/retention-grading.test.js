@@ -153,6 +153,79 @@ describe("scoring: semantic opposites are refused regardless of spelling", () =>
     }
   });
 
+  /* ── phrase-embedded opposites (latent gap, confirmed 2026-08-26) ──────
+     CONFUSABLE_CLASSES held "solicited"/"unsolicited" as bare words only, so
+     "unsolicited order" typed for "solicited order" was never looked up as a
+     confusable: it fell to the generic edit-distance path and came back
+     near:true — a semantic OPPOSITE reported as "close". confusablesFor now
+     swaps every class member found as a whole word inside a target, so the
+     bare-word classes protect every phrase built on them. */
+
+  test("a phrase built on a confusable word refuses the opposite phrase", () => {
+    const r = matchAnswer("unsolicited order", "solicited order", { reject: [] });
+    assert.equal(r.correct, false, "the opposite phrase must not be correct");
+    assert.equal(r.near, false, "and must never be reported as close");
+    assert.equal(r.reason, "confusable");
+    assert.equal(gradeFromMatch(r), GRADE.AGAIN);
+  });
+
+  test("a typo'd opposite phrase is still the opposite phrase", () => {
+    const r = matchAnswer("unsolicted order", "solicited order", { reject: [] });
+    assert.equal(r.correct, false);
+    assert.equal(r.near, false);
+    assert.equal(r.reason, "confusable");
+  });
+
+  test("word-boundary both ways: the substring must not fire", () => {
+    // "solicited" is literally a suffix-substring of "unsolicited"; only a
+    // whole-word match may generate the swap, or every "unsolicited trade"
+    // answer would refuse its own typos.
+    const r = matchAnswer("unsolicited trad", "unsolicited trade", { reject: [] });
+    assert.equal(r.correct, true, `a typo of the correct phrase stays a typo: ${r.reason}`);
+    assert.equal(r.reason, "typo");
+  });
+
+  test("phrase generation is visible in confusablesFor itself, and stays whole-word", () => {
+    const conf = confusablesFor([canonicalize(normalizeAnswer("solicited order"))]);
+    assert.ok(conf.has("unsolicited order"), "member swap inside the phrase");
+    // The anchors are load-bearing in BOTH directions. Without them,
+    // "solicited" matches its own substring inside "unsolicited trade" and
+    // generates the garbage confusable "ununsolicited trade" — junk entries
+    // that sit near legitimate answers are how a whole-word bug would first
+    // surface, so assert directly on the generated set.
+    const conf2 = confusablesFor([canonicalize(normalizeAnswer("unsolicited trade"))]);
+    assert.ok(conf2.has("solicited trade"), "the whole-word member swaps");
+    assert.ok(!conf2.has("ununsolicited trade"), "a substring hit must not generate a swap");
+  });
+
+  /* ── typo budget must not bridge known-distinct terms ──────────────────
+     "systemic risk" sits 2 edits from "systematic risk" — inside the typo
+     budget for a 15-character target — and was accepted as fully CORRECT.
+     They are different finance concepts, and the SIE tests the difference.
+     The confusable registry is exactly the list of known-distinct terms, so
+     the fix is membership: the class now carries all three risk terms, and
+     the existing typo'd-confusable guard refuses the bridge. */
+
+  test('"systemic risk" is never credited for "systematic risk"', () => {
+    const r = matchAnswer("systemic risk", "systematic risk", { reject: [] });
+    assert.equal(r.correct, false, "distinct concept, not a typo");
+    assert.equal(r.near, false);
+    assert.equal(r.reason, "confusable");
+    assert.equal(gradeFromMatch(r), GRADE.AGAIN);
+  });
+
+  test("the systematic/systemic/unsystematic triple refuses in every direction", () => {
+    for (const [input, answer] of [
+      ["systematic risk", "systemic risk"],
+      ["unsystematic risk", "systematic risk"],
+      ["systemic", "systematic"],
+    ]) {
+      const r = matchAnswer(input, answer, { reject: [] });
+      assert.equal(r.correct, false, `"${input}" credited for "${answer}"`);
+      assert.equal(r.near, false, `"${input}" near-credited for "${answer}"`);
+    }
+  });
+
   test("the seeded table covers the exam-critical pairs", () => {
     const conf = (t) => confusablesFor([canonicalize(normalizeAnswer(t))]);
     assert.ok(conf("irrevocable trust").has("revocable trust"));

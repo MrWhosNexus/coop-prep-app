@@ -16,6 +16,14 @@ import "./exam.css";
 /** How often an in-flight sitting is checkpointed to the store. */
 const HEARTBEAT_MS = 15_000;
 
+/** How many recently-seen item ids are kept for the anti-memorisation draw.
+    A bound, not a policy: lib/exam/blueprint.js treats `exclude` as a
+    preference and falls back to seen items rather than shorting a quota, so
+    an over-full list costs only recency granularity, never a short form.
+    500 comfortably spans several full mocks of the largest bank (SIE, ~450)
+    while keeping the persisted progress slice small. */
+const RECENT_ITEM_CAP = 500;
+
 /**
  * The exam simulator shell: start screen, the exam itself, submit, results, review.
  *
@@ -32,15 +40,33 @@ const HEARTBEAT_MS = 15_000;
  * claim they will (see `srsScheduled` below). Promise nothing the wiring does
  * not deliver.
  *
+ * The anti-memorisation draw closes here too. lib/exam/blueprint.js has
+ * preferred unseen items via `exclude` since it landed — and no caller ever
+ * supplied one, so every sitting drew with no memory and a learner met the
+ * whole bank, explanations included, in a handful of mocks, then scored on
+ * recognition. ExamHost now remembers the item ids of every form it starts
+ * (component state, so back-to-back sittings in one mount are covered with no
+ * host wiring at all) and reports the rolling list through `onItemsSeen` so
+ * the integrator can persist it beside the session and hand it back as
+ * `recentItemIds` — the same injected-persistence pattern as savedSession.
+ *
  * @param {Object} props
  * @param {Object|string} [props.savedSession] a serialized session to offer to resume
+ * @param {string[]} [props.recentItemIds] item ids seen in recent sittings, persisted
+ *   by the host; passed to the engine as the draw's `exclude` list
+ * @param {Function} [props.onItemsSeen] (ids: string[]) => void — the updated rolling
+ *   recently-seen list, emitted whenever a sitting begins. Persist it and feed it
+ *   back as `recentItemIds`, or repeat mocks recycle the same questions.
  * @param {Function} [props.onPersist] (sessionJson, session) => void
  * @param {Function} [props.onClear] () => void
  * @param {Function} [props.onSrsReview] (review, session) => void — grade a submitted
  *   sitting into the spaced-repetition deck. Omit and no SRS claim is made.
  * @param {Function} [props.onExit] () => void
  */
-export default function ExamHost({ savedSession = null, onPersist, onClear, onSrsReview, onExit }) {
+export default function ExamHost({
+  savedSession = null, recentItemIds = null, onItemsSeen,
+  onPersist, onClear, onSrsReview, onExit,
+}) {
   const [phase, setPhase] = useState("start"); // start | exam | confirm | results | review
   const [sess, setSess] = useState(null);
   const [certId, setCertId] = useState(null);
@@ -54,6 +80,31 @@ export default function ExamHost({ savedSession = null, onPersist, onClear, onSr
 
   const persistRef = useRef(onPersist);
   useEffect(() => { persistRef.current = onPersist; }, [onPersist]);
+
+  /* Recently-seen item ids, newest first. A ref, not state: nothing renders
+     it, and the one reader (start) wants the freshest value at click time.
+     Seeded once from the host's persisted list; a host that passes nothing
+     still gets in-mount memory, which is what makes the retake flow (results
+     → start → start again) exclude on its own. */
+  const seenItemsRef = useRef(
+    Array.isArray(recentItemIds) ? recentItemIds.filter((id) => typeof id === "string").slice(0, RECENT_ITEM_CAP) : []
+  );
+  const itemsSeenRef = useRef(onItemsSeen);
+  useEffect(() => { itemsSeenRef.current = onItemsSeen; }, [onItemsSeen]);
+
+  /* Record a started form's items as seen. Newest to the FRONT so the cap
+     evicts the stalest ids — eviction order is what turns the cap into a
+     rolling window rather than a permanent first-500 blacklist. Reported to
+     the host on every update; without a listener the ref alone still covers
+     the current mount. */
+  const rememberSeen = useCallback((sessionValue) => {
+    const ids = (sessionValue?.form?.items ?? []).map((i) => i.id).filter((id) => typeof id === "string");
+    if (!ids.length) return;
+    const fresh = new Set(ids);
+    const merged = [...ids, ...seenItemsRef.current.filter((id) => !fresh.has(id))].slice(0, RECENT_ITEM_CAP);
+    seenItemsRef.current = merged;
+    itemsSeenRef.current?.(merged);
+  }, []);
 
   const certs = useMemo(() => exam.listExams(), []);
   const activeCertId = certId ?? certs[0]?.certId ?? null;
@@ -166,6 +217,12 @@ export default function ExamHost({ savedSession = null, onPersist, onClear, onSr
       sectionId: mode === "section" ? (sectionId ?? offering?.sections?.[0]?.id) : undefined,
       now: Date.now(),
       seed: Date.now(),
+      // The anti-memorisation half of the draw. blueprint.js prefers items
+      // NOT on this list and has since it landed — but preference over an
+      // empty list is no preference, and this call site passed nothing, so
+      // repeat mocks recycled the bank freely. A preference, still: a thin
+      // section falls back to seen items rather than shorting its quota.
+      exclude: seenItemsRef.current,
     });
     if (!r.ok) {
       // The engine's refusal is written for a learner — show it, don't replace it.
@@ -176,9 +233,12 @@ export default function ExamHost({ savedSession = null, onPersist, onClear, onSr
       setError("That bank produced no questions at all. There is nothing to sit.");
       return;
     }
+    // Seen the moment the form exists, not at submit: an abandoned sitting
+    // still showed the learner its questions.
+    rememberSeen(r.value);
     setPhase("exam");
     commit(r.value);
-  }, [activeCertId, mode, sectionId, offering, commit]);
+  }, [activeCertId, mode, sectionId, offering, commit, rememberSeen]);
 
   const resume = useCallback(() => {
     if (!resumeState?.session) return;
@@ -187,9 +247,13 @@ export default function ExamHost({ savedSession = null, onPersist, onClear, onSr
       setError(r.error);
       return;
     }
+    // A resumed form was recorded when it was started, but this may be a
+    // fresh mount whose host persisted the session and not the seen list —
+    // re-recording is a dedupe no-op when both survived.
+    rememberSeen(r.value);
     setPhase("exam");
     commit(r.value);
-  }, [resumeState, commit]);
+  }, [resumeState, commit, rememberSeen]);
 
   const retryMissed = useCallback(() => {
     const r = exam.startRetry(sess, { now: Date.now() });

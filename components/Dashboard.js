@@ -53,6 +53,7 @@ import { parseRef } from "@/lib/sheet/cells";
 import * as guideRunner from "@/lib/guide/runner";
 import { LESSONS_BY_ID } from "@/lib/guide/lessons/index";
 import { checkpointForStep, materializeCheckpoint, startingState } from "@/lib/guide/checkpoints";
+import { lessonModes, resolveLessonMode } from "@/lib/guide/spec";
 import { skillsAssessment } from "@/lib/exam/banks";
 import { createSheet, setCells, getCell, getValue, getRangeValues, formatValue } from "@/lib/sheet/model";
 import { pivotFromGrid, pivotToGrid } from "@/lib/sheet/pivot";
@@ -2275,10 +2276,44 @@ function usedRangeOf(sheet) {
 export function GuidedLessonView({
   guidedId, onExit, onRecordComplete, onStepInfo, voiceEnabled = true, onVoiceToggle, lesson: lessonProp,
 }) {
-  const lesson = lessonProp ?? LESSONS_BY_ID[guidedId] ?? null;
+  const baseLesson = lessonProp ?? LESSONS_BY_ID[guidedId] ?? null;
+  // Every mode this lesson can be served in (base mode first). Phase 4b added
+  // "outcome" variants to 34 lessons, but the ONLY runner call site passed no
+  // mode — 129 step overrides shipped dark because no UI ever chose one. The
+  // chooser below is that missing call site.
+  const availableModes = baseLesson ? lessonModes(baseLesson) : [];
+  // The served mode. Single-mode lessons start immediately (no dead chooser);
+  // multi-mode lessons park on the chooser until the learner picks — the
+  // runner is constructed ONCE per choice, so the pick must happen before the
+  // session exists (switching mid-lesson would orphan the session's state).
+  const [sessionMode, setSessionMode] = useState(() => {
+    if (!baseLesson) return null;
+    if (availableModes.length <= 1) return availableModes[0] ?? null;
+    return null;
+  });
+  // The lesson AS SERVED: step text/hints/graders merged with the chosen
+  // mode's overrides. Everything below (steps, panel, runner re-seed) must
+  // read this, not baseLesson — reading baseLesson is exactly the bug that
+  // made outcome mode unreachable.
+  const lesson = sessionMode && baseLesson ? resolveLessonMode(baseLesson, sessionMode) : baseLesson;
   const guided = lesson?.mode !== "instructions"; // default "guided"
-  // One runner per mount (the host keys this component by guidedId).
-  const [runner] = useState(() => (lesson && GUIDE.available ? GUIDE.createRunner(lesson) : null));
+  // One runner per mount for single-mode lessons; for multi-mode lessons it is
+  // created by the chooser (the host keys this component by guidedId).
+  const [runner, setRunner] = useState(() =>
+    baseLesson && GUIDE.available && availableModes.length <= 1 ? GUIDE.createRunner(baseLesson) : null
+  );
+  const chooseMode = (m) => {
+    // Runner first, mode second: the runner is what actually serves the
+    // variant (createSession resolves the mode's step overrides), so a mode
+    // state without a matching runner would render outcome text but grade
+    // against nothing.
+    setRunner(GUIDE.available && baseLesson ? GUIDE.createRunner(baseLesson, { mode: m }) : null);
+    setSessionMode(m);
+    // Remember the pick so next time this lesson's chooser defaults to it.
+    // localStorage (not the progress store) on purpose: it is a UI preference
+    // like coop_theme, not learning progress.
+    try { window.localStorage?.setItem(`coop_guided_mode:${baseLesson.id}`, m); } catch { /* ignore */ }
+  };
   const [seedError, setSeedError] = useState("");
   const [toolState, setToolState] = useState(() => {
     if (!lesson) return null;
@@ -2323,11 +2358,14 @@ export function GuidedLessonView({
   // (window.coop.voice) is resolved here and passed in; narration.js stays pure
   // and goes quiet when no bridge or no voice is available.
   useEffect(() => {
-    if (!guided || !voiceEnabled) return;
+    // sessionMode === null means the mode chooser is on screen — narrating a
+    // step the learner cannot see (and may never see in that mode's wording)
+    // would be noise, so stay quiet until the session actually starts.
+    if (!guided || !voiceEnabled || sessionMode === null) return;
     const bridge = typeof window !== "undefined" ? window.coop?.voice ?? null : null;
     speakStep(curStep, { bridge, enabled: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepIndex, guided, voiceEnabled]);
+  }, [stepIndex, guided, voiceEnabled, sessionMode]);
 
   useEffect(() => () => { if (clearTimerRef.current) clearTimeout(clearTimerRef.current); }, []);
 
@@ -2420,6 +2458,60 @@ export function GuidedLessonView({
         <div className="glass" style={{ padding: 24, maxWidth: 640, margin: "0 auto" }}>
           That guided lesson doesn&apos;t exist.
           <button className="btn-ghost" onClick={onExit} style={{ marginTop: 12 }}><Icon name="arrowL" size={14} /> Back</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Multi-mode lesson, no mode chosen yet: the pre-session chooser. Labels
+  // describe the DIFFERENCE in plain language ("guided" vs "outcome" is
+  // jargon a learner has never seen); the copy must convey that one mode
+  // hands you the formula and the other only hands you the problem.
+  if (sessionMode === null) {
+    const MODE_COPY = {
+      guided: {
+        label: "Walk me through it",
+        detail: "Each step names the exact formula and highlights where it goes. Best for the first pass.",
+      },
+      instructions: {
+        label: "Show me the steps",
+        detail: "You get the full step list and check your own work — no spotlight, no auto-advance.",
+      },
+      outcome: {
+        label: "Just give me the problem",
+        detail: "Each step tells you WHAT to produce, not how. No formulas — figure the method out yourself.",
+      },
+    };
+    let remembered = null;
+    try { remembered = window.localStorage?.getItem(`coop_guided_mode:${baseLesson.id}`) ?? null; } catch { /* ignore */ }
+    return (
+      <div style={{ padding: 40 }}>
+        <div className="glass" style={{ padding: 28, maxWidth: 640, margin: "0 auto" }} data-testid="mode-chooser">
+          <button className="btn-ghost" onClick={onExit}><Icon name="arrowL" size={14} /> Back to lesson</button>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--text-1)", margin: "14px 0 4px" }}>{baseLesson.title}</div>
+          <div style={{ fontSize: 13.5, color: "var(--text-2)", marginBottom: 18 }}>
+            How much help do you want? Pick before you start — changing your mind later restarts the lesson.
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {availableModes.map((m) => {
+              const copy = MODE_COPY[m] ?? { label: m, detail: "" };
+              return (
+                <button
+                  key={m}
+                  className="glass glass-btn"
+                  data-testid={`mode-choice-${m}`}
+                  onClick={() => chooseMode(m)}
+                  style={{ display: "block", width: "100%", textAlign: "left", padding: "14px 18px", borderLeft: "3px solid var(--primary-ring)" }}
+                >
+                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--text-1)" }}>
+                    {copy.label}
+                    {remembered === m && <span className="badge badge-primary" style={{ marginLeft: 8, fontSize: 10.5 }}>Your usual</span>}
+                  </div>
+                  <div style={{ fontSize: 12.5, color: "var(--text-2)", marginTop: 3 }}>{copy.detail}</div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
