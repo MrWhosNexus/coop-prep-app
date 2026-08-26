@@ -18,17 +18,36 @@ Grab the file for your machine from the [latest release](https://github.com/MrWh
 
 | You have | Download | First launch |
 |---|---|---|
-| Windows | `Coop Prep-Setup-<version>.exe` | SmartScreen shows a blue box → **More info** → **Run anyway** |
-| Mac (M1/M2/M3/M4) | `Coop Prep-<version>-arm64.dmg` | See "Opening it on a Mac" below |
-| Mac (Intel) | `Coop Prep-<version>-x64.dmg` | See "Opening it on a Mac" below |
-| Linux | `Coop Prep-<version>-x64.AppImage` | `chmod +x` it, then run it |
-| Debian/Ubuntu | `Coop Prep-<version>-x64.deb` | `sudo apt install ./Coop*.deb` |
+| Windows | `Coop-Prep-Setup-0.2.0.exe` | SmartScreen shows a blue box → **More info** → **Run anyway** |
+| Mac (M1/M2/M3/M4) | `Coop-Prep-0.2.0-arm64.dmg` | See "Opening it on a Mac" below |
+| Mac (Intel) | `Coop-Prep-0.2.0-x64.dmg` | See "Opening it on a Mac" below |
+| Linux | `Coop-Prep-0.2.0-x86_64.AppImage` | `chmod +x` it, then run it |
+| Debian/Ubuntu | `Coop-Prep-0.2.0-amd64.deb` | `sudo apt install ./Coop-Prep-*.deb` |
+
+They are large (250–570 MB) because the voice engine ships its own ONNX runtime.
 
 These builds are **not code-signed** — signing certificates cost money we haven't
 spent. That is why your OS warns you. The warning means "nobody paid Apple or
 Microsoft to vouch for this", not "this is malware". Every release is built by
 [GitHub Actions](.github/workflows/release.yml) straight from the source in this
-repo, and each one publishes SHA-512 checksums you can verify.
+repo, and each one publishes SHA-512 checksums.
+
+#### Verifying a download
+
+Since nothing is signed, the checksums are the integrity story. Download
+`SHA512SUMS-<os>.txt` from the same release and check the file you got:
+
+```bash
+shasum -a 512 -c SHA512SUMS-macos-latest.txt
+```
+
+On Windows PowerShell:
+
+```powershell
+Get-FileHash -Algorithm SHA512 .\Coop-Prep-Setup-0.2.0.exe
+```
+
+and compare it against the line in `SHA512SUMS-windows-latest.txt`.
 
 #### Opening it on a Mac
 

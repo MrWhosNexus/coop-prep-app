@@ -63,18 +63,37 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Checksums
-        # Published alongside the installers so anyone can verify a download by
-        # hand — the only integrity story an unsigned build has.
+        # In Node, not shasum. The first version of this step used
+        # `shasum -a 512` and failed ONLY on Windows: the GitHub Windows runner's
+        # Git Bash has no shasum, the `|| true` swallowed it, and the step wrote
+        # a 0-byte file that the upload below then rejected with
+        # "HTTP 400: Bad Content-Length" — a confusing error two steps removed
+        # from its cause. Node is already set up on every runner and behaves
+        # identically on all three.
+        #
+        # No `|| true` anywhere now. A checksum step that cannot fail is a
+        # checksum step that silently publishes nothing, and for unsigned builds
+        # these hashes are the ONLY integrity story a downloader has.
         shell: bash
         run: |
-          cd dist-electron
-          find . -maxdepth 1 -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.zip' \) \
-            -exec shasum -a 512 {} + > "SHA512SUMS-${{ matrix.os }}.txt" || true
-          cat "SHA512SUMS-${{ matrix.os }}.txt"
+          node -e "
+            const fs = require('fs'), crypto = require('crypto'), path = require('path');
+            const dir = 'dist-electron';
+            const exts = ['.dmg', '.exe', '.AppImage', '.deb', '.zip'];
+            const files = fs.readdirSync(dir).filter(f => exts.includes(path.extname(f))).sort();
+            if (!files.length) throw new Error('no installers found in ' + dir + ' — the build produced nothing to checksum');
+            const lines = files.map(f => {
+              const hash = crypto.createHash('sha512').update(fs.readFileSync(path.join(dir, f))).digest('hex');
+              return hash + '  ' + f;
+            });
+            const out = path.join(dir, 'SHA512SUMS-${{ matrix.os }}.txt');
+            fs.writeFileSync(out, lines.join('\n') + '\n');
+            console.log(lines.join('\n'));
+          "
 
       - name: Attach checksums to the release
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${GITHUB_REF_NAME}" "dist-electron/SHA512SUMS-${{ matrix.os }}.txt" --clobber
         shell: bash
+        run: gh release upload "${GITHUB_REF_NAME}" "dist-electron/SHA512SUMS-${{ matrix.os }}.txt" --clobber
