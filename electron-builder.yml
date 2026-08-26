@@ -7,6 +7,8 @@
 # output: 'export' — see electron/README.md).
 
 appId: com.coopprep.desktop
+# The app's DISPLAY name — window title, menu bar, Applications folder. Keeps its
+# space. Artifact filenames deliberately do NOT interpolate it: see artifactName.
 productName: Coop Prep
 copyright: Copyright © 2026
 
@@ -35,6 +37,16 @@ files:
 extraResources:
   - from: out
     to: out
+
+# Artifact filenames are hardcoded "Coop-Prep", never ${productName}.
+#
+# productName has a space, and GitHub REWRITES spaces in uploaded asset names —
+# inconsistently, at that ("Coop-Prep-...dmg" but "Coop.Prep-...zip.blockmap").
+# So a spaced filename is three different strings: what the build wrote, what the
+# release page serves, and what the SHA512SUMS line names. `shasum -c` then fails
+# with "No such file or directory" on a download that is perfectly intact, which
+# is a worse outcome than publishing no checksums at all — it looks like
+# tampering. Pinned by test/packaging.test.js.
 
 asar: true
 
@@ -140,7 +152,7 @@ mac:
     - target: zip
       arch: [arm64, x64]
   category: public.app-category.education
-  artifactName: ${productName}-${version}-${arch}.${ext}
+  artifactName: Coop-Prep-${version}-${arch}.${ext}
   # No Apple Developer ID on this project, so builds ship unsigned. Saying so
   # explicitly stops electron-builder from half-signing with an ad-hoc identity
   # it happens to find in the keychain of whoever ran the build — which
@@ -159,7 +171,7 @@ mac:
 # The .dmg is what a Mac user actually double-clicks; the .zip is what
 # electron-updater consumes. Both are produced from the same build.
 dmg:
-  artifactName: ${productName}-${version}-${arch}.${ext}
+  artifactName: Coop-Prep-${version}-${arch}.${ext}
 
 linux:
   target:
@@ -169,7 +181,7 @@ linux:
       arch: [x64]
   category: Office
   maintainer: coop-prep
-  artifactName: ${productName}-${version}-${arch}.${ext}
+  artifactName: Coop-Prep-${version}-${arch}.${ext}
 
 deb:
   depends:
@@ -184,7 +196,7 @@ win:
   # Inherits the top-level build/icon.png. The old `build/icon.ico` here did not
   # exist in the repo, and electron-builder treats a missing icon path as a hard
   # error — the Windows target could never have built from a clean clone.
-  artifactName: ${productName}-Setup-${version}.${ext}
+  artifactName: Coop-Prep-Setup-${version}.${ext}
 
 nsis:
   # differentialPackage keeps update downloads small — a fix ships as a delta

@@ -114,6 +114,34 @@ describe("electron packaging", () => {
     assert.deepEqual(stale, [], `electron-builder.yml ships paths that do not exist: ${stale.join(", ")}`);
   });
 
+  test("no artifact filename contains a space", () => {
+    // GitHub REWRITES spaces in uploaded release-asset names, and inconsistently:
+    // the same release produced "Coop-Prep-0.2.0-arm64.dmg" and
+    // "Coop.Prep-0.2.0-arm64.zip.blockmap". So a spaced artifactName is three
+    // different strings — what the build wrote, what the release page serves,
+    // and what the SHA512SUMS line names.
+    //
+    // The cost is specific and bad: `shasum -a 512 -c SHA512SUMS-macos-latest.txt`
+    // fails with "No such file or directory" against a download that is perfectly
+    // intact. For unsigned builds the checksum is the whole integrity story, and a
+    // verification step that fails on a GOOD file reads as tampering. That is
+    // worse than publishing no checksums at all.
+    //
+    // Hence: artifactName never interpolates ${productName} (which keeps its space
+    // for the window title and the Applications folder).
+    const yaml = readFileSync(join(ROOT, "electron-builder.yml"), "utf8");
+    const names = [...yaml.matchAll(/^\s*artifactName:\s*(.+?)\s*$/gm)].map((m) => m[1]);
+
+    assert.ok(names.length > 0, "found artifactName entries to check");
+    for (const name of names) {
+      assert.ok(!name.includes(" "), `artifactName "${name}" contains a space`);
+      assert.ok(
+        !name.includes("productName"),
+        `artifactName "${name}" interpolates productName, which has a space in it`,
+      );
+    }
+  });
+
   test("every asset electron-builder.yml references is TRACKED BY GIT, not just present on disk", () => {
     // The regression this exists for, verbatim: `win.icon: build/icon.ico`
     // pointed at a file that was never committed. Whoever added it had it on
