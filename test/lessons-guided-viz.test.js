@@ -46,6 +46,7 @@ import {
   SCATTER_POINTS_BY_GENDER,
 } from "../lib/guide/lessons/tableau-detail.js";
 import { lesson as shelvesGuideLesson } from "../lib/guide/lessons/tableau-shelves-guide.js";
+import { GUIDE_RESOURCES } from "../data/guide-resources.js";
 
 // Guided lessons: spotlight overlay + voice.
 const GUIDED_LESSONS = [
@@ -144,7 +145,12 @@ describe("guided tableau lessons: still validate through createLesson", () => {
 
 const HMDA_PATH = fileURLToPath(new URL("../public/data/hmda-sample.csv", import.meta.url));
 const HMDA_CSV = readFileSync(HMDA_PATH, "utf8");
-const RESOURCES = { "hmda-sample.csv": HMDA_CSV };
+/* The SHIPPED resource map (data/guide-resources.js), not a local copy.
+   Four test files each kept their own one-entry copy, so registering the
+   governance labs broke nine tests across three files with the same
+   "missing resource" error. Importing the real map means a new dataset is
+   one edit, and a test can never hold an older view of what the app ships. */
+const RESOURCES = GUIDE_RESOURCES;
 
 describe("unrecognized expected-spec keys fail loudly (no more silent auto-pass)", () => {
   // Both spec-matching paths must throw: specMatches (the viz engine's hook)

@@ -48,11 +48,17 @@ import { getAIConfig, setAIConfig, migrateLegacyAIConfig, hasAIKey } from "../li
 
 import { extractConcepts, extractFormulas } from "../lib/games/generators.js";
 import { reviewInDeck, horizonTo, ROLLING_WINDOW_DAYS, GRADE } from "../lib/games/srs.js";
+import { GUIDE_RESOURCES } from "../data/guide-resources.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.join(__dirname, "..");
 const HMDA_PATH = path.join(REPO, "public", "data", "hmda-sample.csv");
-const RESOURCES = { "hmda-sample.csv": fs.readFileSync(HMDA_PATH, "utf-8") };
+/* The SHIPPED resource map (data/guide-resources.js), not a local copy.
+   Four test files each kept their own one-entry copy, so registering the
+   governance labs broke nine tests across three files with the same
+   "missing resource" error. Importing the real map means a new dataset is
+   one edit, and a test can never hold an older view of what the app ships. */
+const RESOURCES = GUIDE_RESOURCES;
 
 /** Dashboard.js is JSX — readable as source here, never importable. */
 function readDashboard() {
@@ -1102,7 +1108,7 @@ describe("guided lessons are reachable from their curriculum lessons", () => {
 
   test("every guided lesson's starting state materializes from the bundled CSV", async () => {
     const { startingState } = await import("../lib/guide/checkpoints.js");
-    const resources = { "hmda-sample.csv": HMDA_CSV };
+    const resources = GUIDE_RESOURCES;
     for (const lesson of GUIDED_LESSONS) {
       const { toolState } = startingState(lesson, 0, resources);
       assert.ok(toolState.tool === "sheet" || toolState.tool === "viz", `${lesson.id} starts in a known tool`);

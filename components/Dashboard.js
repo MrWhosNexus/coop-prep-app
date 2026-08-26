@@ -25,6 +25,7 @@ import { HUSTLE_FLASHCARDS } from "@/data/hustle";
 import { CFI_DISCLAIMER } from "@/data/certs/cfi";
 import { CFI_DRILLS } from "@/data/certs/cfi-drills";
 import { HMDA_CSV } from "@/data/hmda-csv";
+import { GUIDE_RESOURCES } from "@/data/guide-resources";
 import { extractConcepts, extractFormulas } from "@/lib/games/generators";
 import { reviewInDeck, horizonTo, dueCardIds } from "@/lib/games/srs";
 import { applyReviewToDeck, toSrsGrades } from "@/lib/exam/review";
@@ -163,7 +164,6 @@ const TOOL_COMPONENTS = {
 const GUIDE = attachGuide(guideRunner);
 // Guided lessons and CFI drills reference datasets by resource key; the CSV
 // ships as a JS string (fetch() is unavailable under file:// in Electron).
-const GUIDE_RESOURCES = { "hmda-sample.csv": HMDA_CSV };
 
 /* ──────────────────────────────────────────────────────────────────────
    Ported from the "COOP Prep" Claude Design component (COOP Prep.dc.html).

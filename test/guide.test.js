@@ -23,12 +23,18 @@ import { lesson as barsLesson, EXPECTED_RATES } from "../lib/guide/lessons/table
 import { createSheet, setCell, setCells, copyCell, loadCsv, getValue } from "../lib/sheet/model.js";
 import { Shelf, putOnShelf, createEncoding } from "../lib/viz/spec.js";
 import { makeField, FieldType, createCalculatedField } from "../lib/viz/fields.js";
+import { GUIDE_RESOURCES } from "../data/guide-resources.js";
 
 // --- Fixtures ----------------------------------------------------------------
 
 const HMDA_PATH = fileURLToPath(new URL("../public/data/hmda-sample.csv", import.meta.url));
 const HMDA_CSV = readFileSync(HMDA_PATH, "utf8");
-const RESOURCES = { "hmda-sample.csv": HMDA_CSV };
+/* The SHIPPED resource map (data/guide-resources.js), not a local copy.
+   Four test files each kept their own one-entry copy, so registering the
+   governance labs broke nine tests across three files with the same
+   "missing resource" error. Importing the real map means a new dataset is
+   one edit, and a test can never hold an older view of what the app ships. */
+const RESOURCES = GUIDE_RESOURCES;
 
 /** The materialized tool state for entering step `i` of a lesson. */
 function stateFor(lesson, i) {
