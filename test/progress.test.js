@@ -1,6 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { defaultState, markComplete, todayISO } from "../lib/progress.js";
+import {
+  defaultState, markComplete, todayISO,
+  markLabComplete, LAB_BASE_XP, LAB_MIN_XP,
+} from "../lib/progress.js";
 
 test("defaultState includes daily + achievements", () => {
   const s = defaultState();
@@ -25,6 +28,35 @@ test("markComplete is idempotent for an already-complete lesson", () => {
   const xpAfterFirst = s.xp;
   s = markComplete(s, "l1", 50);
   assert.equal(s.xp, xpAfterFirst);
+});
+
+/* ── guided-lab crediting ──
+   Labs once counted as inactivity: only markComplete ran the streak/daily
+   math, so a week of lab work reset the streak. These pin that labs credit
+   activity through the IDENTICAL path, score-scale the XP, and cannot be
+   farmed by re-completing. */
+
+test("markLabComplete credits streak, day, and score-scaled XP like a completion", () => {
+  const today = todayISO();
+  let s = defaultState();
+  s = markLabComplete(s, "excel-pivot", 0.8);
+  assert.equal(s.streak, 1);               // lab work IS activity
+  assert.equal(s.lastDay, today);
+  assert.equal(s.xp, Math.round(LAB_BASE_XP * 0.8)); // scaled by lab score
+  assert.equal(s.daily.lessons, 1);
+  assert.equal(s.labs["excel-pivot"].score, 0.8);
+});
+
+test("markLabComplete floors XP so a rough run still counts as activity", () => {
+  const s = markLabComplete(defaultState(), "excel-pivot", 0.01);
+  assert.equal(s.xp, LAB_MIN_XP);
+  assert.equal(s.streak, 1);
+});
+
+test("markLabComplete is idempotent per lab id — same STATE OBJECT back, no XP re-mint", () => {
+  const first = markLabComplete(defaultState(), "excel-pivot", 0.9);
+  const again = markLabComplete(first, "excel-pivot", 1.0); // even a better score
+  assert.equal(again, first); // identity, mirroring markComplete's guard
 });
 
 /* ── fellowship phase model ──
@@ -65,4 +97,22 @@ test("the Dashboard actually consumes the phase model (call-site assertion)", ()
   assert.match(src, /lib\.daysIntoFellowship\(\)/);
   assert.match(src, /phase === "during"/);
   assert.match(src, /Day \$\{dayOf\}/);
+});
+
+/* ── doCompleteLab: the reward-pipeline call site ──
+   Crediting a lab must flow through the SAME action pipeline as lessons
+   (buildRewardAndFinal), so XP toasts / level-ups / achievements fire for lab
+   work, and a re-completed lab comes back `final: null` exactly like a
+   re-completed reading. Imported here (not unit-mocked) so the test asserts
+   the real call path. */
+test("doCompleteLab runs the reward pipeline once and returns final:null on replay", async () => {
+  const { doCompleteLab } = await import("../lib/coop-lib.js");
+  const before = defaultState();
+  const first = doCompleteLab(before, "excel-pivot", 0.8);
+  assert.ok(first.final, "first completion must produce a new state");
+  assert.ok(first.reward.xpGained > 0, "lab completion must mint XP through the reward pipeline");
+  assert.equal(first.final.streak, 1);
+  const replay = doCompleteLab(first.final, "excel-pivot", 1.0);
+  assert.equal(replay.final, null, "a lab must not be farmable");
+  assert.equal(replay.reward.xpGained, 0);
 });

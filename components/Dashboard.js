@@ -450,14 +450,26 @@ export default function Dashboard() {
   function openModule(id) { setView("module"); setActiveModuleId(id); }
   function openTool(id) { setView("tool"); setActiveToolId(id); }
   function openGuided(id) { setActiveGuidedId(id); setGuidedStepInfo(null); setView("guided"); }
-  const recordGuidedComplete = (guidedId, score) =>
-    dispatchTool((prev) => ({
-      ...prev,
+  /* Finishing a guided lab records the score AND credits streak/XP through
+     doCompleteLab — labs are the app's hardest work, and before this they
+     counted as inactivity (only completeLesson advanced the streak). The
+     score record always updates (best-effort UI history); the XP credit is
+     idempotent per lab inside markLabComplete, so re-runs re-record the score
+     but never re-mint XP. */
+  const recordGuidedComplete = (guidedId, score) => {
+    const withRecord = {
+      ...progress,
       tools: {
-        ...(prev.tools ?? {}),
-        guided: { ...(prev.tools?.guided ?? {}), [guidedId]: { score, completedAt: new Date().toISOString() } },
+        ...(progress.tools ?? {}),
+        guided: { ...(progress.tools?.guided ?? {}), [guidedId]: { score, completedAt: new Date().toISOString() } },
       },
-    }));
+    };
+    const res = lib.doCompleteLab(withRecord, guidedId, score);
+    const final = res.final ?? withRecord;
+    persistProgress(final);
+    setProgress(final);
+    if (res.queued.length) enqueue(res.queued);
+  };
   function dispatchTool(updater) {
     setProgress((prev) => { const next = updater(prev); persistProgress(next); return next; });
   }

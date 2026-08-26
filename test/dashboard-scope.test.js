@@ -287,3 +287,15 @@ describe("Finding 11 — the built export self-hosts the font", () => {
     assert.match(htmlTag, /class="[^"]*variable[^"]*"/, "next/font's variable class must be applied");
   });
 });
+
+// ==============================================================================
+describe("Dashboard.js wiring — guided-lab completion credits progress", () => {
+  test("recordGuidedComplete routes through lib.doCompleteLab and persists its final state", () => {
+    // Labs used to record a score into tools.guided and stop — a week of lab
+    // work counted as inactivity. The credit must go through the real action.
+    assert.match(DASHBOARD_SRC, /const res = lib\.doCompleteLab\(withRecord, guidedId, score\)/);
+    assert.match(DASHBOARD_SRC, /const final = res\.final \?\? withRecord/);
+    // ...and the GuidedHost is actually wired to it.
+    assert.match(DASHBOARD_SRC, /onRecordComplete=\{recordGuidedComplete\}/);
+  });
+});

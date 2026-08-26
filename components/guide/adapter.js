@@ -56,7 +56,9 @@ export function attachGuide(guideModule) {
   ) {
     return {
       available: true,
-      createRunner: (lesson) => createSessionRunner(guideModule, lesson),
+      // opts pass through to createSession — {mode} selects a declared
+      // lesson-mode variant (spec.js LESSON_MODES); omitted = base mode.
+      createRunner: (lesson, opts) => createSessionRunner(guideModule, lesson, opts),
     };
   }
 
@@ -80,8 +82,8 @@ export function attachGuide(guideModule) {
  * @param {Object} g the lib/guide/runner.js module
  * @param {Object} lesson a GuidedLesson (lib/guide/spec.js createLesson output)
  */
-function createSessionRunner(g, lesson) {
-  let session = g.createSession(lesson);
+function createSessionRunner(g, lesson, opts) {
+  let session = g.createSession(lesson, opts);
   return {
     lesson,
     /** The current plain-JSON session (persist with serialize()). */

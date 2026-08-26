@@ -11,6 +11,7 @@ import { grade, GRADERS, resolveSheet, toPlain } from "../lib/guide/graders.js";
 import {
   createSession, currentStep, submitStep, requestHint, skipStep, goToStep,
   isComplete, lessonScore, hintPenalty, HINT_PENALTIES,
+  attemptPenalty, ATTEMPT_PENALTY_FLOOR,
   serializeSession, deserializeSession,
 } from "../lib/guide/runner.js";
 import { checkpointForStep, materializeCheckpoint, startingState } from "../lib/guide/checkpoints.js";
@@ -828,6 +829,31 @@ describe("runner: hints, attempts, scoring, persistence", () => {
     assert.equal(session.stepIndex, 2);
   });
 
+  test("retry pricing: a blind retry is never cheaper than the mildest hint", () => {
+    // The exploit this closes: hints cost 10% but resubmission was free, so
+    // guess-and-check strictly dominated asking for help.
+    assert.equal(attemptPenalty(1), 1); // the passing submission itself is free
+    assert.equal(attemptPenalty(2), 0.9); // one failed retry costs exactly a nudge
+    for (let a = 2; a <= 12; a++) {
+      assert.ok(attemptPenalty(a) <= HINT_PENALTIES[1], `${a} attempts must cost at least a nudge`);
+    }
+    assert.equal(attemptPenalty(50), ATTEMPT_PENALTY_FLOOR); // floored at show-me's 0.3
+    assert.equal(ATTEMPT_PENALTY_FLOOR, HINT_PENALTIES[HINT_PENALTIES.length - 1]);
+  });
+
+  test("retry pricing: submitStep applies the attempt penalty to the passing score (call site)", () => {
+    let session = createSession(xlookupLesson);
+    const wrong = stateFor(xlookupLesson, 0);
+    setCell(wrong.sheets.Regions, "B4", "definitely not a region");
+    session = submitStep(session, xlookupLesson, wrong).session; // 1 failed attempt
+    const right = stateFor(xlookupLesson, 0);
+    setCell(right.sheets.Regions, "B4", "Northeast");
+    session = submitStep(session, xlookupLesson, right).session;
+    assert.equal(session.steps[0].status, "passed");
+    // grade 1.0 x hintPenalty(0)=1 x attemptPenalty(2)=0.9 — the retry was priced.
+    assert.equal(session.steps[0].score, 0.9);
+  });
+
   test("skipStep gives up for zero credit and moves on", () => {
     let session = createSession(pivotLesson);
     session = skipStep(session, pivotLesson);
@@ -844,7 +870,13 @@ describe("runner: hints, attempts, scoring, persistence", () => {
     session = submitStep(session, pivotLesson, ts).session;
     const best = session.steps[1].bestScore;
     assert.ok(best > 0);
-    assert.equal(lessonScore(session, pivotLesson).steps[1].credit, best * 0.5);
+    // Retry pricing (deliberate change): the one FAILED submission above is no
+    // longer free — it costs an attemptPenalty of 0.9, the price of a nudge.
+    // Half-credit for the unfinished step then multiplies by that penalty:
+    // best * 0.5 * 0.9. Verified by hand against the scoring model in
+    // lib/guide/runner.js; this is a test update for changed behaviour, not a
+    // loosened assertion.
+    assert.equal(lessonScore(session, pivotLesson).steps[1].credit, best * 0.5 * 0.9);
   });
 
   test("sessions survive a JSON round trip mid-lesson and resume to completion", () => {
@@ -865,6 +897,23 @@ describe("runner: hints, attempts, scoring, persistence", () => {
     const out = submitStep(restored, xlookupLesson, ts2);
     assert.equal(out.result.pass, true);
     assert.equal(out.session.stepIndex, 2);
+  });
+
+  test("a NON-DEFAULT mode survives the JSON round trip", () => {
+    // Regression pin: deserializeSession once rebuilt the session without its
+    // "mode" field, so an outcome-mode session resumed as the scaffolded
+    // default after a restart. Round-tripping the DEFAULT mode would pass even
+    // with that bug (the fallback masks it), so this must use a non-default
+    // mode on a lesson that declares one.
+    const session = createSession(pivotLesson, { mode: "outcome" });
+    assert.notEqual(pivotLesson.mode, "outcome"); // guard: it really is non-default
+    const restored = deserializeSession(JSON.stringify(serializeSession(session)), pivotLesson);
+    assert.equal(restored.mode, "outcome");
+    assert.deepEqual(restored, session);
+    // a saved mode the lesson no longer declares falls back to the base mode
+    const stale = serializeSession(session);
+    stale.mode = "no-such-mode";
+    assert.equal(deserializeSession(stale, pivotLesson).mode, pivotLesson.mode);
   });
 
   test("deserializeSession rejects the wrong lesson and reconciles changed steps by id", () => {

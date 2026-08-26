@@ -130,8 +130,11 @@ describe("guide/spec: step.spotlightLabel", () => {
 
 // ==============================================================================
 describe("guide/spec: lesson.mode", () => {
-  test("LESSON_MODES lists guided and instructions", () => {
-    assert.deepEqual(LESSON_MODES, ["guided", "instructions"]);
+  test("LESSON_MODES lists guided, instructions, and outcome", () => {
+    // "outcome" joined the roster when the unscaffolded variant landed
+    // (lib/guide/spec.js). The old two-mode expectation described the world
+    // before that assignment; this is a deliberate test update, not a loosening.
+    assert.deepEqual(LESSON_MODES, ["guided", "instructions", "outcome"]);
   });
 
   test("accepts mode: instructions", () => {
